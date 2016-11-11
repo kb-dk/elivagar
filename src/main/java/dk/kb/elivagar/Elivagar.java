@@ -120,9 +120,6 @@ public class Elivagar {
      */
     private static void marshalBooks(MediaServiceAsmxSoap mediaService, String serviceNS)
             throws JAXBException, PropertyException {
-
-        // Toggle filename for readability (debugging)
-        boolean debugging = true;
         
         String book_Path = null;
 
@@ -139,12 +136,8 @@ public class Elivagar {
         JAXBElement<Book> rootElement = null;
 
         for (Book book : books.getBook()) {
-            if (debugging == true) {
-                book_Path = Elivagar.booksPath + book.getBookId().toString() +  Elivagar.XML_SUFFIX;
-            }
-            else {
-                book_Path = Elivagar.booksPath + book.getIdentifier().toString() + Elivagar.XML_SUFFIX;
-            }
+            book_Path = Elivagar.booksPath + book.getBookId().toString() +  Elivagar.XML_SUFFIX;
+            
             // Debug printing
             System.out.println(book_Path);
 
