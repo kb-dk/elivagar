@@ -20,10 +20,23 @@
       <artifactId>pubhubWSClient</artifactId>
       <version>0.1</version>
     </dependency>
+    <!-- TESTING -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>6.9.10</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>1.10.19</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jaccept</groupId>
+      <artifactId>jaccept-core</artifactId>
+      <version>0.4</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

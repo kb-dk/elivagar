@@ -24,3 +24,8 @@ Update the version variable in pom.xml
 
 Produce the new package using Maven
 
+
+Running the unit-test against pubhub
+----------------------------------------------------------
+The tests running against pubhub requires a file with the license key guid.
+This file must be placed in the home folder of the linux-user, and it must be named 'pubhub-license.txt'.

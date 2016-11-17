@@ -27,56 +27,26 @@ import dk.pubhub.service.BookId;
  */
 public class Elivagar {
 
-    // TODO Should be moved to config file 
-    private static final String LICENSE_KEY_GUID = "WRITE_YOUR_LICENSE_KEY_GUID_HERE";
-    
-    private static String userHome = System.getProperty("user.home");
-
-    private static String bookIdsPath = userHome + "/Tmp/BookIDs/";
-    private static String booksPath = userHome + "/Tmp/Books/";
-
-
     private static final String XML_SUFFIX = ".xml";
+
+    protected final String licenseKeyGuid;
+    protected final MediaServiceAsmxSoap mediaService;
+    protected final String serviceNS;
     
     /**
      * Constructor for the Elivagar class. 
-     * @param args List of arguments delivered from the commandline.
-     * So far all arguments will be ignored.
+     * @param licenseKeyGuid The license key 
      * @throws JAXBException When XML marshaling fail
      * @throws PropertyException When the Marshaller property can not be set
      * @throws IOException When creating a directory fail
      */
-    public void elivagar() 
-            throws PropertyException, JAXBException, IOException {
-        
-        // Controls for debugging
-        boolean marshal_bookIDs_to_individual_files = true;
-        boolean marshal_books_to_individual_files = true;
+    public Elivagar(String licenseKeyGuid) throws PropertyException, JAXBException, IOException {
+        this.licenseKeyGuid = licenseKeyGuid;
        
-        Elivagar.createDirectory(bookIdsPath);
-        Elivagar.createDirectory(booksPath);
-        
         MediaServiceAsmx mediaServiceAsmx = new MediaServiceAsmx();
-        
         QName serviceName = mediaServiceAsmx.getServiceName();
-        String serviceNS = serviceName.getNamespaceURI();
-        
-        MediaServiceAsmxSoap mediaService = mediaServiceAsmx.getMediaServiceAsmxSoap();
-
-        // Marshal BookIDs to individual file
-        if (marshal_bookIDs_to_individual_files) {
-            marshalBookIDs(mediaService, serviceNS);
-            // Debugging
-            System.out.println("Marshaled all BookIDs to individual files");
-
-        }
-       
-        // Marshal Books to individual file
-        if (marshal_books_to_individual_files) {
-            marshalBooks(mediaService, serviceNS);
-            // Debugging
-            System.out.println("Marshaled all Books to individual files");
-        }
+        serviceNS = serviceName.getNamespaceURI();
+        mediaService = mediaServiceAsmx.getMediaServiceAsmxSoap();
     }
 
     /**
@@ -86,13 +56,9 @@ public class Elivagar {
      * @throws JAXBException When XML marshaling fail
      * @throws PropertyException When the Marshaller property can not be set
      */
-    private static void marshalBookIDs(MediaServiceAsmxSoap mediaService, String serviceNS) 
-            throws JAXBException, PropertyException {
-
-        String BookID_path;
-        
+    public void marshalBookIDs(File outputDir) throws JAXBException, PropertyException {
         // Fetch all bookIDs from PubHub
-        ArrayOfBookId BookIDs = mediaService.listAllBookIds(Elivagar.LICENSE_KEY_GUID);
+        ArrayOfBookId BookIDs = mediaService.listAllBookIds(licenseKeyGuid);
         // Debug printing
         System.out.println("Got all BookIDs");
 
@@ -102,12 +68,12 @@ public class Elivagar {
         marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
    
         for (BookId book : BookIDs.getBookId()) {
-            BookID_path = Elivagar.bookIdsPath + book.getValue().toString() + Elivagar.XML_SUFFIX;
+            File bookIdFile = new File(outputDir, book.getValue().toString() + Elivagar.XML_SUFFIX);
             // Debug printing
-            System.out.println(BookID_path);
+            System.out.println(bookIdFile.getAbsolutePath());
 
             marshaller.marshal(new JAXBElement<BookId>(new QName(serviceNS, BookId.class.getSimpleName()), 
-                    BookId.class, book), new File(BookID_path));
+                    BookId.class, book), bookIdFile);
         }
     }
 
@@ -118,16 +84,13 @@ public class Elivagar {
      * @throws JAXBException When XML marshaling fail
      * @throws PropertyException When the Marshaller property can not be set
      */
-    private static void marshalBooks(MediaServiceAsmxSoap mediaService, String serviceNS)
-            throws JAXBException, PropertyException {
+    public void marshalBooks(File outputDir) throws JAXBException, PropertyException {
 
         // Toggle filename for readability (debugging)
         boolean debugging = true;
         
-        String book_Path = null;
-
         // Fetch all books from PubHub
-        ArrayOfBook books = mediaService.listAllBooks(Elivagar.LICENSE_KEY_GUID);
+        ArrayOfBook books = mediaService.listAllBooks(licenseKeyGuid);
         // Debug printing
         System.out.println("Got Books");
         
@@ -139,30 +102,19 @@ public class Elivagar {
         JAXBElement<Book> rootElement = null;
 
         for (Book book : books.getBook()) {
+            File bookFile;
             if (debugging == true) {
-                book_Path = Elivagar.booksPath + book.getBookId().toString() +  Elivagar.XML_SUFFIX;
+                bookFile = new File(outputDir, book.getBookId().toString() +  Elivagar.XML_SUFFIX);
             }
             else {
-                book_Path = Elivagar.booksPath + book.getIdentifier().toString() + Elivagar.XML_SUFFIX;
+                bookFile = new File(outputDir, book.getIdentifier().toString() +  Elivagar.XML_SUFFIX);
             }
             // Debug printing
-            System.out.println(book_Path);
+            System.out.println(bookFile.getAbsolutePath());
 
             rootElement = new JAXBElement<Book>(new QName(serviceNS, Book.class.getSimpleName()), 
                     Book.class, book);
-            marshaller.marshal(rootElement, new File(book_Path));
-        }
-    }
-    /**
-     * Create or reuse directory
-     * @param dirPath Path to directory
-     * @throws IOException When creating a directory fail
-     */
-    private static void createDirectory(String dirPath) 
-            throws IOException {
-        Path path = Paths.get(dirPath);
-        if (!Files.exists(path)) {
-                Files.createDirectories(path);
+            marshaller.marshal(rootElement, bookFile);
         }
     }
 }
