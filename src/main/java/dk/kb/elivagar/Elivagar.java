@@ -84,16 +84,7 @@ public class Elivagar {
      * @throws JAXBException When XML marshaling fail
      * @throws PropertyException When the Marshaller property can not be set
      */
-<<<<<<< HEAD
-    public void marshalBooks(File outputDir) throws JAXBException, PropertyException {
-
-        // Toggle filename for readability (debugging)
-        boolean debugging = true;
-=======
-    private static void marshalBooks(MediaServiceAsmxSoap mediaService, String serviceNS)
-            throws JAXBException, PropertyException {
->>>>>>> cddffe9e3605dfc77c711847f893cc1cf4bcf826
-        
+    public void marshalBooks(File outputDir) throws JAXBException, PropertyException {        
         // Fetch all books from PubHub
         ArrayOfBook books = mediaService.listAllBooks(licenseKeyGuid);
         // Debug printing
@@ -107,18 +98,7 @@ public class Elivagar {
         JAXBElement<Book> rootElement = null;
 
         for (Book book : books.getBook()) {
-<<<<<<< HEAD
-            File bookFile;
-            if (debugging == true) {
-                bookFile = new File(outputDir, book.getBookId().toString() +  Elivagar.XML_SUFFIX);
-            }
-            else {
-                bookFile = new File(outputDir, book.getIdentifier().toString() +  Elivagar.XML_SUFFIX);
-            }
-=======
-            book_Path = Elivagar.booksPath + book.getBookId().toString() +  Elivagar.XML_SUFFIX;
-            
->>>>>>> cddffe9e3605dfc77c711847f893cc1cf4bcf826
+            File bookFile = new File(outputDir, book.getBookId().toString() +  Elivagar.XML_SUFFIX);
             // Debug printing
             System.out.println(bookFile.getAbsolutePath());
 
