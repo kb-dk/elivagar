@@ -22,10 +22,12 @@ public class ElivagarTest extends ExtendedTestCase {
     String bookIdsPath = baseDir + "/BookIDs/";
     String modifiedBookIdsPath = baseDir + "/ModifiedBookIDs/";
     String booksPath = baseDir + "/Books/";
+    String modifiedBooksPath = baseDir + "/ModifiedBooks/";
     
     File bookIdsDir;
     File modifiedBookIdsDir;
     File booksDir;
+    File modifiedBooksDir;
 
     Long MILLIS_PER_YEAR = 31556908800L; // from wiki
     
@@ -44,6 +46,7 @@ public class ElivagarTest extends ExtendedTestCase {
         bookIdsDir = FileUtils.createDirectory(bookIdsPath);
         modifiedBookIdsDir = FileUtils.createDirectory(modifiedBookIdsPath);
         booksDir = FileUtils.createDirectory(booksPath);
+        modifiedBooksDir = FileUtils.createDirectory(modifiedBooksPath);
         
         elivagar = new Elivagar(license);
     }
@@ -66,11 +69,21 @@ public class ElivagarTest extends ExtendedTestCase {
         Assert.assertEquals(bookIdsDir.list().length, count);
     }
     
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void testElivagarRetrievingModifiedBookIDs() throws Exception {
         int count = 10;
         Date oneYearAgo = new Date(System.currentTimeMillis()-MILLIS_PER_YEAR);
         elivagar.downloadBookIDsAfterModifyDate(modifiedBookIdsDir, oneYearAgo, count);
+        System.out.println("Marshaled all BookIDs to individual files");
+
+//        Assert.assertEquals(bookIdsDir.list().length, count);
+    }
+    
+    @Test(enabled = true)
+    public void testElivagarRetrievingModifiedBooks() throws Exception {
+        int count = 10;
+        Date oneYearAgo = new Date(System.currentTimeMillis()-MILLIS_PER_YEAR);
+        elivagar.downloadBooksAfterModifyDate(modifiedBooksDir, oneYearAgo, count);
         System.out.println("Marshaled all BookIDs to individual files");
 
 //        Assert.assertEquals(bookIdsDir.list().length, count);
