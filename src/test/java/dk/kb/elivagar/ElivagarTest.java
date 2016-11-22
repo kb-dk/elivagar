@@ -18,16 +18,9 @@ public class ElivagarTest extends ExtendedTestCase {
     String license;
     
 //    String userHome = System.getProperty("user.home");
-    String baseDir = "tempDir";
-    String bookIdsPath = baseDir + "/BookIDs/";
-    String modifiedBookIdsPath = baseDir + "/ModifiedBookIDs/";
-    String booksPath = baseDir + "/Books/";
-    String modifiedBooksPath = baseDir + "/ModifiedBooks/";
+    String baseDirPath = "tempDir";
     
-    File bookIdsDir;
-    File modifiedBookIdsDir;
-    File booksDir;
-    File modifiedBooksDir;
+    File baseDir;
 
     Long MILLIS_PER_YEAR = 31556908800L; // from wiki
     
@@ -43,38 +36,35 @@ public class ElivagarTest extends ExtendedTestCase {
         }
         license = TestFileUtils.readFile(passwordFile);
         
-        bookIdsDir = FileUtils.createDirectory(bookIdsPath);
-        modifiedBookIdsDir = FileUtils.createDirectory(modifiedBookIdsPath);
-        booksDir = FileUtils.createDirectory(booksPath);
-        modifiedBooksDir = FileUtils.createDirectory(modifiedBooksPath);
+        baseDir = FileUtils.createDirectory(baseDirPath);
         
-        elivagar = new Elivagar(license);
+        elivagar = new Elivagar(license, baseDir);
     }
     
     @Test(enabled = false)
     public void testElivagarRetrievingBooks() throws Exception {
         int count = 10;
-        elivagar.downloadAllBooks(booksDir, count);
+        elivagar.retrieveAllBooks(count);
         System.out.println("Marshaled all Books to individual files");
 
-        Assert.assertEquals(booksDir.list().length, count);
+        Assert.assertEquals(baseDir.list().length, count);
     }
     
     @Test(enabled = false)
     public void testElivagarRetrievingBookIDs() throws Exception {
-        int count = 10;
-        elivagar.downloadAllBookIDs(bookIdsDir, count);
-        System.out.println("Marshaled all BookIDs to individual files");
-
-        Assert.assertEquals(bookIdsDir.list().length, count);
+//        int count = 10;
+//        elivagar.downloadAllBookIDs(bookIdsDir, count);
+//        System.out.println("Marshaled all BookIDs to individual files");
+//
+//        Assert.assertEquals(bookIdsDir.list().length, count);
     }
     
     @Test(enabled = false)
     public void testElivagarRetrievingModifiedBookIDs() throws Exception {
-        int count = 10;
-        Date oneYearAgo = new Date(System.currentTimeMillis()-MILLIS_PER_YEAR);
-        elivagar.downloadBookIDsAfterModifyDate(modifiedBookIdsDir, oneYearAgo, count);
-        System.out.println("Marshaled all BookIDs to individual files");
+//        int count = 10;
+//        Date oneYearAgo = new Date(System.currentTimeMillis()-MILLIS_PER_YEAR);
+//        elivagar.downloadBookIDsAfterModifyDate(modifiedBookIdsDir, oneYearAgo, count);
+//        System.out.println("Marshaled all BookIDs to individual files");
 
 //        Assert.assertEquals(bookIdsDir.list().length, count);
     }
@@ -83,9 +73,9 @@ public class ElivagarTest extends ExtendedTestCase {
     public void testElivagarRetrievingModifiedBooks() throws Exception {
         int count = 10;
         Date oneYearAgo = new Date(System.currentTimeMillis()-MILLIS_PER_YEAR);
-        elivagar.downloadBooksAfterModifyDate(modifiedBooksDir, oneYearAgo, count);
+        elivagar.retrieveModifiedBooks(oneYearAgo, count);
         System.out.println("Marshaled all BookIDs to individual files");
 
-//        Assert.assertEquals(bookIdsDir.list().length, count);
+        Assert.assertEquals(baseDir.list().length, count);
     }
 }
