@@ -16,7 +16,7 @@ import dk.pubhub.service.ModifiedBookList;
 /**
  * Class for retrieving the data from Pubhub.
  */
-public class PubhubRetriever {
+public class PubhubMetadataRetriever {
 
     /** The license key for pubhub.*/
     protected final String licenseKey;
@@ -30,7 +30,7 @@ public class PubhubRetriever {
      * Constructor.
      * @param licenseKey The license key for pubhub.
      */
-    public PubhubRetriever(String licenseKey) {
+    public PubhubMetadataRetriever(String licenseKey) {
         this.licenseKey = licenseKey;
         
         MediaServiceAsmx mediaServiceAsmx = new MediaServiceAsmx();

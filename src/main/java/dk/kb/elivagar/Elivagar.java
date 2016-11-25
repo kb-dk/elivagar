@@ -1,40 +1,16 @@
 package dk.kb.elivagar;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
 
 import dk.kb.elivagar.pubhub.PubhubPacker;
-import dk.kb.elivagar.pubhub.PubhubRetriever;
-import dk.kb.elivagar.utils.CalendarUtils;
-import dk.kb.elivagar.utils.FileUtils;
-import dk.kb.elivagar.utils.StringUtils;
-import dk.pubhub.service.ArrayOfBook;
-import dk.pubhub.service.ArrayOfBookId;
-import dk.pubhub.service.ArrayOfSubject;
+import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
 import dk.pubhub.service.Book;
-import dk.pubhub.service.MediaServiceAsmx;
-import dk.pubhub.service.MediaServiceAsmxSoap;
-import dk.pubhub.service.ModifiedBookIdList;
-import dk.pubhub.service.ModifiedBookList;
-import dk.pubhub.service.Subject;
-import dk.pubhub.service.BookId;
-import dk.pubhub.service.Image;
 
 /**
  * Class for instantiating the Elivagar workflow.
@@ -45,8 +21,9 @@ public class Elivagar {
     /** The license key GUID for pub-hub.*/
     protected final String licenseKeyGuid;
     
-    protected final PubhubRetriever retriever;
-    
+    /** The retriever for Pubhub.*/
+    protected final PubhubMetadataRetriever retriever;
+    /** The packer of the Pubhub data.*/
     protected final PubhubPacker packer;
     
     /**
@@ -58,7 +35,7 @@ public class Elivagar {
      */
     public Elivagar(String licenseKeyGuid, File outputDir) {
         this.licenseKeyGuid = licenseKeyGuid;
-        this.retriever = new PubhubRetriever(licenseKeyGuid);
+        this.retriever = new PubhubMetadataRetriever(licenseKeyGuid);
         this.packer = new PubhubPacker(outputDir, retriever.getServiceNamespace());
     }
     
@@ -91,7 +68,7 @@ public class Elivagar {
             packer.packBook(book);
         }
     }
-//    
+    
 //    /**
 //     * Prints the book ids.
 //     * @param bookIDs The book id elements to print.
