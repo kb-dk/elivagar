@@ -25,5 +25,14 @@ public class CalendarUtils {
         } catch (Exception e) {
             throw new IllegalStateException("Could not convert the date '" + date + "' into the xml format.", e);
         }
-}
+    }
+    
+    /**
+     * Turns a XMLGregorianCalendar date into a regular Java date.
+     * @param xmlDate The xml date.
+     * @return The Java date.
+     */
+    public static Date getDateFromXmlGregorianCalendar(XMLGregorianCalendar xmlDate) {
+        return xmlDate.toGregorianCalendar().getTime();
+    }
 }

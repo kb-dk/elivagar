@@ -13,9 +13,6 @@ import java.util.List;
  * Utility class for handling standard stream issues.
  */
 public final class StreamUtils {
-    /** Private constructor to prevent instantiation of this utility class.*/
-    private StreamUtils() {}
-    
     /** The default buffer size. 32 kb. */
     private static final int IO_BUFFER_SIZE = 32*1024;
     

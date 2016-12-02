@@ -41,5 +41,11 @@ public class StringUtilsTest extends ExtendedTestCase {
         String name = UUID.randomUUID().toString();
         
         Assert.assertEquals(StringUtils.getPrefix(name), name);
-    }    
+    }
+    
+    @Test
+    public void testConstructor() {
+        new StringUtils();
+    }
+
 }
