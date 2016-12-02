@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileAttribute;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,7 +78,7 @@ public class PubhubPacker {
      * @throws IOException If an issue occurs when retrieving the directory, or creating or downloading the files.
      */
     public void packBook(Book book) throws JAXBException, IOException {
-        File bookDir = FileUtils.createDirectory(baseDir.getAbsolutePath() + "/" + book.getBookId() + "/");
+        File bookDir = getBookDir(book.getBookId());
         
         JAXBElement<Book> rootElement = null;
         Marshaller marshaller = getMarshallerForClass(book.getClass());
@@ -93,5 +95,29 @@ public class PubhubPacker {
                 httpClient.performDownload(os, new URL(image.getValue()));
             }
         }
+    }
+    
+    /**
+     * Packs a file for the book. This is expected to be the content file, either pdf or epub.
+     * This makes a symbolic link to the file from the book-folder.
+     * It is a prerequisite that the is file has the name of the ID.
+     * @param bookFile The file for the book.
+     */
+    public void packFileForBook(File bookFile) throws IOException {
+        String id = StringUtils.getSuffix(bookFile.getName());
+        File bookDir = getBookDir(id);
+        File symbolicBookFile = new File(bookDir, bookFile.getName());
+        
+        Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
+    }
+    
+    /**
+     * 
+     * @param id
+     * @return
+     * @throws IOException
+     */
+    protected File getBookDir(String id) throws IOException {
+        return FileUtils.createDirectory(baseDir.getAbsolutePath() + "/" + id + "/");
     }
 }

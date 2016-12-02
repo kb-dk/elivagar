@@ -18,8 +18,8 @@ import dk.pubhub.service.Book;
  */
 public class Elivagar {
 
-    /** The license key GUID for pub-hub.*/
-    protected final String licenseKeyGuid;
+    /** The configuration for pubhub.*/
+    protected final Configuration conf;
     
     /** The retriever for Pubhub.*/
     protected final PubhubMetadataRetriever retriever;
@@ -28,15 +28,15 @@ public class Elivagar {
     
     /**
      * Constructor for the Elivagar class. 
-     * @param licenseKeyGuid The license key 
+     * @param conf The configuration for elivagar. 
      * @throws JAXBException When XML marshaling fail
      * @throws PropertyException When the Marshaller property can not be set
      * @throws IOException When creating a directory fail
      */
-    public Elivagar(String licenseKeyGuid, File outputDir) {
-        this.licenseKeyGuid = licenseKeyGuid;
-        this.retriever = new PubhubMetadataRetriever(licenseKeyGuid);
-        this.packer = new PubhubPacker(outputDir, retriever.getServiceNamespace());
+    public Elivagar(Configuration conf) {
+        this.conf = conf;
+        this.retriever = new PubhubMetadataRetriever(conf.getLicenseKey());
+        this.packer = new PubhubPacker(conf.getOutputDir(), retriever.getServiceNamespace());
     }
     
     /**
@@ -66,6 +66,20 @@ public class Elivagar {
         for(int i = 0; i < books.size() && i < max; i++) {
             Book book = books.get(i);
             packer.packBook(book);
+        }
+    }
+    
+    /**
+     * Packs the files for the books into the right
+     * It is asserted, that the book files has the name of the 
+     */
+    public void packFilesForBooks() {
+        for(File fileForBook : conf.getFileDir().listFiles()) {
+            try {
+                packer.packFileForBook(fileForBook);
+            } catch (IOException e) {
+                // TODO: log this
+            }
         }
     }
     

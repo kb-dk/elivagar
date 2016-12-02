@@ -13,8 +13,7 @@ public class FileUtils {
      * @param dirPath Path to directory
      * @throws IOException When creating a directory fail
      */
-    public static File createDirectory(String dirPath) 
-            throws IOException {
+    public static File createDirectory(String dirPath) throws IOException {
         Path path = Paths.get(dirPath);
         if (!Files.exists(path)) {
                 Files.createDirectories(path);

@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class TestFileUtils {
 
@@ -18,5 +21,23 @@ public class TestFileUtils {
 
             return res.toString();
         }
+    }
+    
+    public static File createEmptyDirectory(String dirPath) throws IOException {
+        Path path = Paths.get(dirPath);
+        if(Files.exists(path)) {
+            deleteFile(path.toFile());
+        }
+        Files.createDirectories(path);
+        return new File(dirPath);
+    }
+    
+    public static void deleteFile(File file) {
+        if(file.isDirectory()) {
+            for(File f : file.listFiles()) {
+                deleteFile(f);
+            }
+        }
+        file.delete();
     }
 }

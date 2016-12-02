@@ -2,6 +2,8 @@ package dk.kb.elivagar;
 
 import java.io.File;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jaccept.structure.ExtendedTestCase;
 import org.testng.Assert;
@@ -36,9 +38,14 @@ public class ElivagarTest extends ExtendedTestCase {
         }
         license = TestFileUtils.readFile(passwordFile);
         
-        baseDir = FileUtils.createDirectory(baseDirPath);
+        baseDir = TestFileUtils.createEmptyDirectory(baseDirPath);
         
-        elivagar = new Elivagar(license, baseDir);
+        Map<String, String> confMap = new HashMap<String, String>();
+        confMap.put(Configuration.Constants.CONF_FILE_DIR, baseDir.getAbsolutePath());
+        confMap.put(Configuration.Constants.CONF_OUTPUT_DIR, baseDir.getAbsolutePath());
+        confMap.put(Configuration.Constants.CONF_LICENSE_KEY, license);
+        Configuration conf = new Configuration(confMap);
+        elivagar = new Elivagar(conf);
     }
     
     @Test(enabled = false)
