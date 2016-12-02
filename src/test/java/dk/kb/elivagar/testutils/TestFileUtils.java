@@ -2,6 +2,7 @@ package dk.kb.elivagar.testutils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,5 +40,11 @@ public class TestFileUtils {
             }
         }
         file.delete();
+    }
+    
+    public static void createFile(File outputFile, String content) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            fos.write(content.getBytes());
+        }
     }
 }

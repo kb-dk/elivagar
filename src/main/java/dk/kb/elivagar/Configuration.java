@@ -1,7 +1,10 @@
 package dk.kb.elivagar;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
+
+import dk.kb.elivagar.utils.FileUtils;
 
 /**
  * Configuration for Elivagar.
@@ -22,9 +25,10 @@ public class Configuration {
     /**
      * Constructor.
      * @param confMap The YAML map for the configuration.
+     * @throws IOException If the output directory does not exist and cannot be created.
      */
-    public Configuration(Map<String, String> confMap) {
-        outputDir = new File(confMap.get(Constants.CONF_OUTPUT_DIR));
+    public Configuration(Map<String, String> confMap) throws IOException {
+        outputDir = FileUtils.createDirectory(confMap.get(Constants.CONF_OUTPUT_DIR));
         licenseKey = confMap.get(Constants.CONF_LICENSE_KEY);
         fileDir = new File(confMap.get(Constants.CONF_FILE_DIR));
     }

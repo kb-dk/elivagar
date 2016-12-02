@@ -1,14 +1,17 @@
 package dk.kb.elivagar;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.jaccept.structure.ExtendedTestCase;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import dk.kb.elivagar.testutils.TestFileUtils;
@@ -21,6 +24,7 @@ public class ElivagarTest extends ExtendedTestCase {
     
 //    String userHome = System.getProperty("user.home");
     String baseDirPath = "tempDir";
+    String bookFilesDirPath = baseDirPath + "/bookFiles";
     
     File baseDir;
 
@@ -41,11 +45,16 @@ public class ElivagarTest extends ExtendedTestCase {
         baseDir = TestFileUtils.createEmptyDirectory(baseDirPath);
         
         Map<String, String> confMap = new HashMap<String, String>();
-        confMap.put(Configuration.Constants.CONF_FILE_DIR, baseDir.getAbsolutePath());
         confMap.put(Configuration.Constants.CONF_OUTPUT_DIR, baseDir.getAbsolutePath());
+        confMap.put(Configuration.Constants.CONF_FILE_DIR, new File(bookFilesDirPath).getAbsolutePath());
         confMap.put(Configuration.Constants.CONF_LICENSE_KEY, license);
         Configuration conf = new Configuration(confMap);
         elivagar = new Elivagar(conf);
+    }
+    
+    @BeforeMethod
+    public void setupMethod() throws Exception {
+        baseDir = TestFileUtils.createEmptyDirectory(baseDirPath);        
     }
     
     @Test(enabled = false)
@@ -68,6 +77,7 @@ public class ElivagarTest extends ExtendedTestCase {
     
     @Test(enabled = false)
     public void testElivagarRetrievingModifiedBookIDs() throws Exception {
+//        elivagar.r
 //        int count = 10;
 //        Date oneYearAgo = new Date(System.currentTimeMillis()-MILLIS_PER_YEAR);
 //        elivagar.downloadBookIDsAfterModifyDate(modifiedBookIdsDir, oneYearAgo, count);
@@ -84,5 +94,29 @@ public class ElivagarTest extends ExtendedTestCase {
         System.out.println("Marshaled all BookIDs to individual files");
 
         Assert.assertEquals(baseDir.list().length, count);
+    }
+    
+    @Test
+    public void testPackingBooks() throws Exception {
+        File bookFilesDir = FileUtils.createDirectory(bookFilesDirPath);
+        Assert.assertEquals(baseDir.list().length, 1);
+        
+        int numberOfBooks = 10;
+        for(int i = 0; i < numberOfBooks; i++) {
+            File testFile = new File(bookFilesDir, UUID.randomUUID().toString());
+            TestFileUtils.createFile(testFile, UUID.randomUUID().toString());
+        }
+        
+        elivagar.packFilesForBooks();
+        
+        Assert.assertEquals(baseDir.list().length, 1 + numberOfBooks);
+        
+        for(File bookDir : baseDir.listFiles()) {
+            if(!bookDir.equals(bookFilesDir)) {
+                for(File bookFile : bookDir.listFiles()) {
+                    Assert.assertTrue(Files.isSymbolicLink(bookFile.toPath()));
+                }
+            }
+        }
     }
 }

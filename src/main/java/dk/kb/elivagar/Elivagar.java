@@ -76,7 +76,11 @@ public class Elivagar {
     public void packFilesForBooks() {
         for(File fileForBook : conf.getFileDir().listFiles()) {
             try {
-                packer.packFileForBook(fileForBook);
+                if(fileForBook.isFile()) {
+                    packer.packFileForBook(fileForBook);
+                } else {
+                    // TODO: log this non-file (e.g. a directory).
+                }
             } catch (IOException e) {
                 // TODO: log this
             }

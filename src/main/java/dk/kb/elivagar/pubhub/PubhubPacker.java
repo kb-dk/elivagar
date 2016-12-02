@@ -104,7 +104,7 @@ public class PubhubPacker {
      * @param bookFile The file for the book.
      */
     public void packFileForBook(File bookFile) throws IOException {
-        String id = StringUtils.getSuffix(bookFile.getName());
+        String id = StringUtils.getPrefix(bookFile.getName());
         File bookDir = getBookDir(id);
         File symbolicBookFile = new File(bookDir, bookFile.getName());
         
@@ -118,6 +118,7 @@ public class PubhubPacker {
      * @throws IOException
      */
     protected File getBookDir(String id) throws IOException {
-        return FileUtils.createDirectory(baseDir.getAbsolutePath() + "/" + id + "/");
+        String path = baseDir.getAbsolutePath() + "/" + id + "/";
+        return FileUtils.createDirectory(path);
     }
 }
