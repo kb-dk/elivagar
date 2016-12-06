@@ -17,7 +17,7 @@ import org.testng.annotations.Test;
 import dk.kb.elivagar.testutils.TestFileUtils;
 import dk.kb.elivagar.utils.FileUtils;
 
-public class ElivagarTest extends ExtendedTestCase {
+public class PubhubWorkflowTest extends ExtendedTestCase {
 
     String licenseFilePath = System.getenv("HOME") + "/pubhub-license.txt";
     String license;
@@ -32,7 +32,7 @@ public class ElivagarTest extends ExtendedTestCase {
     
     boolean marshal_bookIDs_to_individual_files = true;
     boolean marshal_books_to_individual_files = true;
-    Elivagar elivagar;
+    PubhubWorkflow elivagarWorkflow;
     
     @BeforeClass
     public void setup() throws Exception {
@@ -49,7 +49,7 @@ public class ElivagarTest extends ExtendedTestCase {
         confMap.put(Configuration.Constants.CONF_FILE_DIR, new File(bookFilesDirPath).getAbsolutePath());
         confMap.put(Configuration.Constants.CONF_LICENSE_KEY, license);
         Configuration conf = new Configuration(confMap);
-        elivagar = new Elivagar(conf);
+        elivagarWorkflow = new PubhubWorkflow(conf);
     }
     
     @BeforeMethod
@@ -60,7 +60,7 @@ public class ElivagarTest extends ExtendedTestCase {
     @Test(enabled = false)
     public void testElivagarRetrievingBooks() throws Exception {
         int count = 10;
-        elivagar.retrieveAllBooks(count);
+        elivagarWorkflow.retrieveAllBooks(count);
         System.out.println("Marshaled all Books to individual files");
 
         Assert.assertEquals(baseDir.list().length, count);
@@ -90,7 +90,7 @@ public class ElivagarTest extends ExtendedTestCase {
     public void testElivagarRetrievingModifiedBooks() throws Exception {
         int count = 10;
         Date oneYearAgo = new Date(System.currentTimeMillis()-MILLIS_PER_YEAR);
-        elivagar.retrieveModifiedBooks(oneYearAgo, count);
+        elivagarWorkflow.retrieveModifiedBooks(oneYearAgo, count);
         System.out.println("Marshaled all BookIDs to individual files");
 
         Assert.assertEquals(baseDir.list().length, count);
@@ -107,7 +107,7 @@ public class ElivagarTest extends ExtendedTestCase {
             TestFileUtils.createFile(testFile, UUID.randomUUID().toString());
         }
         
-        elivagar.packFilesForBooks();
+        elivagarWorkflow.packFilesForBooks();
         
         Assert.assertEquals(baseDir.list().length, 1 + numberOfBooks);
         

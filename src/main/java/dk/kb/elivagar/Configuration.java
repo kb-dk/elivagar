@@ -2,9 +2,11 @@ package dk.kb.elivagar;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import dk.kb.elivagar.utils.FileUtils;
+import dk.kb.elivagar.utils.YamlUtils;
 
 /**
  * Configuration for Elivagar.
@@ -61,8 +63,22 @@ public class Configuration {
         /** The configuration name for the output directory.*/
         final String CONF_OUTPUT_DIR = "output_dir";
         /** The configuration name for the license key.*/
-        final String CONF_LICENSE_KEY = "retrieve_file_script";
+        final String CONF_LICENSE_KEY = "license_key";
         /** The configuration name for the file directory.*/
         final String CONF_FILE_DIR = "book_dir";
+        /** The configuration root element for elivagar.*/
+        final String CONF_ELIVAGAR = "elivagar";
+    }
+    
+    /**
+     * Creates a configuration from a file.
+     * @param f The YAML file with the configuration.
+     * @return The configuration.
+     * @throws IOException If it fails to load, or the configured elements cannot be instantiated.
+     */
+    public static Configuration createFromYAMLFile(File f) throws IOException {
+        LinkedHashMap<String, LinkedHashMap> map = YamlUtils.loadYamlSettings(f);
+        Map<String, String> confMap = (Map<String, String>) map.get(Constants.CONF_ELIVAGAR);
+        return new Configuration(confMap);
     }
 }

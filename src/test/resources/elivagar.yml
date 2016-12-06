@@ -1,0 +1,4 @@
+elivagar:
+  output_dir: tempDir/packaged_books
+  book_dir: tempDir/downloaded_book_files
+  license_key: DO_NOT_PUT_LICENSE_IN_GITHUB_FILE
