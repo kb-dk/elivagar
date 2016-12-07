@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.attribute.FileAttribute;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +14,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.HttpClient;
@@ -30,6 +32,9 @@ import dk.pubhub.service.Image;
  * along with all images (frontpage, thumbnail, etc.) for book, and the 
  */
 public class PubhubPacker {
+    /** The logger.*/
+    private static final Logger log = LoggerFactory.getLogger(PubhubPacker.class);
+
     /** The base directory where the data should be placed.*/
     protected final File baseDir;
     /** The namespace of marshalled xml.*/
@@ -41,8 +46,8 @@ public class PubhubPacker {
     
     /**
      * Constructor.
-     * @param baseDir 
-     * @param serviceNamespace
+     * @param baseDir The base directory where the books are being packages.
+     * @param serviceNamespace The namespace for the service.
      */
     public PubhubPacker(File baseDir, String serviceNamespace) {
         this.baseDir = baseDir;
@@ -60,6 +65,7 @@ public class PubhubPacker {
      */
     protected Marshaller getMarshallerForClass(Class c) throws JAXBException {
         if(!marshallers.containsKey(c.getSimpleName())) {
+            log.debug("Instantiating marshaller for class '" + c.getName() + "'.");
             JAXBContext context = JAXBContext.newInstance(Book.class);
             Marshaller marshaller = context.createMarshaller();
        
@@ -78,6 +84,7 @@ public class PubhubPacker {
      * @throws IOException If an issue occurs when retrieving the directory, or creating or downloading the files.
      */
     public void packBook(Book book) throws JAXBException, IOException {
+        log.info("Packaging book '" + book.getBookId() + "'.");
         File bookDir = getBookDir(book.getBookId());
         
         JAXBElement<Book> rootElement = null;
@@ -88,6 +95,7 @@ public class PubhubPacker {
         marshaller.marshal(rootElement, bookFile);
 
         for(Image image : book.getImages().getImage()) {
+            log.debug("Retrieving image file for '" + book.getBookId() + "', at " + image.getValue());
             String suffix = StringUtils.getSuffix(image.getValue());
             File imageFile = new File(bookDir, book.getBookId() + "_" + image.getType() + "." + suffix);
 
@@ -102,20 +110,26 @@ public class PubhubPacker {
      * This makes a symbolic link to the file from the book-folder.
      * It is a prerequisite that the is file has the name of the ID.
      * @param bookFile The file for the book.
+     * @throws IOException If the book directory cannot be instantiated, or if the symbolic link from the
+     * original book file cannot be created.
      */
     public void packFileForBook(File bookFile) throws IOException {
         String id = StringUtils.getPrefix(bookFile.getName());
+        log.info("Packaging book file for book-id: " + id);
         File bookDir = getBookDir(id);
         File symbolicBookFile = new File(bookDir, bookFile.getName());
-        
-        Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
+        if(symbolicBookFile.isFile()) {
+            log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
+        } else {
+            Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
+        }
     }
     
     /**
-     * 
-     * @param id
-     * @return
-     * @throws IOException
+     * Retrieves the directory for the book with the given ID.
+     * @param id The ID for the book, whose directory should be retrieved.
+     * @return The directory for the given book id.
+     * @throws IOException If the directory cannot be instantiated.
      */
     protected File getBookDir(String id) throws IOException {
         String path = baseDir.getAbsolutePath() + "/" + id + "/";

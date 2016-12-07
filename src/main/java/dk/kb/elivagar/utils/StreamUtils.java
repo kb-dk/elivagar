@@ -18,7 +18,6 @@ public final class StreamUtils {
     
     /**
      * Utility function for moving data from an inputstream to an outputstream.
-     * TODO move to a utility class.
      * 
      * @param in The input stream to copy to the output stream.
      * @param out The output stream where the input stream should be copied.

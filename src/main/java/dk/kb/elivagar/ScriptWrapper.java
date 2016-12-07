@@ -3,12 +3,17 @@ package dk.kb.elivagar;
 import java.io.File;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import dk.kb.elivagar.utils.StreamUtils;
 
 /**
  * Class for executing an external bash script.
  */
 public class ScriptWrapper {
+    /** The logger.*/
+    private static final Logger log = LoggerFactory.getLogger(ScriptWrapper.class);
 
     /** The file with the script to script.*/
     protected final File scriptFile;
@@ -26,21 +31,28 @@ public class ScriptWrapper {
     
     /**
      * Calls the script with the given argument.
-     * @param arg The argument(s) for the script.
+     * @param args The argument(s) for the script.
      */
     public void callVoidScript(String ... args) {
         try {
-            String command = "bash " + scriptFile.getAbsolutePath();
+            StringBuffer command = new StringBuffer();
+            command.append("bash ");
+            command.append(scriptFile.getAbsolutePath());
             for(String arg : args) {
-                command += " " + arg;
+                command.append(" " + arg);
             }
-            Process p = Runtime.getRuntime().exec(command);
+            log.info("Executing commandline: " + command.toString());
+            Process p = Runtime.getRuntime().exec(command.toString());
             int success = p.waitFor();
             if(success != 0) {
                 String errMsg = "Failed to run the script.\nErrors:\n" 
                         + StreamUtils.extractInputStreamAsString(p.getErrorStream()) + "Output:\n"
                         + StreamUtils.extractInputStreamAsString(p.getInputStream());
                 throw new IllegalStateException(errMsg);
+            } else {
+                log.debug("Successful execution of script. Received the following output:\nErrors:\n" 
+                        + StreamUtils.extractInputStreamAsString(p.getErrorStream()) + "Output:\n"
+                        + StreamUtils.extractInputStreamAsString(p.getInputStream()));
             }
         } catch (IOException | InterruptedException e) {
             throw new IllegalStateException("Failure during execution", e);

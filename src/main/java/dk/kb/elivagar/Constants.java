@@ -5,5 +5,9 @@ package dk.kb.elivagar;
  */
 public interface Constants {
     /** The suffix of XML files.*/
-    static final String XML_SUFFIX = ".xml";
+    String XML_SUFFIX = ".xml";
+    /** The suffix of pdf book files.*/
+    String PDF_SUFFIX = ".pdf";
+    /** The suffix of epub book files.*/
+    String EPUD_SUFFIX = ".epub";
 }

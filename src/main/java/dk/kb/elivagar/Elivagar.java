@@ -3,16 +3,29 @@ package dk.kb.elivagar;
 import java.io.File;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Class for instantiating the Elivagar workflow.
- *
+ * Takes the following arguments:
+ * <ul>
+ * <li>Configuration file </li>
+ * <li>Metadata modify date (OPTIONAL: -1 default - meaning all)</li>
+ * <li>Max downloads (OPTIONAL: -1 default - meaning all)</li>
+ * </ul>
+ * 
+ * The two last options only deals with the metadata retrieval/packaging. 
+ * All the book files will be packed.
  */
 public class Elivagar {
+    /** The logger.*/
+    private static final Logger log = LoggerFactory.getLogger(Elivagar.class);
 
     /**
      * Main method.
-     * Requires at least the arguments of the 
-     * @param args
+     * Requires at least the one argument for the configuration.
+     * @param args The arguments.
      */
     public static void main(String ... args) {
         if(args.length < 1) {
@@ -25,13 +38,21 @@ public class Elivagar {
             System.err.println("The configuration file '" + confFile.getAbsolutePath() + "' is not a valid file.");
             System.exit(-1);
         }
+        log.debug("[ARG1] Using configuration file: " + confPath);
         long modifyDate = -1;
         if(args.length > 1) {
             modifyDate = Long.parseLong(args[1]);
+            log.debug("[ARG2] Only extracting metadata for books, which has been modified within the last '"
+                    + modifyDate + "' milliseconds.");
+        } else {
+            log.debug("[ARG2] No modify time limit for the books.");
         }
         long maxDownloads = -1;
         if(args.length > 2) {
             maxDownloads = Long.parseLong(args[2]);
+            log.debug("[ARG3] Maximum packages the metadata for '" + maxDownloads + "' books.");
+        } else {
+            log.debug("[ARG3] Downloading and packaging the metadata of as many books as possible.");
         }
         
         try {
@@ -45,8 +66,7 @@ public class Elivagar {
                 workflow.retrieveModifiedBooks(d, maxDownloads);
             }
         } catch (Exception e) {
-            System.err.println("Failure to run the workflow. \nThe waters of Elivagar must hav run over!");
-            e.printStackTrace();
+            log.error("Failure to run the workflow. \nThe waters of Elivagar must hav run over!", e);
             System.exit(-1);
         }
     }

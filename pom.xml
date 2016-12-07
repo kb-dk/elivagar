@@ -12,6 +12,13 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <slf4j.version>1.7.21</slf4j.version>
+    <logback.version>1.1.7</logback.version>
+    <assembly.home.env.name>ELIVAGAR_HOME</assembly.home.env.name>
+    <assembly.home.env.name.ref>${ELIVAGAR_HOME}</assembly.home.env.name.ref>
+    <assembly.conf.env.file>ELIVAGAR_CONF_FILE</assembly.conf.env.file>
+    <assembly.conf.env.file.ref>${ELIVAGAR_CONF_FILE}</assembly.conf.env.file.ref>
+    <assembly.main.class.name>dk.kb.elivagar.Elivagar</assembly.main.class.name>
   </properties>
 
   <dependencies>
@@ -25,6 +32,22 @@
       <artifactId>snakeyaml</artifactId>
       <version>1.17</version>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+
     <!-- TESTING -->
     <dependency>
       <groupId>org.testng</groupId>

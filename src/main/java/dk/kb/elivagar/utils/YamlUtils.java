@@ -13,8 +13,6 @@ public class YamlUtils {
     /**
      * Load YAML settings in the given file.
      * @param ymlFile The settings file in YAML format to load
-     * @throws YggdrasilException If settings file was not found
-     * or experienced wrong datastructure.
      * @return the loaded settings as a {@link LinkedHashMap}
      */
     public static LinkedHashMap<String, LinkedHashMap> loadYamlSettings(File ymlFile) {

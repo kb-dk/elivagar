@@ -8,6 +8,9 @@ import java.net.URL;
 
 import dk.kb.elivagar.utils.StreamUtils;
 
+/**
+ * Http client for downloading stuff (mostly the cover image files).
+ */
 public class HttpClient {
 
     /**

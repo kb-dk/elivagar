@@ -5,6 +5,9 @@ import java.util.Date;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import dk.kb.elivagar.utils.CalendarUtils;
 import dk.pubhub.service.ArrayOfBook;
 import dk.pubhub.service.ArrayOfBookId;
@@ -17,6 +20,8 @@ import dk.pubhub.service.ModifiedBookList;
  * Class for retrieving the data from Pubhub.
  */
 public class PubhubMetadataRetriever {
+    /** The logger.*/
+    private static final Logger log = LoggerFactory.getLogger(PubhubMetadataRetriever.class);
 
     /** The license key for pubhub.*/
     protected final String licenseKey;
@@ -51,7 +56,7 @@ public class PubhubMetadataRetriever {
      * @return The array of all the book ids.
      */
     public ArrayOfBookId retrieveAllBookIDs() {
-        System.out.println("Retrieving all BookIDs");
+        log.info("Retrieving all BookIDs");
         return mediaService.listAllBookIds(licenseKey);
     }
     
@@ -61,7 +66,7 @@ public class PubhubMetadataRetriever {
      * @return The list of modified book ids.
      */
     public ModifiedBookIdList retrieveBookIDsAfterModifyDate(Date earliestDate) {
-        System.out.println("Retrieving IDs for modified books after date '" + earliestDate + "'.");
+        log.info("Retrieving IDs for modified books after date '" + earliestDate + "'.");
         XMLGregorianCalendar xmlDate = CalendarUtils.getXmlGregorianCalendar(earliestDate);
         return mediaService.listModifiedBookIds(licenseKey, xmlDate);
     }
@@ -71,7 +76,7 @@ public class PubhubMetadataRetriever {
      * @return Array of all the books.
      */
     public ArrayOfBook downloadAllBooks() {        
-        System.out.println("Downloading all books.");
+        log.info("Downloading all books.");
         return mediaService.listAllBooks(licenseKey);
     }
     
@@ -81,7 +86,7 @@ public class PubhubMetadataRetriever {
      * @return The list of modified books.
      */
     public ModifiedBookList downloadBooksAfterModifyDate(Date earliestDate) {
-        System.out.println("Downloading books modified after date '" + earliestDate + "'.");
+        log.info("Downloading books modified after date '" + earliestDate + "'.");
         XMLGregorianCalendar xmlDate = CalendarUtils.getXmlGregorianCalendar(earliestDate);
         return mediaService.listModifiedBooks(licenseKey, xmlDate);
     }

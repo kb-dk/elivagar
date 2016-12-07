@@ -20,8 +20,10 @@ public class StringUtils {
     
     /**
      * Extracts the prefix of a filename.
-     * @param filename
-     * @return
+     * Note, in opposition to the other function, this requires the exact name of the file.
+     * It cannot deal with the whole path.
+     * @param filename The name of the file.
+     * @return The prefix. Possibly the whole filename, if the file does not have a suffix.
      */
     public static String getPrefix(String filename) {
         if(filename.contains(".")) {

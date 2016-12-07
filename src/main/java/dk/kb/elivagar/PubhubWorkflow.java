@@ -7,7 +7,9 @@ import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.PropertyException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
 import dk.kb.elivagar.pubhub.PubhubPacker;
@@ -18,6 +20,8 @@ import dk.pubhub.service.Book;
  * Workflow for the pubhub.
  */
 public class PubhubWorkflow {
+    /** The logger.*/
+    private static final Logger log = LoggerFactory.getLogger(PubhubWorkflow.class);
 
     /** The configuration for pubhub.*/
     protected final Configuration conf;
@@ -30,9 +34,6 @@ public class PubhubWorkflow {
     /**
      * Constructor for the Elivagar class. 
      * @param conf The configuration for elivagar. 
-     * @throws JAXBException When XML marshaling fail
-     * @throws PropertyException When the Marshaller property can not be set
-     * @throws IOException When creating a directory fail
      */
     public PubhubWorkflow(Configuration conf) {
         this.conf = conf;
@@ -80,10 +81,11 @@ public class PubhubWorkflow {
                 if(fileForBook.isFile()) {
                     packer.packFileForBook(fileForBook);
                 } else {
-                    // TODO: log this non-file (e.g. a directory).
+                    log.trace("Cannot package directory: " + fileForBook.getAbsolutePath());
                 }
             } catch (IOException e) {
-                // TODO: log this
+                log.error("Failed to package the file '" + fileForBook.getAbsolutePath() + "' for a book. "
+                        + "Trying to continue with next book file.", e);
             }
         }
     }
@@ -104,31 +106,5 @@ public class PubhubWorkflow {
                 + statistics.getBothDataCount() + "'");
         printer.println("Number of book directories with neither book file nor metadata file: '" 
                 + statistics.getBothDataCount() + "'");
-    }
-    
-//    /**
-//     * Prints the book ids.
-//     * @param bookIDs The book id elements to print.
-//     * @param outputDir The directory where the book ids should be marshalled into files.
-//     * @param count The maximum number of book ids to extract.
-//     * @throws JAXBException If the xml marshalling fails.
-//     * @throws PropertyException If the properties of the marshallaer cannot be set.
-//     */
-//    protected void printBookIDs(List<BookId> bookIDs, File outputDir, int count) throws JAXBException, PropertyException {
-//
-//        JAXBContext context = JAXBContext.newInstance( BookId.class );
-//        Marshaller marshaller = context.createMarshaller();
-//   
-//        marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-//   
-//        for(int i = 0; i < bookIDs.size() && i < count; i++) {
-//            BookId book = bookIDs.get(i);
-//            File bookIdFile = new File(outputDir, book.getValue().toString() + Elivagar.XML_SUFFIX);
-//            // Debug printing
-//            System.out.println(bookIdFile.getAbsolutePath());
-//
-//            marshaller.marshal(new JAXBElement<BookId>(new QName(serviceNS, BookId.class.getSimpleName()), 
-//                    BookId.class, book), bookIdFile);
-//        }
-//    }
+    }    
 }

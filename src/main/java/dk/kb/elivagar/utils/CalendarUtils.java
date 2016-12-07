@@ -6,7 +6,16 @@ import java.util.GregorianCalendar;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Utility class for dealing with dates and calendars. Especially converting to and from the date XML date format.
+ */
 public class CalendarUtils {
+    /** The logger.*/
+    private static final Logger log = LoggerFactory.getLogger(CalendarUtils.class);
+
     /**
      * Turns a date into a XMLGregorianCalendar.
      * @param date The date. If the argument is null, then epoch is returned.
@@ -14,7 +23,7 @@ public class CalendarUtils {
      */
     public static XMLGregorianCalendar getXmlGregorianCalendar(Date date) {
         if(date == null) {
-//            log.debug("Cannot convert the date '" + date + "'. Returning epoch instead.");
+            log.debug("Cannot convert the date '" + date + "'. Returning epoch instead.");
             date = new Date(0);
         }
         

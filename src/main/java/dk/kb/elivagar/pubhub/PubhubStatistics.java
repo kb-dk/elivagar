@@ -2,12 +2,17 @@ package dk.kb.elivagar.pubhub;
 
 import java.io.File;
 
-import dk.kb.elivagar.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import dk.kb.elivagar.Constants;
 
 /**
  * Method for calculating the statistics for the books retrieved from pubhub. 
  */
 public class PubhubStatistics {
+    /** The logger.*/
+    private static final Logger log = LoggerFactory.getLogger(PubhubStatistics.class);
 
     /** The base directory.*/
     protected final File baseDir;
@@ -36,9 +41,12 @@ public class PubhubStatistics {
      * This should be run before retrieving the values.
      */
     public void calculateStatistics() {
+        log.info("Calculating the statistics on the books. Expecting '" + baseDir.list().length + "' books.");
         for(File dir : baseDir.listFiles()) {
             if(dir.isDirectory()) {
                 calculateStatisticsOnBookDir(dir);
+            } else {
+                log.warn("Expected the file '" + dir.getAbsolutePath() + "' to be a directory for a book. Continues.");
             }
         }
     }
@@ -54,16 +62,11 @@ public class PubhubStatistics {
         boolean hasMetadata = false;
         boolean hasFile = false;
         for(File f : dir.listFiles()) {
-            String suffix = StringUtils.getSuffix(f.getName());
-            if(suffix.isEmpty()) {
-                // TODO log this
-                // ignore.
-                continue;
-            }
-            if(suffix.equals("xml")) {
+            String filename = f.getName().toLowerCase();
+            if(filename.endsWith(Constants.XML_SUFFIX)) {
                 // TODO perhaps only, if the file has the name ${book-id}.xml, where book-id is the dir-name.
                 hasMetadata = true;
-            } else if(suffix.equalsIgnoreCase("epub") || suffix.equalsIgnoreCase("pdf")) {
+            } else if(filename.endsWith(Constants.EPUD_SUFFIX) || filename.endsWith(Constants.PDF_SUFFIX)) {
                 hasFile = true;
             }
         }
@@ -77,27 +80,27 @@ public class PubhubStatistics {
             neitherData++;
         }
     }
-    /** The number of directories containing both book file and metadata file.*/
+    /** @return The number of directories containing both book file and metadata file.*/
     public long getBothDataCount() {
         return bothDataCount;
     }
     
-    /** The number of directories containing only metadata file.*/
+    /** @return The number of directories containing only metadata file.*/
     public long getOnlyMetadataCount() {
         return onlyMetadata;
     }
     
-    /** The number of directories containing only book file.*/
+    /** @return The number of directories containing only book file.*/
     public long getOnlyBookFileCount() {
         return onlyBookFile;
     }
     
-    /** The number of directories with neither book file or metadata file.*/
+    /** @return The number of directories with neither book file or metadata file.*/
     public long getNeitherDataCount() {
         return neitherData;
     }
     
-    /** The number of directories traversed. */
+    /** @return The number of directories traversed. */
     public long getTotalCount() {
         return count;
     }
