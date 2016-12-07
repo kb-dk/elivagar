@@ -50,8 +50,11 @@ public class Elivagar {
         long maxDownloads = -1;
         if(args.length > 2) {
             maxDownloads = Long.parseLong(args[2]);
+        }
+        if(maxDownloads > 0) {
             log.debug("[ARG3] Maximum packages the metadata for '" + maxDownloads + "' books.");
         } else {
+            maxDownloads = Long.MAX_VALUE;
             log.debug("[ARG3] Downloading and packaging the metadata of as many books as possible.");
         }
         
