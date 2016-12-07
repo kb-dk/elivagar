@@ -65,6 +65,8 @@ public class Elivagar {
                 Date d = new Date(System.currentTimeMillis() - modifyDate);
                 workflow.retrieveModifiedBooks(d, maxDownloads);
             }
+            workflow.packFilesForBooks();
+            workflow.makeStatistics(System.out);
         } catch (Exception e) {
             log.error("Failure to run the workflow. \nThe waters of Elivagar must hav run over!", e);
             System.exit(-1);

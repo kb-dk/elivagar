@@ -91,7 +91,6 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
         int count = 10;
         Date oneYearAgo = new Date(System.currentTimeMillis()-MILLIS_PER_YEAR);
         elivagarWorkflow.retrieveModifiedBooks(oneYearAgo, count);
-        System.out.println("Marshaled all BookIDs to individual files");
 
         Assert.assertEquals(baseDir.list().length, count);
     }

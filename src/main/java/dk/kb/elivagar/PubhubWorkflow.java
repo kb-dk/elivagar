@@ -101,10 +101,11 @@ public class PubhubWorkflow {
         printer.println("Number of book directories traversed: " + statistics.getTotalCount());
         printer.println("Number of book directories with both book file and metadata file: '" 
                 + statistics.getBothDataCount() + "'");
-        printer.println("Number of book directories with only book file: '" + statistics.getBothDataCount() + "'");
+        printer.println("Number of book directories with only book file: '" 
+                + statistics.getOnlyBookFileCount() + "'");
         printer.println("Number of book directories with only metadata file: '" 
-                + statistics.getBothDataCount() + "'");
+                + statistics.getOnlyMetadataCount() + "'");
         printer.println("Number of book directories with neither book file nor metadata file: '" 
-                + statistics.getBothDataCount() + "'");
+                + statistics.getNeitherDataCount() + "'");
     }    
 }

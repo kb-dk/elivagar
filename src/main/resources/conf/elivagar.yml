@@ -1,4 +1,4 @@
 elivagar:
   output_dir: tempDir
   license_key: LICENSE_KEY
-  file_dir: /tmp/
+  book_orig_dir: /tmp/

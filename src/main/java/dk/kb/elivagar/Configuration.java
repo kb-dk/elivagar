@@ -70,7 +70,7 @@ public class Configuration {
         /** The configuration name for the license key.*/
         String CONF_LICENSE_KEY = "license_key";
         /** The configuration name for the file directory.*/
-        String CONF_FILE_DIR = "book_dir";
+        String CONF_FILE_DIR = "book_orig_dir";
         /** The configuration root element for elivagar.*/
         String CONF_ELIVAGAR = "elivagar";
     }
