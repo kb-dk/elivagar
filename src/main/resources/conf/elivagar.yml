@@ -2,3 +2,4 @@ elivagar:
   output_dir: tempDir
   license_key: LICENSE_KEY
   book_orig_dir: /tmp/
+  characterization_script: bin/run_fits.sh

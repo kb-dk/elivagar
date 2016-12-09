@@ -33,7 +33,7 @@ public class ScriptWrapper {
      * Calls the script with the given argument.
      * @param args The argument(s) for the script.
      */
-    public void callVoidScript(String ... args) {
+    protected void callVoidScript(String ... args) {
         try {
             StringBuffer command = new StringBuffer();
             command.append("bash ");

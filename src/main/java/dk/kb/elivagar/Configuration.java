@@ -28,6 +28,8 @@ public class Configuration {
     protected final String licenseKey;
     /** The directory containing the files.*/
     protected final File fileDir;
+    /** The script for performing the characterization.*/
+    protected File scriptFile;
     
     /**
      * Constructor.
@@ -38,6 +40,9 @@ public class Configuration {
         outputDir = FileUtils.createDirectory(confMap.get(Constants.CONF_OUTPUT_DIR));
         licenseKey = confMap.get(Constants.CONF_LICENSE_KEY);
         fileDir = new File(confMap.get(Constants.CONF_FILE_DIR));
+        if(confMap.containsKey(Constants.CONF_CHARACTERIZATION_SCRIPT)) {
+            scriptFile = new File(confMap.get(Constants.CONF_CHARACTERIZATION_SCRIPT));
+        }
     }
     
     /**
@@ -62,6 +67,13 @@ public class Configuration {
     }
     
     /**
+     * @return The file for the characterization.
+     */
+    public File getCharacterizationScriptFile() {
+        return scriptFile;
+    }
+    
+    /**
      * Constants for the configuration.
      */
     protected interface Constants {
@@ -71,6 +83,8 @@ public class Configuration {
         String CONF_LICENSE_KEY = "license_key";
         /** The configuration name for the file directory.*/
         String CONF_FILE_DIR = "book_orig_dir";
+        /** The configuration name for the characterization script file path.*/
+        String CONF_CHARACTERIZATION_SCRIPT = "characterization_script";
         /** The configuration root element for elivagar.*/
         String CONF_ELIVAGAR = "elivagar";
     }

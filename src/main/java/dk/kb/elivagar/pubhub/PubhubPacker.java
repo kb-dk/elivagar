@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.HttpClient;
+import dk.kb.elivagar.ScriptWrapper;
 import dk.kb.elivagar.utils.FileUtils;
 import dk.kb.elivagar.utils.StringUtils;
 import dk.pubhub.service.Book;
@@ -43,17 +44,21 @@ public class PubhubPacker {
     protected final HttpClient httpClient;
     /** Map between marshallers and their the classes they marshall.*/
     protected final Map<String, Marshaller> marshallers;
+    /** The script for characterizing the book files. May be null, if no script exists.*/
+    protected PubhubCharacterizationScriptWrapper characterizationScript;
     
     /**
      * Constructor.
      * @param baseDir The base directory where the books are being packages.
      * @param serviceNamespace The namespace for the service.
+     * @param script The script for characterizing the book files. May be null, for no characterization.
      */
-    public PubhubPacker(File baseDir, String serviceNamespace) {
+    public PubhubPacker(File baseDir, String serviceNamespace, PubhubCharacterizationScriptWrapper script) {
         this.baseDir = baseDir;
         this.namespace = serviceNamespace;
         this.marshallers = new HashMap<String, Marshaller>();
         this.httpClient = new HttpClient();
+        this.characterizationScript = script;
     }
     
     /**
@@ -122,6 +127,11 @@ public class PubhubPacker {
             log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
         } else {
             Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
+            if(characterizationScript != null) {
+                // 2 args; 1 for input file path and 1 for output file path.
+                File characterizationOutputFile = new File(bookDir, id + ".fits");
+                characterizationScript.execute(bookFile, characterizationOutputFile);
+            }
         }
     }
     
