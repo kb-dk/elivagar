@@ -18,12 +18,13 @@ import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dk.kb.elivagar.Configuration;
 import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.HttpClient;
-import dk.kb.elivagar.ScriptWrapper;
 import dk.kb.elivagar.utils.FileUtils;
 import dk.kb.elivagar.utils.StringUtils;
 import dk.pubhub.service.Book;
+import dk.pubhub.service.BookTypeEnum;
 import dk.pubhub.service.Image;
 
 /**
@@ -36,8 +37,8 @@ public class PubhubPacker {
     /** The logger.*/
     private static final Logger log = LoggerFactory.getLogger(PubhubPacker.class);
 
-    /** The base directory where the data should be placed.*/
-    protected final File baseDir;
+    /** The Configuration with the base directories for the files to be packed.*/
+    protected final Configuration conf;
     /** The namespace of marshalled xml.*/
     protected final String namespace;
     /** The HTTP client for retrieving the extra files for the book, e.g. the images.*/
@@ -49,12 +50,12 @@ public class PubhubPacker {
     
     /**
      * Constructor.
-     * @param baseDir The base directory where the books are being packages.
+     * @param conf The Configuration with the base directories for the files to be packed.
      * @param serviceNamespace The namespace for the service.
      * @param script The script for characterizing the book files. May be null, for no characterization.
      */
-    public PubhubPacker(File baseDir, String serviceNamespace, PubhubCharacterizationScriptWrapper script) {
-        this.baseDir = baseDir;
+    public PubhubPacker(Configuration conf, String serviceNamespace, PubhubCharacterizationScriptWrapper script) {
+        this.conf = conf;
         this.namespace = serviceNamespace;
         this.marshallers = new HashMap<String, Marshaller>();
         this.httpClient = new HttpClient();
@@ -90,7 +91,7 @@ public class PubhubPacker {
      */
     public void packBook(Book book) throws JAXBException, IOException {
         log.info("Packaging book '" + book.getBookId() + "'.");
-        File bookDir = getBookDir(book.getBookId());
+        File bookDir = getBookDir(book.getBookId(), book.getBookType());
         
         JAXBElement<Book> rootElement = null;
         Marshaller marshaller = getMarshallerForClass(book.getClass());
@@ -118,10 +119,10 @@ public class PubhubPacker {
      * @throws IOException If the book directory cannot be instantiated, or if the symbolic link from the
      * original book file cannot be created.
      */
-    public void packFileForBook(File bookFile) throws IOException {
+    public void packFileForEbook(File bookFile) throws IOException {
         String id = StringUtils.getPrefix(bookFile.getName());
         log.info("Packaging book file for book-id: " + id);
-        File bookDir = getBookDir(id);
+        File bookDir = getBookDir(id, BookTypeEnum.EBOG);
         File symbolicBookFile = new File(bookDir, bookFile.getName());
         if(symbolicBookFile.isFile()) {
             log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
@@ -138,11 +139,19 @@ public class PubhubPacker {
     /**
      * Retrieves the directory for the book with the given ID.
      * @param id The ID for the book, whose directory should be retrieved.
+     * @param type The type of book (ebook or audio book).
      * @return The directory for the given book id.
      * @throws IOException If the directory cannot be instantiated.
      */
-    protected File getBookDir(String id) throws IOException {
-        String path = baseDir.getAbsolutePath() + "/" + id + "/";
+    protected File getBookDir(String id, BookTypeEnum type) throws IOException {
+        String path;
+        if(type == BookTypeEnum.EBOG) {
+            path = conf.getEbookOutputDir().getAbsolutePath() + "/" + id + "/";
+        } else if(type == BookTypeEnum.LYDBOG) {
+            path = conf.getAudioOutputDir().getAbsolutePath() + "/" + id + "/";
+        } else {
+            throw new IllegalStateException("Cannot handle BookTypeEnum '" + type + "'.");
+        }
         return FileUtils.createDirectory(path);
     }
 }

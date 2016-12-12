@@ -15,6 +15,9 @@ public class ConfigurationTest extends ExtendedTestCase {
         Assert.assertNotNull(conf);
         Assert.assertNotNull(conf.getFileDir());
         Assert.assertNotNull(conf.getLicenseKey());
-        Assert.assertNotNull(conf.getOutputDir());
+        Assert.assertNotNull(conf.getAudioOutputDir());
+        Assert.assertNotNull(conf.getEbookOutputDir());
+        Assert.assertTrue(conf.getAudioOutputDir().isDirectory());
+        Assert.assertTrue(conf.getEbookOutputDir().isDirectory());
     }
 }

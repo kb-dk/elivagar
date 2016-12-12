@@ -22,8 +22,10 @@ public class Configuration {
     /** The logger.*/
     private static final Logger log = LoggerFactory.getLogger(Configuration.class);
 
-    /** The output directory.*/
-    protected final File outputDir;
+    /** The output directory for the ebooks.*/
+    protected final File ebookOutputDir;
+    /** The output directory for the audio-books.*/
+    protected final File abookOutputDir;
     /** The license key for Pubhub.*/
     protected final String licenseKey;
     /** The directory containing the files.*/
@@ -37,7 +39,9 @@ public class Configuration {
      * @throws IOException If the output directory does not exist and cannot be created.
      */
     public Configuration(Map<String, String> confMap) throws IOException {
-        outputDir = FileUtils.createDirectory(confMap.get(Constants.CONF_OUTPUT_DIR));
+        validateThatMapContainsKey(confMap, Constants.CONF_EBOOK_OUTPUT_DIR);
+        ebookOutputDir = FileUtils.createDirectory(confMap.get(Constants.CONF_EBOOK_OUTPUT_DIR));
+        abookOutputDir = FileUtils.createDirectory(confMap.get(Constants.CONF_AUDIO_OUTPUT_DIR));
         licenseKey = confMap.get(Constants.CONF_LICENSE_KEY);
         fileDir = new File(confMap.get(Constants.CONF_FILE_DIR));
         if(confMap.containsKey(Constants.CONF_CHARACTERIZATION_SCRIPT)) {
@@ -46,10 +50,17 @@ public class Configuration {
     }
     
     /**
-     * @return The output directory for the book directories.
+     * @return The output directory for the ebook directories.
      */
-    public File getOutputDir() {
-        return outputDir;
+    public File getEbookOutputDir() {
+        return ebookOutputDir;
+    }
+    
+    /**
+     * @return The output directory for the audio book directories.
+     */
+    public File getAudioOutputDir() {
+        return abookOutputDir;
     }
     
     /**
@@ -74,11 +85,27 @@ public class Configuration {
     }
     
     /**
+     * Validates that the map contains a given key.
+     * @param map The map to validate.
+     * @param key The key which must be present and have a value in it.
+     */
+    protected void validateThatMapContainsKey(Map<String, String> map, String key) {
+        if(!map.containsKey(key)) {
+            throw new IllegalStateException("The configuration must include '" + key + "'");
+        }
+        if(map.get(key).isEmpty()) {
+            throw new IllegalStateException("The configuration field '" + key + "' must have a value.");
+        }
+    }
+    
+    /**
      * Constants for the configuration.
      */
     protected interface Constants {
         /** The configuration name for the output directory.*/
-        String CONF_OUTPUT_DIR = "output_dir";
+        String CONF_EBOOK_OUTPUT_DIR = "ebook_output_dir";
+        /** The configuration name for the output directory.*/
+        String CONF_AUDIO_OUTPUT_DIR = "audio_output_dir";
         /** The configuration name for the license key.*/
         String CONF_LICENSE_KEY = "license_key";
         /** The configuration name for the file directory.*/

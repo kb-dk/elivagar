@@ -43,7 +43,7 @@ public class PubhubWorkflow {
         if(conf.getCharacterizationScriptFile() != null) {
             script = new PubhubCharacterizationScriptWrapper(conf.getCharacterizationScriptFile()); 
         }
-        this.packer = new PubhubPacker(conf.getOutputDir(), retriever.getServiceNamespace(), script);
+        this.packer = new PubhubPacker(conf, retriever.getServiceNamespace(), script);
     }
     
     /**
@@ -84,7 +84,7 @@ public class PubhubWorkflow {
         for(File fileForBook : conf.getFileDir().listFiles()) {
             try {
                 if(fileForBook.isFile()) {
-                    packer.packFileForBook(fileForBook);
+                    packer.packFileForEbook(fileForBook);
                 } else {
                     log.trace("Cannot package directory: " + fileForBook.getAbsolutePath());
                 }
@@ -96,13 +96,31 @@ public class PubhubWorkflow {
     }
     
     /**
-     * Makes and prints the statistics for the base directory.
-     * @param printer The stream where the output is written.
+     * Makes and prints the statistics for the both the ebook directory and the audio directory.
+     * @param printer The print stream where the output is written.
      */
     public void makeStatistics(PrintStream printer) {
-        PubhubStatistics statistics = new PubhubStatistics(conf.outputDir);
+        if(conf.getEbookOutputDir().list() != null) {
+            makeStatisticsForDirectory(printer, conf.getEbookOutputDir());
+        } else {
+            printer.println("No ebooks to make statistics upon.");
+        }
+        if(conf.getAudioOutputDir().list() != null) {
+            makeStatisticsForDirectory(printer, conf.getAudioOutputDir());
+        } else {
+            printer.println("No ebooks to make statistics upon.");
+        }
+    }
+    
+    /**
+     * Calculates the statistics on the books in the given directory.
+     * @param printer The print stream where the output is written.
+     * @param dir The directory to calculate the statistics upon.
+     */
+    protected void makeStatisticsForDirectory(PrintStream printer, File dir) {
+        PubhubStatistics statistics = new PubhubStatistics(dir);
+        printer.println("Calculating the statistics for directory: " + dir.getAbsolutePath());
         statistics.calculateStatistics();
-        
         printer.println("Number of book directories traversed: " + statistics.getTotalCount());
         printer.println("Number of book directories with both book file and metadata file: '" 
                 + statistics.getBothDataCount() + "'");

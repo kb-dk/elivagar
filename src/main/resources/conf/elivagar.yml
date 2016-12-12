@@ -1,5 +1,6 @@
 elivagar:
-  output_dir: tempDir
+  ebook_output_dir: tempDir/packaged_books
+  audio_output_dir: tempDir/packaged_audio
+  book_orig_dir: /path/to/book/files/
   license_key: LICENSE_KEY
-  book_orig_dir: /tmp/
   characterization_script: bin/run_fits.sh
