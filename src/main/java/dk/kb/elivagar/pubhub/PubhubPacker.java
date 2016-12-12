@@ -125,6 +125,8 @@ public class PubhubPacker {
         File bookDir = getBookDir(id, BookTypeEnum.EBOG);
         File symbolicBookFile = new File(bookDir, bookFile.getName());
         if(symbolicBookFile.isFile()) {
+            // TODO: what if the orig book file has changed? 
+            // Shouldn't we then recharacterize the file?
             log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
         } else {
             Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
