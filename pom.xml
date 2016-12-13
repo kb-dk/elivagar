@@ -4,7 +4,7 @@
 
   <groupId>dk.kb</groupId>
   <artifactId>elivagar</artifactId>
-  <version>0.0.8-SNAPSHOT</version>
+  <version>1.0.0-RC1</version>
   <packaging>jar</packaging>
 
   <name>elivagar</name>
