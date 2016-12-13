@@ -10,10 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.utils.CalendarUtils;
 import dk.pubhub.service.ArrayOfBook;
-import dk.pubhub.service.ArrayOfBookId;
 import dk.pubhub.service.MediaServiceAsmx;
 import dk.pubhub.service.MediaServiceAsmxSoap;
-import dk.pubhub.service.ModifiedBookIdList;
 import dk.pubhub.service.ModifiedBookList;
 
 /**

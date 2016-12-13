@@ -69,7 +69,8 @@ public class PubhubWorkflow {
      * @throws IOException If files cannot be created or downloaded.
      */
     public void retrieveModifiedBooks(Date earliestDate, long max) throws JAXBException, IOException {
-        List<Book> books = retriever.downloadBookMetadataAfterModifyDate(earliestDate).getNewAndModifiedBooks().getBook();
+        List<Book> books = retriever.downloadBookMetadataAfterModifyDate(
+                earliestDate).getNewAndModifiedBooks().getBook();
         for(int i = 0; i < books.size() && i < max; i++) {
             Book book = books.get(i);
             packer.packBook(book);
