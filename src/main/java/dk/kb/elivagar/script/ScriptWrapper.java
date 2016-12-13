@@ -1,4 +1,4 @@
-package dk.kb.elivagar;
+package dk.kb.elivagar.script;
 
 import java.io.File;
 import java.io.IOException;

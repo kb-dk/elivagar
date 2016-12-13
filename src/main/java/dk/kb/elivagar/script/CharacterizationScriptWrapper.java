@@ -1,19 +1,17 @@
-package dk.kb.elivagar.pubhub;
+package dk.kb.elivagar.script;
 
 import java.io.File;
-
-import dk.kb.elivagar.ScriptWrapper;
 
 /**
  * Wrapper for the script for performing the characterization of the book files from PubHub.
  * Basically wraps the execution to require the specific number of arguments (2; input and output file).
  */
-public class PubhubCharacterizationScriptWrapper extends ScriptWrapper {
+public class CharacterizationScriptWrapper extends ScriptWrapper {
     /**
      * Constructor.
      * @param scriptFile The script.
      */
-    public PubhubCharacterizationScriptWrapper(File scriptFile) {
+    public CharacterizationScriptWrapper(File scriptFile) {
         super(scriptFile);
     }
     

@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.Configuration;
 import dk.kb.elivagar.HttpClient;
+import dk.kb.elivagar.script.CharacterizationScriptWrapper;
 import dk.kb.elivagar.utils.FileUtils;
 import dk.kb.elivagar.utils.StringUtils;
 import dk.pubhub.service.Book;
@@ -54,7 +55,7 @@ public class PubhubPacker {
     /** Map between marshallers and their the classes they marshall.*/
     protected final Map<String, Marshaller> marshallers;
     /** The script for characterizing the book files. May be null, if no script exists.*/
-    protected PubhubCharacterizationScriptWrapper characterizationScript;
+    protected CharacterizationScriptWrapper characterizationScript;
     
     /**
      * Constructor.
@@ -62,7 +63,7 @@ public class PubhubPacker {
      * @param serviceNamespace The namespace for the service.
      * @param script The script for characterizing the book files. May be null, for no characterization.
      */
-    public PubhubPacker(Configuration conf, String serviceNamespace, PubhubCharacterizationScriptWrapper script) {
+    public PubhubPacker(Configuration conf, String serviceNamespace, CharacterizationScriptWrapper script) {
         this.conf = conf;
         this.namespace = serviceNamespace;
         this.marshallers = new HashMap<String, Marshaller>();
@@ -160,7 +161,7 @@ public class PubhubPacker {
         } else if(type == BookTypeEnum.LYDBOG) {
             path = conf.getAudioOutputDir().getAbsolutePath() + "/" + id + "/";
         } else {
-            throw new IllegalStateException("Cannot handle BookTypeEnum '" + type + "'.");
+            throw new IllegalStateException("Cannot handle unknown BookTypeEnum '" + type + "'.");
         }
         return FileUtils.createDirectory(path);
     }

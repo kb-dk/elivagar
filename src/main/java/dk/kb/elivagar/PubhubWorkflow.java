@@ -11,10 +11,10 @@ import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import dk.kb.elivagar.pubhub.PubhubCharacterizationScriptWrapper;
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
 import dk.kb.elivagar.pubhub.PubhubPacker;
 import dk.kb.elivagar.pubhub.PubhubStatistics;
+import dk.kb.elivagar.script.CharacterizationScriptWrapper;
 import dk.pubhub.service.Book;
 
 /**
@@ -39,9 +39,9 @@ public class PubhubWorkflow {
     public PubhubWorkflow(Configuration conf) {
         this.conf = conf;
         this.retriever = new PubhubMetadataRetriever(conf.getLicenseKey());
-        PubhubCharacterizationScriptWrapper script = null;
+        CharacterizationScriptWrapper script = null;
         if(conf.getCharacterizationScriptFile() != null) {
-            script = new PubhubCharacterizationScriptWrapper(conf.getCharacterizationScriptFile()); 
+            script = new CharacterizationScriptWrapper(conf.getCharacterizationScriptFile()); 
         }
         this.packer = new PubhubPacker(conf, retriever.getServiceNamespace(), script);
     }

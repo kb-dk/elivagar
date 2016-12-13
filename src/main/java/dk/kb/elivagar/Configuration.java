@@ -22,10 +22,9 @@ import dk.kb.elivagar.utils.YamlUtils;
  *     <li>audio_output_dir: /path/to/audio/output/dir/</li>
  *     <li>book_orig_dir: /path/to/orig/book/dir/</li>
  *     <li>license_key: DO_NOT_PUT_LICENSE_IN_GITHUB_FILE</li>
- *     <li>characterization_script: bin/run_fits.sh</li>
+ *     <li>characterization_script: bin/run_fits.sh (optional)</li>
  *   </ul>
  * </ul>
- * 
  */
 public class Configuration {
     /** The logger.*/
@@ -63,6 +62,9 @@ public class Configuration {
      */
     public Configuration(Map<String, String> confMap) throws IOException {
         validateThatMapContainsKey(confMap, CONF_EBOOK_OUTPUT_DIR);
+        validateThatMapContainsKey(confMap, CONF_AUDIO_OUTPUT_DIR);
+        validateThatMapContainsKey(confMap, CONF_LICENSE_KEY);
+        validateThatMapContainsKey(confMap, CONF_FILE_DIR);
         ebookOutputDir = FileUtils.createDirectory(confMap.get(CONF_EBOOK_OUTPUT_DIR));
         abookOutputDir = FileUtils.createDirectory(confMap.get(CONF_AUDIO_OUTPUT_DIR));
         licenseKey = confMap.get(CONF_LICENSE_KEY);
