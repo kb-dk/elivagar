@@ -33,8 +33,8 @@ public class PubhubWorkflow {
     protected final PubhubPacker packer;
     
     /**
-     * Constructor for the Elivagar class. 
-     * @param conf The configuration for elivagar. 
+     * Constructor. 
+     * @param conf The elivagar configuration. 
      */
     public PubhubWorkflow(Configuration conf) {
         this.conf = conf;
@@ -53,7 +53,7 @@ public class PubhubWorkflow {
      * @throws IOException If files cannot be created or downloaded.
      */
     public void retrieveAllBooks(long max) throws JAXBException, IOException {
-        List<Book> books = retriever.downloadAllBooks().getBook();
+        List<Book> books = retriever.downloadAllBookMetadata().getBook();
         for(int i = 0; i < books.size() && i < max; i++) {
             Book book = books.get(i);
             packer.packBook(book);
@@ -69,7 +69,7 @@ public class PubhubWorkflow {
      * @throws IOException If files cannot be created or downloaded.
      */
     public void retrieveModifiedBooks(Date earliestDate, long max) throws JAXBException, IOException {
-        List<Book> books = retriever.downloadBooksAfterModifyDate(earliestDate).getNewAndModifiedBooks().getBook();
+        List<Book> books = retriever.downloadBookMetadataAfterModifyDate(earliestDate).getNewAndModifiedBooks().getBook();
         for(int i = 0; i < books.size() && i < max; i++) {
             Book book = books.get(i);
             packer.packBook(book);
@@ -77,8 +77,8 @@ public class PubhubWorkflow {
     }
     
     /**
-     * Packs the files for the books into the right
-     * It is asserted, that the book files has the name of the 
+     * Packs the files for the books into the right folder.
+     * It is asserted, that the book files is named with the id as the suffix.
      */
     public void packFilesForBooks() {
         for(File fileForBook : conf.getFileDir().listFiles()) {

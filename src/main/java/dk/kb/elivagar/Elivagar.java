@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  * Takes the following arguments:
  * <ul>
  * <li>Configuration file </li>
- * <li>Metadata modify date (OPTIONAL: -1 default - meaning all)</li>
+ * <li>Metadata modify date (OPTIONAL: -1 default - meaning all - Must be number of milliseconds ago)</li>
  * <li>Max downloads (OPTIONAL: -1 default - meaning all)</li>
  * </ul>
  * 
@@ -71,7 +71,7 @@ public class Elivagar {
             workflow.packFilesForBooks();
             workflow.makeStatistics(System.out);
         } catch (Exception e) {
-            log.error("Failure to run the workflow. \nThe waters of Elivagar must hav run over!", e);
+            log.error("Failure to run the workflow. \nThe waters of Elivagar must have frozen over!", e);
             System.exit(-1);
         }
     }

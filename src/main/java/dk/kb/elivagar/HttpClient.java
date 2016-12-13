@@ -6,12 +6,17 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import dk.kb.elivagar.utils.StreamUtils;
 
 /**
  * Http client for downloading stuff (mostly the cover image files).
  */
 public class HttpClient {
+    /** The logger.*/
+    private static final Logger log = LoggerFactory.getLogger(HttpClient.class);
 
     /**
      * Constructor.
@@ -20,14 +25,12 @@ public class HttpClient {
     public HttpClient() {}
 
     /**
-     * Retrieves the data from a given url and puts it onto a given 
-     * outputstream. It has to be a 'HTTP' url, since the data is retrieved 
-     * through a HTTP-request.
+     * Retrieves the data from a given url and puts it onto a given outputstream. 
+     * It has to be a 'HTTP' url, since the data is retrieved through a HTTP-request.
      * 
      * @param out The output stream to put the data.
      * @param url The url for where the data should be retrieved.
-     * @throws IOException If any problems occurs during the retrieval of the 
-     * data.
+     * @throws IOException If any problems occurs during the retrieval of the data.
      */
     public void performDownload(OutputStream out, URL url)
             throws IOException {
@@ -40,6 +43,7 @@ public class HttpClient {
 
     /**
      * Retrieves the Input stream for a given URL.
+     * Remember to close the returned input stream after use.
      * @param url The URL to retrieve.
      * @return The InputStream to the given URL.
      * @throws IOException If any problems occurs during the retrieval.
@@ -48,6 +52,10 @@ public class HttpClient {
         HttpURLConnection conn = getConnection(url);
         conn.setDoInput(true);
         conn.setRequestMethod("GET");
+        if(conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            log.warn("Received a bad http response for the retrieval of '" + url.toString() + "':"
+                    + conn.getResponseCode() + ". Tries to continue anyway.");
+        }
         return conn.getInputStream();
     }
 

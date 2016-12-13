@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.Configuration;
-import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.HttpClient;
 import dk.kb.elivagar.utils.FileUtils;
 import dk.kb.elivagar.utils.StringUtils;
@@ -31,12 +30,21 @@ import dk.pubhub.service.Image;
  * Class for packing the data from PubHub.
  * 
  * Each individual book will be placed in its own directory, where the book metadata is placed in an XML file, 
- * along with all images (frontpage, thumbnail, etc.) for book, and the 
+ * along with all images (frontpage, thumbnail, etc.) for book, and a symbolic link to the content file for the book.
  */
 public class PubhubPacker {
     /** The logger.*/
     private static final Logger log = LoggerFactory.getLogger(PubhubPacker.class);
 
+    /** The suffix of XML files.*/
+    public static final String XML_SUFFIX = ".xml";
+    /** The suffix of pdf book files.*/
+    public static final String PDF_SUFFIX = ".pdf";
+    /** The suffix of epub book files.*/
+    public static final String EPUD_SUFFIX = ".epub";
+    /** The suffix for the fits characterization metadata output files.*/
+    public static final String FITS_SUFFIX = ".fits";
+    
     /** The Configuration with the base directories for the files to be packed.*/
     protected final Configuration conf;
     /** The namespace of marshalled xml.*/
@@ -72,7 +80,7 @@ public class PubhubPacker {
     protected Marshaller getMarshallerForClass(Class c) throws JAXBException {
         if(!marshallers.containsKey(c.getSimpleName())) {
             log.debug("Instantiating marshaller for class '" + c.getName() + "'.");
-            JAXBContext context = JAXBContext.newInstance(Book.class);
+            JAXBContext context = JAXBContext.newInstance(c);
             Marshaller marshaller = context.createMarshaller();
        
             marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
@@ -95,7 +103,7 @@ public class PubhubPacker {
         
         JAXBElement<Book> rootElement = null;
         Marshaller marshaller = getMarshallerForClass(book.getClass());
-        File bookFile = new File(bookDir, book.getBookId() +  Constants.XML_SUFFIX);
+        File bookFile = new File(bookDir, book.getBookId() +  XML_SUFFIX);
         rootElement = new JAXBElement<Book>(new QName(namespace, Book.class.getSimpleName()), 
                 Book.class, book);
         marshaller.marshal(rootElement, bookFile);
@@ -114,7 +122,7 @@ public class PubhubPacker {
     /**
      * Packs a file for the book. This is expected to be the content file, either pdf or epub.
      * This makes a symbolic link to the file from the book-folder.
-     * It is a prerequisite that the is file has the name of the ID.
+     * It is a prerequisite that the file has the name of the ID.
      * @param bookFile The file for the book.
      * @throws IOException If the book directory cannot be instantiated, or if the symbolic link from the
      * original book file cannot be created.
@@ -132,7 +140,7 @@ public class PubhubPacker {
             Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
             if(characterizationScript != null) {
                 // 2 args; 1 for input file path and 1 for output file path.
-                File characterizationOutputFile = new File(bookDir, id + ".fits");
+                File characterizationOutputFile = new File(bookDir, id + FITS_SUFFIX);
                 characterizationScript.execute(bookFile, characterizationOutputFile);
             }
         }

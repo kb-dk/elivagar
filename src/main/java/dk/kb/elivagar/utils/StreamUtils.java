@@ -21,8 +21,7 @@ public final class StreamUtils {
      * 
      * @param in The input stream to copy to the output stream.
      * @param out The output stream where the input stream should be copied.
-     * @throws IOException If anything problems occur with transferring the 
-     * data between the streams.
+     * @throws IOException If any problems occur with transferring the data between the streams.
      */
     public static void copyInputStreamToOutputStream(InputStream in,
             OutputStream out) throws IOException {

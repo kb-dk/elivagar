@@ -14,14 +14,37 @@ import dk.kb.elivagar.utils.YamlUtils;
 /**
  * Configuration for Elivagar.
  * 
- * It should have the following format:
- * 
+ * It should have the following YAML format:
+ * <ul>
+ *   <li>elivagar:</li>
+ *   <ul>
+ *     <li>ebook_output_dir: /path/to/ebook/output/dir/</li>
+ *     <li>audio_output_dir: /path/to/audio/output/dir/</li>
+ *     <li>book_orig_dir: /path/to/orig/book/dir/</li>
+ *     <li>license_key: DO_NOT_PUT_LICENSE_IN_GITHUB_FILE</li>
+ *     <li>characterization_script: bin/run_fits.sh</li>
+ *   </ul>
+ * </ul>
  * 
  */
 public class Configuration {
     /** The logger.*/
     private static final Logger log = LoggerFactory.getLogger(Configuration.class);
 
+    /** The configuration root element for elivagar.*/
+    public static final String CONF_ELIVAGAR = "elivagar";
+    /** The configuration name for the output directory.*/
+    public static final String CONF_EBOOK_OUTPUT_DIR = "ebook_output_dir";
+    /** The configuration name for the output directory.*/
+    public static final String CONF_AUDIO_OUTPUT_DIR = "audio_output_dir";
+    /** The configuration name for the license key.*/
+    public static final String CONF_LICENSE_KEY = "license_key";
+    /** The configuration name for the file directory.*/
+    public static final String CONF_FILE_DIR = "book_orig_dir";
+    /** The configuration name for the characterization script file path.*/
+    public static final String CONF_CHARACTERIZATION_SCRIPT = "characterization_script";
+
+    
     /** The output directory for the ebooks.*/
     protected final File ebookOutputDir;
     /** The output directory for the audio-books.*/
@@ -39,13 +62,13 @@ public class Configuration {
      * @throws IOException If the output directory does not exist and cannot be created.
      */
     public Configuration(Map<String, String> confMap) throws IOException {
-        validateThatMapContainsKey(confMap, Constants.CONF_EBOOK_OUTPUT_DIR);
-        ebookOutputDir = FileUtils.createDirectory(confMap.get(Constants.CONF_EBOOK_OUTPUT_DIR));
-        abookOutputDir = FileUtils.createDirectory(confMap.get(Constants.CONF_AUDIO_OUTPUT_DIR));
-        licenseKey = confMap.get(Constants.CONF_LICENSE_KEY);
-        fileDir = new File(confMap.get(Constants.CONF_FILE_DIR));
-        if(confMap.containsKey(Constants.CONF_CHARACTERIZATION_SCRIPT)) {
-            scriptFile = new File(confMap.get(Constants.CONF_CHARACTERIZATION_SCRIPT));
+        validateThatMapContainsKey(confMap, CONF_EBOOK_OUTPUT_DIR);
+        ebookOutputDir = FileUtils.createDirectory(confMap.get(CONF_EBOOK_OUTPUT_DIR));
+        abookOutputDir = FileUtils.createDirectory(confMap.get(CONF_AUDIO_OUTPUT_DIR));
+        licenseKey = confMap.get(CONF_LICENSE_KEY);
+        fileDir = new File(confMap.get(CONF_FILE_DIR));
+        if(confMap.containsKey(CONF_CHARACTERIZATION_SCRIPT)) {
+            scriptFile = new File(confMap.get(CONF_CHARACTERIZATION_SCRIPT));
         }
     }
     
@@ -99,24 +122,6 @@ public class Configuration {
     }
     
     /**
-     * Constants for the configuration.
-     */
-    protected interface Constants {
-        /** The configuration name for the output directory.*/
-        String CONF_EBOOK_OUTPUT_DIR = "ebook_output_dir";
-        /** The configuration name for the output directory.*/
-        String CONF_AUDIO_OUTPUT_DIR = "audio_output_dir";
-        /** The configuration name for the license key.*/
-        String CONF_LICENSE_KEY = "license_key";
-        /** The configuration name for the file directory.*/
-        String CONF_FILE_DIR = "book_orig_dir";
-        /** The configuration name for the characterization script file path.*/
-        String CONF_CHARACTERIZATION_SCRIPT = "characterization_script";
-        /** The configuration root element for elivagar.*/
-        String CONF_ELIVAGAR = "elivagar";
-    }
-    
-    /**
      * Creates a configuration from a file.
      * @param yamlFile The YAML file with the configuration.
      * @return The configuration.
@@ -125,7 +130,7 @@ public class Configuration {
     public static Configuration createFromYAMLFile(File yamlFile) throws IOException {
         log.debug("Loading configuration from file '" + yamlFile.getAbsolutePath() + "'");
         LinkedHashMap<String, LinkedHashMap> map = YamlUtils.loadYamlSettings(yamlFile);
-        Map<String, String> confMap = (Map<String, String>) map.get(Constants.CONF_ELIVAGAR);
+        Map<String, String> confMap = (Map<String, String>) map.get(CONF_ELIVAGAR);
         return new Configuration(confMap);
     }
 }

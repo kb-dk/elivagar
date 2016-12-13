@@ -34,8 +34,6 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
 
     Long MILLIS_PER_YEAR = 31556908800L; // from wiki
 
-    boolean marshal_bookIDs_to_individual_files = true;
-    boolean marshal_books_to_individual_files = true;
     PubhubWorkflow elivagarWorkflow;
 
     @BeforeClass
@@ -51,10 +49,10 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
         baseAudioDir = TestFileUtils.createEmptyDirectory(audioBaseDirPath);
 
         Map<String, String> confMap = new HashMap<String, String>();
-        confMap.put(Configuration.Constants.CONF_EBOOK_OUTPUT_DIR, baseBookDir.getAbsolutePath());
-        confMap.put(Configuration.Constants.CONF_AUDIO_OUTPUT_DIR, baseAudioDir.getAbsolutePath());
-        confMap.put(Configuration.Constants.CONF_FILE_DIR, new File(bookFilesDirPath).getAbsolutePath());
-        confMap.put(Configuration.Constants.CONF_LICENSE_KEY, license);
+        confMap.put(Configuration.CONF_EBOOK_OUTPUT_DIR, baseBookDir.getAbsolutePath());
+        confMap.put(Configuration.CONF_AUDIO_OUTPUT_DIR, baseAudioDir.getAbsolutePath());
+        confMap.put(Configuration.CONF_FILE_DIR, new File(bookFilesDirPath).getAbsolutePath());
+        confMap.put(Configuration.CONF_LICENSE_KEY, license);
         Configuration conf = new Configuration(confMap);
         elivagarWorkflow = new PubhubWorkflow(conf);
     }
@@ -71,26 +69,6 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
         System.out.println("Marshaled all Books to individual files");
 
         Assert.assertEquals(baseDir.list().length, count);
-    }
-
-    @Test(enabled = false)
-    public void testElivagarRetrievingBookIDs() throws Exception {
-        //        int count = 10;
-        //        elivagar.downloadAllBookIDs(bookIdsDir, count);
-        //        System.out.println("Marshaled all BookIDs to individual files");
-        //
-        //        Assert.assertEquals(bookIdsDir.list().length, count);
-    }
-
-    @Test(enabled = false)
-    public void testElivagarRetrievingModifiedBookIDs() throws Exception {
-        //        elivagar.r
-        //        int count = 10;
-        //        Date oneYearAgo = new Date(System.currentTimeMillis()-MILLIS_PER_YEAR);
-        //        elivagar.downloadBookIDsAfterModifyDate(modifiedBookIdsDir, oneYearAgo, count);
-        //        System.out.println("Marshaled all BookIDs to individual files");
-
-        //        Assert.assertEquals(bookIdsDir.list().length, count);
     }
 
     @Test(enabled = true)

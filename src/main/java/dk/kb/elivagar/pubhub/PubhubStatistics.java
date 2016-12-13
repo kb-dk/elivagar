@@ -5,8 +5,6 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import dk.kb.elivagar.Constants;
-
 /**
  * Method for calculating the statistics for the books retrieved from pubhub. 
  */
@@ -63,10 +61,10 @@ public class PubhubStatistics {
         boolean hasFile = false;
         for(File f : dir.listFiles()) {
             String filename = f.getName().toLowerCase();
-            if(filename.endsWith(Constants.XML_SUFFIX)) {
+            if(filename.endsWith(PubhubPacker.XML_SUFFIX)) {
                 // TODO perhaps only, if the file has the name ${book-id}.xml, where book-id is the dir-name.
                 hasMetadata = true;
-            } else if(filename.endsWith(Constants.EPUD_SUFFIX) || filename.endsWith(Constants.PDF_SUFFIX)) {
+            } else if(filename.endsWith(PubhubPacker.EPUD_SUFFIX) || filename.endsWith(PubhubPacker.PDF_SUFFIX)) {
                 hasFile = true;
             }
         }
