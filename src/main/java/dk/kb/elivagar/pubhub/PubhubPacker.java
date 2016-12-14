@@ -133,17 +133,35 @@ public class PubhubPacker {
         log.info("Packaging book file for book-id: " + id);
         File bookDir = getBookDir(id, BookTypeEnum.EBOG);
         File symbolicBookFile = new File(bookDir, bookFile.getName());
+        File characterizationOutputFile = new File(bookDir, id + FITS_SUFFIX);
         if(symbolicBookFile.isFile()) {
-            // TODO: what if the orig book file has changed? 
-            // Shouldn't we then recharacterize the file?
             log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
+            runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
         } else {
             Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
-            if(characterizationScript != null) {
+            runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
+        }
+    }
+    
+    /**
+     * Runs the characterization if the prerequisites for characterization are met.
+     * The prerequisites are, that a characerization scripts was defined in the configuration, 
+     * that either the file has not yet been characterized, 
+     * or that the file is newer that the output characterization file. 
+     * @param inputFile The file to have characterized.
+     * @param outputFile The file where the output of the characterization should be placed.
+     */
+    protected void runCharacterizationIfNeeded(File inputFile, File outputFile) {
+        if(characterizationScript != null) {
+            if(!outputFile.exists() || 
+                    (outputFile.lastModified() < inputFile.lastModified())) {
                 // 2 args; 1 for input file path and 1 for output file path.
-                File characterizationOutputFile = new File(bookDir, id + FITS_SUFFIX);
-                characterizationScript.execute(bookFile, characterizationOutputFile);
+                characterizationScript.execute(inputFile, outputFile);                    
+            } else {
+                log.trace("Characterization output file is newer that the file to characterize.");
             }
+        } else {
+            log.trace("Characterization is turned off.");
         }
     }
     
