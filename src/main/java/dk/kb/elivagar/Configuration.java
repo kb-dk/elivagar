@@ -17,13 +17,15 @@ import dk.kb.elivagar.utils.YamlUtils;
  * It should have the following YAML format:
  * <ul>
  *   <li>elivagar:</li>
- *   <ul>
- *     <li>ebook_output_dir: /path/to/ebook/output/dir/</li>
- *     <li>audio_output_dir: /path/to/audio/output/dir/</li>
- *     <li>book_orig_dir: /path/to/orig/book/dir/</li>
- *     <li>license_key: DO_NOT_PUT_LICENSE_IN_GITHUB_FILE</li>
- *     <li>characterization_script: bin/run_fits.sh (optional)</li>
- *   </ul>
+ *   <li>
+ *     <ul>
+ *       <li>ebook_output_dir: /path/to/ebook/output/dir/</li>
+ *       <li>audio_output_dir: /path/to/audio/output/dir/</li>
+ *       <li>book_orig_dir: /path/to/orig/book/dir/</li>
+ *       <li>license_key: DO_NOT_PUT_LICENSE_IN_GITHUB_FILE</li>
+ *       <li>characterization_script: bin/run_fits.sh (optional)</li>
+ *     </ul>
+ *   </li>
  * </ul>
  */
 public class Configuration {

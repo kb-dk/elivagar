@@ -12,14 +12,18 @@ import org.slf4j.LoggerFactory;
  * <ul>
  *   <li>Configuration file </li>
  *   <li>Metadata modify date (OPTIONAL)</li>
- *   <ul>
- *     <li>Must be in number of milliseconds ago.</li>
- *     <li>Use -1 (or less) for all books, or 0 for no books.</li>
- *   </ul>
+ *   <li>
+ *     <ul>
+ *       <li>Must be in number of milliseconds ago.</li>
+ *       <li>Use -1 (or less) for all books, or 0 for no books.</li>
+ *     </ul>
+ *   </li>
  *   <li>Max downloads (OPTIONAL)</li>
- *   <ul>
- *     <li>Use -1 for all books</li>
- *   </ul>
+ *   <li>
+ *     <ul>
+ *       <li>Use -1 for all books</li>
+ *     </ul>
+ *   </li>
  * </ul>
  * 
  * The two last options only deals with the metadata retrieval/packaging. 
