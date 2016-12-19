@@ -42,10 +42,10 @@ public class PubhubPacker {
     /** The suffix of pdf book files.*/
     public static final String PDF_SUFFIX = ".pdf";
     /** The suffix of epub book files.*/
-    public static final String EPUD_SUFFIX = ".epub";
+    public static final String EPUB_SUFFIX = ".epub";
     /** The suffix for the fits characterization metadata output files.*/
     public static final String FITS_SUFFIX = ".fits";
-    
+
     /** The Configuration with the base directories for the files to be packed.*/
     protected final Configuration conf;
     /** The namespace of marshalled xml.*/
@@ -56,7 +56,7 @@ public class PubhubPacker {
     protected final Map<String, Marshaller> marshallers;
     /** The script for characterizing the book files. May be null, if no script exists.*/
     protected CharacterizationScriptWrapper characterizationScript;
-    
+
     /**
      * Constructor.
      * @param conf The Configuration with the base directories for the files to be packed.
@@ -70,7 +70,7 @@ public class PubhubPacker {
         this.httpClient = new HttpClient();
         this.characterizationScript = script;
     }
-    
+
     /**
      * Retrieves the marshaller for the given class.
      * This is made to reuse marshallers for each class.
@@ -83,13 +83,13 @@ public class PubhubPacker {
             log.debug("Instantiating marshaller for class '" + c.getName() + "'.");
             JAXBContext context = JAXBContext.newInstance(c);
             Marshaller marshaller = context.createMarshaller();
-       
+
             marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
             marshallers.put(c.getSimpleName(), marshaller);
         }
         return marshallers.get(c.getSimpleName());
     }
-    
+
     /**
      * Pack a book with all files in a dedicated directory.
      * This means marshalling the metadata of the book, and retrieving the image files.
@@ -101,7 +101,7 @@ public class PubhubPacker {
     public void packBook(Book book) throws JAXBException, IOException {
         log.info("Packaging book '" + book.getBookId() + "'.");
         File bookDir = getBookDir(book.getBookId(), book.getBookType());
-        
+
         JAXBElement<Book> rootElement = null;
         Marshaller marshaller = getMarshallerForClass(book.getClass());
         File bookFile = new File(bookDir, book.getBookId() +  XML_SUFFIX);
@@ -110,25 +110,34 @@ public class PubhubPacker {
         marshaller.marshal(rootElement, bookFile);
 
         for(Image image : book.getImages().getImage()) {
-            log.debug("Retrieving image file for '" + book.getBookId() + "', at " + image.getValue());
-            String suffix = StringUtils.getSuffix(image.getValue());
-            File imageFile = new File(bookDir, book.getBookId() + "_" + image.getType() + "." + suffix);
+            try {
+                log.debug("Retrieving image file for '" + book.getBookId() + "', at " + image.getValue());
+                String suffix = StringUtils.getSuffix(image.getValue());
+                File imageFile = new File(bookDir, book.getBookId() + "_" + image.getType() + "." + suffix);
 
-            try (OutputStream os = new FileOutputStream(imageFile)) {
-                httpClient.performDownload(os, new URL(image.getValue()));
+                try (OutputStream os = new FileOutputStream(imageFile)) {
+                    httpClient.performDownload(os, new URL(image.getValue()));
+                }
+            } catch (Exception e) {
+                log.warn("Failed to download the images '" + image.getValue() + "'. Continues without it.", e);
             }
         }
     }
-    
+
     /**
      * Packs a file for the book. This is expected to be the content file, either pdf or epub.
      * This makes a symbolic link to the file from the book-folder.
      * It is a prerequisite that the file has the name of the ID.
+     * Also, if the file is ignored, if it does not have the pdf or epub suffix.
      * @param bookFile The file for the book.
      * @throws IOException If the book directory cannot be instantiated, or if the symbolic link from the
      * original book file cannot be created.
      */
     public void packFileForEbook(File bookFile) throws IOException {
+        if(!hasEbookFileSuffix(bookFile)) {
+            log.trace("The file '" + bookFile.getAbsolutePath() + "' does not have a ebook suffix.");
+            return;
+        }
         String id = StringUtils.getPrefix(bookFile.getName());
         log.info("Packaging book file for book-id: " + id);
         File bookDir = getBookDir(id, BookTypeEnum.EBOG);
@@ -142,7 +151,16 @@ public class PubhubPacker {
             runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
         }
     }
-    
+
+    /**
+     * Checks if a file has an ebook suffix (pdf or epub).
+     * @param bookFile The file.
+     * @return Whether it ends with '.pdf' or '.epub'.
+     */
+    protected boolean hasEbookFileSuffix(File bookFile) {
+        return bookFile.getName().endsWith(PDF_SUFFIX) || bookFile.getName().endsWith(EPUB_SUFFIX);
+    }
+
     /**
      * Runs the characterization if the prerequisites for characterization are met.
      * The prerequisites are, that a characerization scripts was defined in the configuration, 
@@ -164,7 +182,7 @@ public class PubhubPacker {
             log.trace("Characterization is turned off.");
         }
     }
-    
+
     /**
      * Retrieves the directory for the book with the given ID.
      * @param id The ID for the book, whose directory should be retrieved.

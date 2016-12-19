@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  *   <li>Max downloads (OPTIONAL)</li>
  *   <li>
  *     <ul>
- *       <li>Use -1 for all books</li>
+ *       <li>Use non-positive integer for all books</li>
  *     </ul>
  *   </li>
  * </ul>

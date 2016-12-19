@@ -64,7 +64,7 @@ public class PubhubStatistics {
             if(filename.endsWith(PubhubPacker.XML_SUFFIX)) {
                 // TODO perhaps only, if the file has the name ${book-id}.xml, where book-id is the dir-name.
                 hasMetadata = true;
-            } else if(filename.endsWith(PubhubPacker.EPUD_SUFFIX) || filename.endsWith(PubhubPacker.PDF_SUFFIX)) {
+            } else if(filename.endsWith(PubhubPacker.EPUB_SUFFIX) || filename.endsWith(PubhubPacker.PDF_SUFFIX)) {
                 hasFile = true;
             }
         }
