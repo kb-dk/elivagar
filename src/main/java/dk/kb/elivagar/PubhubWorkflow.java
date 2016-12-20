@@ -82,6 +82,10 @@ public class PubhubWorkflow {
      * It is asserted, that the book files is named with the id as the suffix.
      */
     public void packFilesForBooks() {
+        if(conf.getFileDir().listFiles() == null) {
+            log.info("No book files to package.");
+            return;
+        }
         for(File fileForBook : conf.getFileDir().listFiles()) {
             try {
                 if(fileForBook.isFile()) {
