@@ -13,11 +13,17 @@ public class ConfigurationTest extends ExtendedTestCase {
     public void testLoadingFromFile() throws IOException {
         Configuration conf = Configuration.createFromYAMLFile(new File("src/test/resources/elivagar.yml"));
         Assert.assertNotNull(conf);
-        Assert.assertNotNull(conf.getFileDir());
-        Assert.assertNotNull(conf.getLicenseKey());
+        Assert.assertNotNull(conf.getAudioFileDir());
+        Assert.assertNotNull(conf.getAudioFormats());
         Assert.assertNotNull(conf.getAudioOutputDir());
+        Assert.assertNotNull(conf.getCharacterizationScriptFile());
+        Assert.assertNotNull(conf.getEbookFileDir());
+        Assert.assertNotNull(conf.getEbookFormats());
         Assert.assertNotNull(conf.getEbookOutputDir());
+        Assert.assertNotNull(conf.getLicenseKey());
         Assert.assertTrue(conf.getAudioOutputDir().isDirectory());
         Assert.assertTrue(conf.getEbookOutputDir().isDirectory());
+        Assert.assertFalse(conf.getAudioFormats().isEmpty());
+        Assert.assertFalse(conf.getEbookFormats().isEmpty());
     }
 }

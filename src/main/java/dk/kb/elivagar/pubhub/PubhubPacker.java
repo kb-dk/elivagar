@@ -39,10 +39,6 @@ public class PubhubPacker {
 
     /** The suffix of XML files.*/
     public static final String XML_SUFFIX = ".xml";
-    /** The suffix of pdf book files.*/
-    public static final String PDF_SUFFIX = ".pdf";
-    /** The suffix of epub book files.*/
-    public static final String EPUB_SUFFIX = ".epub";
     /** The suffix for the fits characterization metadata output files.*/
     public static final String FITS_SUFFIX = ".fits";
 
@@ -133,7 +129,7 @@ public class PubhubPacker {
      * @throws IOException If the book directory cannot be instantiated, or if the symbolic link from the
      * original book file cannot be created.
      */
-    public void packFileForEbook(File bookFile) throws IOException {
+    public void packFileForAudioBook(File bookFile) throws IOException {
         if(!hasEbookFileSuffix(bookFile)) {
             log.trace("The file '" + bookFile.getAbsolutePath() + "' does not have a ebook suffix.");
             return;
@@ -153,14 +149,93 @@ public class PubhubPacker {
     }
 
     /**
-     * Checks if a file has an ebook suffix (pdf or epub).
-     * @param bookFile The file.
-     * @return Whether it ends with '.pdf' or '.epub'.
+     * Packs a file for the ebook. This is expected to be the content file in an ebook format 
+     * - according to the configured formats (e.g. pdf or epub).
+     * 
+     * This makes a symbolic link to the file from the ebook folder to the original file.
+     * It is a prerequisite that the file has the name of the ID.
+     * Also, if the file is ignored, if it does not have an ebook suffix.
+     * @param bookFile The file for the ebook.
+     * @throws IOException If the book directory cannot be instantiated, or if the symbolic link from the
+     * original ebook file cannot be created.
      */
-    protected boolean hasEbookFileSuffix(File bookFile) {
-        return bookFile.getName().endsWith(PDF_SUFFIX) || bookFile.getName().endsWith(EPUB_SUFFIX);
+    public void packFileForEbook(File bookFile) throws IOException {
+        if(!hasEbookFileSuffix(bookFile)) {
+            log.trace("The file '" + bookFile.getAbsolutePath() + "' does not have a ebook suffix.");
+            return;
+        }
+        String id = StringUtils.getPrefix(bookFile.getName());
+        log.info("Packaging book file for book-id: " + id);
+        File bookDir = getBookDir(id, BookTypeEnum.EBOG);
+        File symbolicBookFile = new File(bookDir, bookFile.getName());
+        File characterizationOutputFile = new File(bookDir, bookFile.getName() + FITS_SUFFIX);
+        if(symbolicBookFile.isFile()) {
+            log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
+            runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
+        } else {
+            Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
+            runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
+        }
     }
 
+    /**
+     * Packs a file for the audio book. 
+     * This is expected to be the content file in an audio format - according to the configured formats (e.g. mp3).
+     * 
+     * This makes a symbolic link to the file from the audio book folder to the original file.
+     * It is a prerequisite that the file has the name of the ID.
+     * Also, if the file is ignored, if it does not have an audio book suffix.
+     * @param bookFile The file for the audio book.
+     * @throws IOException If the book directory cannot be instantiated, or if the symbolic link from the
+     * original audio file cannot be created.
+     */
+    public void packFileForAudio(File bookFile) throws IOException {
+        if(!hasAudioFileSuffix(bookFile)) {
+            log.trace("The file '" + bookFile.getAbsolutePath() + "' does not have a audio suffix.");
+            return;
+        }
+        String id = StringUtils.getPrefix(bookFile.getName());
+        log.info("Packaging book file for book-id: " + id);
+        File bookDir = getBookDir(id, BookTypeEnum.LYDBOG);
+        File symbolicBookFile = new File(bookDir, bookFile.getName());
+        File characterizationOutputFile = new File(bookDir, bookFile.getName() + FITS_SUFFIX);
+        if(symbolicBookFile.isFile()) {
+            log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
+            runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
+        } else {
+            Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
+            runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
+        }
+    }
+    
+    /**
+     * Checks if a file has an ebook suffix as defined in the configuration (e.g. pdf or epub).
+     * @param bookFile The file.
+     * @return Whether the file has an ebook suffix.
+     */
+    protected boolean hasEbookFileSuffix(File bookFile) {
+        for(String suffix : conf.getEbookFormats()) {
+            if(bookFile.getName().endsWith("." + suffix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Checks if a file has an audio book suffix as defined in the configuration (e.g. mp3).
+     * @param bookFile The file.
+     * @return Whether the file has an audio book suffix.
+     */
+    protected boolean hasAudioFileSuffix(File bookFile) {
+        for(String suffix : conf.getAudioFormats()) {
+            if(bookFile.getName().endsWith("." + suffix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     /**
      * Runs the characterization if the prerequisites for characterization are met.
      * The prerequisites are, that a characerization scripts was defined in the configuration, 

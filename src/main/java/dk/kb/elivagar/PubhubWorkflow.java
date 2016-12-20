@@ -14,6 +14,9 @@ import org.slf4j.LoggerFactory;
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
 import dk.kb.elivagar.pubhub.PubhubPacker;
 import dk.kb.elivagar.pubhub.PubhubStatistics;
+import dk.kb.elivagar.pubhub.validator.AudioSuffixValidator;
+import dk.kb.elivagar.pubhub.validator.EbookSuffixValidator;
+import dk.kb.elivagar.pubhub.validator.FileSuffixValidator;
 import dk.kb.elivagar.script.CharacterizationScriptWrapper;
 import dk.pubhub.service.Book;
 
@@ -78,15 +81,23 @@ public class PubhubWorkflow {
     }
     
     /**
-     * Packs the files for the books into the right folder.
-     * It is asserted, that the book files is named with the id as the suffix.
+     * Instantiates the packaging of both ebooks and audio books.
      */
     public void packFilesForBooks() {
-        if(conf.getFileDir().listFiles() == null) {
+        packFilesForEbooks();
+        packFilesForAudioBooks();
+    }
+    
+    /**
+     * Packs the files for the ebooks into their right folder.
+     * It is asserted, that the book files is named with the id as the suffix.
+     */
+    protected void packFilesForEbooks() {
+        if(conf.getEbookFileDir().listFiles() == null) {
             log.info("No book files to package.");
             return;
         }
-        for(File fileForBook : conf.getFileDir().listFiles()) {
+        for(File fileForBook : conf.getEbookFileDir().listFiles()) {
             try {
                 if(fileForBook.isFile()) {
                     packer.packFileForEbook(fileForBook);
@@ -101,17 +112,40 @@ public class PubhubWorkflow {
     }
     
     /**
+     * Packs the files for the audio books into their right folder.
+     * It is asserted, that the book files is named with the id as the suffix.
+     */
+    protected void packFilesForAudioBooks() {
+        if(conf.getAudioFileDir().listFiles() == null) {
+            log.info("No audio files to package.");
+            return;
+        }
+        for(File fileForAudioBook : conf.getAudioFileDir().listFiles()) {
+            try {
+                if(fileForAudioBook.isFile()) {
+                    packer.packFileForAudio(fileForAudioBook);
+                } else {
+                    log.trace("Cannot package directory: " + fileForAudioBook.getAbsolutePath());
+                }
+            } catch (IOException e) {
+                log.error("Failed to package the file '" + fileForAudioBook.getAbsolutePath() + "' for a audio book. "
+                        + "Trying to continue with next audio book file.", e);
+            }
+        }
+    }
+    
+    /**
      * Makes and prints the statistics for the both the ebook directory and the audio directory.
      * @param printer The print stream where the output is written.
      */
     public void makeStatistics(PrintStream printer) {
         if(conf.getEbookOutputDir().list() != null) {
-            makeStatisticsForDirectory(printer, conf.getEbookOutputDir());
+            makeStatisticsForDirectory(printer, conf.getEbookOutputDir(), new EbookSuffixValidator(conf));
         } else {
             printer.println("No ebooks to make statistics upon.");
         }
         if(conf.getAudioOutputDir().list() != null) {
-            makeStatisticsForDirectory(printer, conf.getAudioOutputDir());
+            makeStatisticsForDirectory(printer, conf.getAudioOutputDir(), new AudioSuffixValidator(conf));
         } else {
             printer.println("No ebooks to make statistics upon.");
         }
@@ -122,8 +156,8 @@ public class PubhubWorkflow {
      * @param printer The print stream where the output is written.
      * @param dir The directory to calculate the statistics upon.
      */
-    protected void makeStatisticsForDirectory(PrintStream printer, File dir) {
-        PubhubStatistics statistics = new PubhubStatistics(dir);
+    protected void makeStatisticsForDirectory(PrintStream printer, File dir, FileSuffixValidator validator) {
+        PubhubStatistics statistics = new PubhubStatistics(dir, validator);
         printer.println("Calculating the statistics for directory: " + dir.getAbsolutePath());
         statistics.calculateStatistics();
         printer.println("Number of book directories traversed: " + statistics.getTotalCount());

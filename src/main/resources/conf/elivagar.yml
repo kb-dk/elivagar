@@ -1,6 +1,12 @@
 elivagar:
   ebook_output_dir: tempDir/packaged_books
   audio_output_dir: tempDir/packaged_audio
-  book_orig_dir: /path/to/book/files/
+  ebook_orig_dir: /path/to/book/files/
+  audio_orig_dir: /path/to/audio/files/
   license_key: LICENSE_KEY
   characterization_script: bin/run_fits.sh
+  ebook_formats:
+    - pdf
+    - epub
+  audio_formats:
+    - mp3

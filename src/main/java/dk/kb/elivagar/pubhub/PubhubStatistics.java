@@ -5,6 +5,8 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dk.kb.elivagar.pubhub.validator.FileSuffixValidator;
+
 /**
  * Method for calculating the statistics for the books retrieved from pubhub. 
  */
@@ -14,6 +16,8 @@ public class PubhubStatistics {
 
     /** The base directory.*/
     protected final File baseDir;
+    /** The validator for which files are considered content-files.*/
+    protected final FileSuffixValidator validator;
     
     /** The number of directories traversed. */
     protected long count = 0l;
@@ -29,9 +33,11 @@ public class PubhubStatistics {
     /**
      * Constructor.
      * @param baseDir The base directory, where each retrieved book has its own subdirectory.
+     * @param validator The validator for which files are considered content-files.
      */
-    public PubhubStatistics(File baseDir) {
+    public PubhubStatistics(File baseDir, FileSuffixValidator validator) {
         this.baseDir = baseDir;
+        this.validator = validator;
     }
     
     /**
@@ -64,7 +70,7 @@ public class PubhubStatistics {
             if(filename.endsWith(PubhubPacker.XML_SUFFIX)) {
                 // TODO perhaps only, if the file has the name ${book-id}.xml, where book-id is the dir-name.
                 hasMetadata = true;
-            } else if(filename.endsWith(PubhubPacker.EPUB_SUFFIX) || filename.endsWith(PubhubPacker.PDF_SUFFIX)) {
+            } else if(validator.hasValidSuffix(f)) {
                 hasFile = true;
             }
         }

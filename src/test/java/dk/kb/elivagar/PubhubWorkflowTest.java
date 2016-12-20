@@ -2,6 +2,7 @@ package dk.kb.elivagar;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,10 @@ import dk.kb.elivagar.utils.FileUtils;
 
 public class PubhubWorkflowTest extends ExtendedTestCase {
 
+    public static final String PDF_SUFFIX = ".pdf";
+    public static final String EPUB_SUFFIX = ".epub";
+
+    
     String licenseFilePath = System.getenv("HOME") + "/pubhub-license.txt";
     String license;
 
@@ -49,11 +54,14 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
         baseBookDir = TestFileUtils.createEmptyDirectory(ebookBaseDirPath);
         baseAudioDir = TestFileUtils.createEmptyDirectory(audioBaseDirPath);
 
-        Map<String, String> confMap = new HashMap<String, String>();
+        Map<String, Object> confMap = new HashMap<String, Object>();
         confMap.put(Configuration.CONF_EBOOK_OUTPUT_DIR, baseBookDir.getAbsolutePath());
         confMap.put(Configuration.CONF_AUDIO_OUTPUT_DIR, baseAudioDir.getAbsolutePath());
-        confMap.put(Configuration.CONF_FILE_DIR, new File(bookFilesDirPath).getAbsolutePath());
+        confMap.put(Configuration.CONF_EBOOK_FILE_DIR, new File(bookFilesDirPath).getAbsolutePath());
+        confMap.put(Configuration.CONF_AUDIO_FILE_DIR, new File(bookFilesDirPath).getAbsolutePath());
         confMap.put(Configuration.CONF_LICENSE_KEY, license);
+        confMap.put(Configuration.CONF_AUDIO_FORMATS, Arrays.asList("mp3"));
+        confMap.put(Configuration.CONF_EBOOK_FORMATS, Arrays.asList("pdf", "epub"));
         Configuration conf = new Configuration(confMap);
         elivagarWorkflow = new PubhubWorkflow(conf);
     }
@@ -89,7 +97,7 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
 
         int numberOfBooks = 10;
         for(int i = 0; i < numberOfBooks; i++) {
-            File testFile = new File(bookFilesDir, UUID.randomUUID().toString() + PubhubPacker.PDF_SUFFIX);
+            File testFile = new File(bookFilesDir, UUID.randomUUID().toString() + PDF_SUFFIX);
             TestFileUtils.createFile(testFile, UUID.randomUUID().toString());
         }
 
@@ -116,7 +124,7 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
 
         int numberOfBooks = 10;
         for(int i = 0; i < numberOfBooks; i++) {
-            File testFile = new File(bookFilesDir, UUID.randomUUID().toString() + PubhubPacker.EPUB_SUFFIX);
+            File testFile = new File(bookFilesDir, UUID.randomUUID().toString() + EPUB_SUFFIX);
             TestFileUtils.createFile(testFile, UUID.randomUUID().toString());
         }
 
