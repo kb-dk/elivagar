@@ -26,7 +26,10 @@ import dk.pubhub.service.Book;
 public class PubhubWorkflow {
     /** The logger.*/
     private static final Logger log = LoggerFactory.getLogger(PubhubWorkflow.class);
-
+    
+    /** The sub directory path from audio book dir to the folder with the actual file.*/
+    protected static final String AUDIO_SUB_DIR_PATH = "Full/Mp3/";
+    
     /** The configuration for pubhub.*/
     protected final Configuration conf;
     
@@ -90,7 +93,7 @@ public class PubhubWorkflow {
     
     /**
      * Packs the files for the ebooks into their right folder.
-     * It is asserted, that the book files is named with the id as the suffix.
+     * It is asserted, that the book files is named with the id as the prefix.
      */
     protected void packFilesForEbooks() {
         if(conf.getEbookFileDir().listFiles() == null) {
@@ -113,22 +116,28 @@ public class PubhubWorkflow {
     
     /**
      * Packs the files for the audio books into their right folder.
-     * It is asserted, that the book files is named with the id as the suffix.
+     * The audio books are placed in a sub-directory with the following structure:
+     * $AUDIO_BOOK_BASE_DIR / ${ID} / Full / Mp3 / ${ID} . mp3
+     * 
+     * It is asserted, that the book files is named with the id as the prefix.
      */
     protected void packFilesForAudioBooks() {
         if(conf.getAudioFileDir().listFiles() == null) {
             log.info("No audio files to package.");
             return;
         }
-        for(File fileForAudioBook : conf.getAudioFileDir().listFiles()) {
+        for(File audioBookDir : conf.getAudioFileDir().listFiles()) {
+            String id = audioBookDir.getName();
+            File expectedAudioBookFile = new File(audioBookDir, AUDIO_SUB_DIR_PATH + id + ".mp3");
             try {
-                if(fileForAudioBook.isFile()) {
-                    packer.packFileForAudio(fileForAudioBook);
+                if(expectedAudioBookFile.isFile()) {
+                    packer.packFileForAudio(expectedAudioBookFile);
                 } else {
-                    log.trace("Cannot package directory: " + fileForAudioBook.getAbsolutePath());
+                    log.trace("Cannot handle non-existing Audio-book file: " 
+                            + expectedAudioBookFile.getAbsolutePath());
                 }
             } catch (IOException e) {
-                log.error("Failed to package the file '" + fileForAudioBook.getAbsolutePath() + "' for a audio book. "
+                log.error("Failed to package the file '" + audioBookDir.getAbsolutePath() + "' for a audio book. "
                         + "Trying to continue with next audio book file.", e);
             }
         }

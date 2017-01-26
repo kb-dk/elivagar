@@ -20,6 +20,9 @@ import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.Configuration;
 import dk.kb.elivagar.HttpClient;
+import dk.kb.elivagar.pubhub.validator.AudioSuffixValidator;
+import dk.kb.elivagar.pubhub.validator.EbookSuffixValidator;
+import dk.kb.elivagar.pubhub.validator.FileSuffixValidator;
 import dk.kb.elivagar.script.CharacterizationScriptWrapper;
 import dk.kb.elivagar.utils.FileUtils;
 import dk.kb.elivagar.utils.StringUtils;
@@ -53,6 +56,11 @@ public class PubhubPacker {
     /** The script for characterizing the book files. May be null, if no script exists.*/
     protected CharacterizationScriptWrapper characterizationScript;
 
+    /** The suffix validator for audio files.*/
+    protected final AudioSuffixValidator audioSuffixValidator;
+    /** The suffix validator for ebook files..*/
+    protected final EbookSuffixValidator ebookSuffixValidator;
+    
     /**
      * Constructor.
      * @param conf The Configuration with the base directories for the files to be packed.
@@ -65,6 +73,8 @@ public class PubhubPacker {
         this.marshallers = new HashMap<String, Marshaller>();
         this.httpClient = new HttpClient();
         this.characterizationScript = script;
+        this.audioSuffixValidator = new AudioSuffixValidator(conf);
+        this.ebookSuffixValidator = new EbookSuffixValidator(conf);
     }
 
     /**
@@ -121,34 +131,6 @@ public class PubhubPacker {
     }
 
     /**
-     * Packs a file for the book. This is expected to be the content file, either pdf or epub.
-     * This makes a symbolic link to the file from the book-folder.
-     * It is a prerequisite that the file has the name of the ID.
-     * Also, if the file is ignored, if it does not have the pdf or epub suffix.
-     * @param bookFile The file for the book.
-     * @throws IOException If the book directory cannot be instantiated, or if the symbolic link from the
-     * original book file cannot be created.
-     */
-    public void packFileForAudioBook(File bookFile) throws IOException {
-        if(!hasEbookFileSuffix(bookFile)) {
-            log.trace("The file '" + bookFile.getAbsolutePath() + "' does not have a ebook suffix.");
-            return;
-        }
-        String id = StringUtils.getPrefix(bookFile.getName());
-        log.info("Packaging book file for book-id: " + id);
-        File bookDir = getBookDir(id, BookTypeEnum.EBOG);
-        File symbolicBookFile = new File(bookDir, bookFile.getName());
-        File characterizationOutputFile = new File(bookDir, id + FITS_SUFFIX);
-        if(symbolicBookFile.isFile()) {
-            log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
-            runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
-        } else {
-            Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
-            runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
-        }
-    }
-
-    /**
      * Packs a file for the ebook. This is expected to be the content file in an ebook format 
      * - according to the configured formats (e.g. pdf or epub).
      * 
@@ -160,7 +142,7 @@ public class PubhubPacker {
      * original ebook file cannot be created.
      */
     public void packFileForEbook(File bookFile) throws IOException {
-        if(!hasEbookFileSuffix(bookFile)) {
+        if(!ebookSuffixValidator.hasValidSuffix(bookFile)) {
             log.trace("The file '" + bookFile.getAbsolutePath() + "' does not have a ebook suffix.");
             return;
         }
@@ -190,7 +172,7 @@ public class PubhubPacker {
      * original audio file cannot be created.
      */
     public void packFileForAudio(File bookFile) throws IOException {
-        if(!hasAudioFileSuffix(bookFile)) {
+        if(!audioSuffixValidator.hasValidSuffix(bookFile)) {
             log.trace("The file '" + bookFile.getAbsolutePath() + "' does not have a audio suffix.");
             return;
         }
@@ -206,34 +188,6 @@ public class PubhubPacker {
             Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
             runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
         }
-    }
-    
-    /**
-     * Checks if a file has an ebook suffix as defined in the configuration (e.g. pdf or epub).
-     * @param bookFile The file.
-     * @return Whether the file has an ebook suffix.
-     */
-    protected boolean hasEbookFileSuffix(File bookFile) {
-        for(String suffix : conf.getEbookFormats()) {
-            if(bookFile.getName().endsWith("." + suffix)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * Checks if a file has an audio book suffix as defined in the configuration (e.g. mp3).
-     * @param bookFile The file.
-     * @return Whether the file has an audio book suffix.
-     */
-    protected boolean hasAudioFileSuffix(File bookFile) {
-        for(String suffix : conf.getAudioFormats()) {
-            if(bookFile.getName().endsWith("." + suffix)) {
-                return true;
-            }
-        }
-        return false;
     }
     
     /**

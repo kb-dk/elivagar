@@ -45,7 +45,8 @@ public class PubhubStatistics {
      * This should be run before retrieving the values.
      */
     public void calculateStatistics() {
-        log.info("Calculating the statistics on the books. Expecting '" + baseDir.list().length + "' books.");
+        log.info("Calculating the statistics on the books in directory '" + baseDir.getAbsolutePath()
+                + "'. Expecting '" + baseDir.list().length + "' books.");
         for(File dir : baseDir.listFiles()) {
             if(dir.isDirectory()) {
                 calculateStatisticsOnBookDir(dir);
