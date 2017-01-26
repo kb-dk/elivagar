@@ -26,18 +26,18 @@ import dk.pubhub.service.Book;
 public class PubhubWorkflow {
     /** The logger.*/
     private static final Logger log = LoggerFactory.getLogger(PubhubWorkflow.class);
-    
+
     /** The sub directory path from audio book dir to the folder with the actual file.*/
     protected static final String AUDIO_SUB_DIR_PATH = "Full/Mp3/";
-    
+
     /** The configuration for pubhub.*/
     protected final Configuration conf;
-    
+
     /** The retriever for Pubhub.*/
     protected final PubhubMetadataRetriever retriever;
     /** The packer of the Pubhub data.*/
     protected final PubhubPacker packer;
-    
+
     /**
      * Constructor. 
      * @param conf The elivagar configuration. 
@@ -51,7 +51,7 @@ public class PubhubWorkflow {
         }
         this.packer = new PubhubPacker(conf, retriever.getServiceNamespace(), script);
     }
-    
+
     /**
      * Retrieves all the books.
      * @param max The maximum number of books to retrieve.
@@ -65,7 +65,7 @@ public class PubhubWorkflow {
             packer.packBook(book);
         }
     }
-    
+
     /**
      * Retrieves the books which have been modified after a given date.
      * Though with a given maximum number of books to retrieve.
@@ -82,7 +82,7 @@ public class PubhubWorkflow {
             packer.packBook(book);
         }
     }
-    
+
     /**
      * Instantiates the packaging of both ebooks and audio books.
      */
@@ -90,7 +90,7 @@ public class PubhubWorkflow {
         packFilesForEbooks();
         packFilesForAudioBooks();
     }
-    
+
     /**
      * Packs the files for the ebooks into their right folder.
      * It is asserted, that the book files is named with the id as the prefix.
@@ -113,7 +113,7 @@ public class PubhubWorkflow {
             }
         }
     }
-    
+
     /**
      * Packs the files for the audio books into their right folder.
      * The audio books are placed in a sub-directory with the following structure:
@@ -126,23 +126,35 @@ public class PubhubWorkflow {
             log.info("No audio files to package.");
             return;
         }
-        for(File audioBookDir : conf.getAudioFileDir().listFiles()) {
-            String id = audioBookDir.getName();
-            File expectedAudioBookFile = new File(audioBookDir, AUDIO_SUB_DIR_PATH + id + ".mp3");
-            try {
-                if(expectedAudioBookFile.isFile()) {
-                    packer.packFileForAudio(expectedAudioBookFile);
-                } else {
-                    log.trace("Cannot handle non-existing Audio-book file: " 
-                            + expectedAudioBookFile.getAbsolutePath());
+        for(File audioBookBaseDir : conf.getAudioFileDir().listFiles()) {
+            String id = audioBookBaseDir.getName();
+            File audioBookFileDir = new File(audioBookBaseDir, AUDIO_SUB_DIR_PATH);
+            if(!audioBookFileDir.isDirectory()) {
+                log.trace("Cannot handle non-existing Audio-book file: " 
+                        + audioBookFileDir.getAbsolutePath());
+            } else {
+                for(File audioBookFile : audioBookFileDir.listFiles()) {
+                    try {
+                        if(!audioBookFile.getName().startsWith(id)) {
+                            log.info("Ignores the file '" + audioBookFile.getAbsolutePath() + " since it does not "
+                                    + "comply with the format '{ID}/" + AUDIO_SUB_DIR_PATH + "{ID}.{suffix}");
+                        } else {
+                            if(audioBookFile.isFile()) {
+                                packer.packFileForAudio(audioBookFile);
+                            } else {
+                                log.trace("Cannot handle directory: " 
+                                        + audioBookFile.getAbsolutePath());
+                            }
+                        }
+                    } catch (IOException e) {
+                        log.error("Failed to package the file '" + audioBookBaseDir.getAbsolutePath() + "' for a audio book. "
+                                + "Trying to continue with next audio book file.", e);
+                    }
                 }
-            } catch (IOException e) {
-                log.error("Failed to package the file '" + audioBookDir.getAbsolutePath() + "' for a audio book. "
-                        + "Trying to continue with next audio book file.", e);
             }
         }
     }
-    
+
     /**
      * Makes and prints the statistics for the both the ebook directory and the audio directory.
      * @param printer The print stream where the output is written.
@@ -159,7 +171,7 @@ public class PubhubWorkflow {
             printer.println("No ebooks to make statistics upon.");
         }
     }
-    
+
     /**
      * Calculates the statistics on the books in the given directory.
      * @param printer The print stream where the output is written.
