@@ -22,7 +22,6 @@ import dk.kb.elivagar.Configuration;
 import dk.kb.elivagar.HttpClient;
 import dk.kb.elivagar.pubhub.validator.AudioSuffixValidator;
 import dk.kb.elivagar.pubhub.validator.EbookSuffixValidator;
-import dk.kb.elivagar.pubhub.validator.FileSuffixValidator;
 import dk.kb.elivagar.script.CharacterizationScriptWrapper;
 import dk.kb.elivagar.utils.FileUtils;
 import dk.kb.elivagar.utils.StringUtils;
@@ -99,7 +98,6 @@ public class PubhubPacker {
     /**
      * Pack a book with all files in a dedicated directory.
      * This means marshalling the metadata of the book, and retrieving the image files.
-     * TODO: Get the e-book.
      * @param book The book to pack.
      * @throws JAXBException If the book cannot be marshalled into an XML file.
      * @throws IOException If an issue occurs when retrieving the directory, or creating or downloading the files.
