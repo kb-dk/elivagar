@@ -164,7 +164,12 @@ public class PubhubPacker {
      * 
      * This makes a symbolic link to the file from the audio book folder to the original file.
      * It is a prerequisite that the file has the name of the ID.
+     * The file name might be in upper-case, but the ID should be in lower-case, therefore
+     * it is lowercased for the directory, the symbolic link and the characterization file.
      * Also, if the file is ignored, if it does not have an audio book suffix.
+     * 
+     * This will also perform the characterization, if needed.
+     * 
      * @param bookFile The file for the audio book.
      * @throws IOException If the book directory cannot be instantiated, or if the symbolic link from the
      * original audio file cannot be created.
@@ -174,11 +179,11 @@ public class PubhubPacker {
             log.trace("The file '" + bookFile.getAbsolutePath() + "' does not have a audio suffix.");
             return;
         }
-        String id = StringUtils.getPrefix(bookFile.getName());
+        String id = StringUtils.getPrefix(bookFile.getName()).toLowerCase(); 
         log.info("Packaging book file for book-id: " + id);
         File bookDir = getBookDir(id, BookTypeEnum.LYDBOG);
-        File symbolicBookFile = new File(bookDir, bookFile.getName());
-        File characterizationOutputFile = new File(bookDir, bookFile.getName() + FITS_SUFFIX);
+        File symbolicBookFile = new File(bookDir, bookFile.getName().toLowerCase());
+        File characterizationOutputFile = new File(bookDir, bookFile.getName().toLowerCase() + FITS_SUFFIX);
         if(symbolicBookFile.isFile()) {
             log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
             runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
