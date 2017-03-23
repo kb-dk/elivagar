@@ -34,13 +34,13 @@ public class ScriptWrapper {
      * @param args The argument(s) for the script.
      */
     protected void callVoidScript(String ... args) {
+        StringBuffer command = new StringBuffer();
+        command.append("bash ");
+        command.append(scriptFile.getAbsolutePath());
+        for(String arg : args) {
+            command.append(" " + arg);
+        }
         try {
-            StringBuffer command = new StringBuffer();
-            command.append("bash ");
-            command.append(scriptFile.getAbsolutePath());
-            for(String arg : args) {
-                command.append(" " + arg);
-            }
             log.info("Executing commandline: " + command.toString());
             Process p = Runtime.getRuntime().exec(command.toString());
             int success = p.waitFor();
@@ -55,7 +55,7 @@ public class ScriptWrapper {
                         + StreamUtils.extractInputStreamAsString(p.getInputStream()));
             }
         } catch (IOException | InterruptedException e) {
-            throw new IllegalStateException("Failure during execution", e);
+            throw new IllegalStateException("Failure during execution of command: '" + command + "'", e);
         }
     }
 }

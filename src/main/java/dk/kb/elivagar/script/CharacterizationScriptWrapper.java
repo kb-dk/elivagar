@@ -22,6 +22,6 @@ public class CharacterizationScriptWrapper extends ScriptWrapper {
      * @param outputFile The output file, where the characterization results is placed.
      */
     public void execute(File inputFile, File outputFile) {
-        callVoidScript(inputFile.getAbsolutePath(), outputFile.getAbsolutePath()); 
+        callVoidScript("\"" + inputFile.getAbsolutePath() + "\"", "\"" + outputFile.getAbsolutePath() + "\""); 
     }
 }

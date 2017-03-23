@@ -29,7 +29,6 @@ public class ScriptWrapperTest extends ExtendedTestCase {
         exampleScript = new File(tempDir, origScript.getName());
 
         StreamUtils.copyInputStreamToOutputStream(new FileInputStream(origScript), new FileOutputStream(exampleScript));
-
     }
 
     @Test
