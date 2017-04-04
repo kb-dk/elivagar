@@ -195,7 +195,7 @@ public class PubhubPacker {
     
     /**
      * Runs the characterization if the prerequisites for characterization are met.
-     * The prerequisites are, that a characerization scripts was defined in the configuration, 
+     * The prerequisites are, that a characterization scripts was defined in the configuration, 
      * that either the file has not yet been characterized, 
      * or that the file is newer that the output characterization file. 
      * @param inputFile The file to have characterized.
