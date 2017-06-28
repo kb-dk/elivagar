@@ -10,6 +10,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class TestFileUtils {
+    
+    protected static final String TEMPDIR_NAME = "tempDir";
 
     public static String readFile(File file) throws IOException {
         try(BufferedReader br = new BufferedReader(new FileReader(file));) {
@@ -22,6 +24,14 @@ public class TestFileUtils {
 
             return res.toString();
         }
+    }
+    
+    public static File setupTempDir() throws IOException {
+        return createEmptyDirectory(TEMPDIR_NAME);
+    }
+    
+    public static void tearDown() {
+        deleteFile(new File(TEMPDIR_NAME));
     }
     
     public static File createEmptyDirectory(String dirPath) throws IOException {
