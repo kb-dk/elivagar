@@ -18,8 +18,8 @@ import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import dk.kb.elivagar.Configuration;
 import dk.kb.elivagar.HttpClient;
+import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.pubhub.validator.AudioSuffixValidator;
 import dk.kb.elivagar.pubhub.validator.EbookSuffixValidator;
 import dk.kb.elivagar.script.CharacterizationScriptWrapper;

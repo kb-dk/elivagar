@@ -1,4 +1,4 @@
-package dk.kb.elivagar;
+package dk.kb.elivagar.config;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +35,12 @@ import dk.kb.elivagar.utils.YamlUtils;
  *     <ul>
  *       <li>- mp3</li>
  *     </ul>
+ *     <li>aleph:</li>
+ *     <ul>
+ *       <li>aleph_url: $ALEPH_URL</li>
+ *       <li>aleph_base: $ALEPH_BASE</li>
+ *       <li>temp_dir: $TEMP_DIR</li>
+ *     </ul>
  *   </ul>
  * </ul>
  */
@@ -61,6 +67,15 @@ public class Configuration {
     /** The configuration name for the list of formats for the audio books.*/
     public static final String CONF_AUDIO_FORMATS = "audio_formats";
     
+    /** The configuration Aleph element.*/
+    public static final String CONF_ALEPH_ROOT = "aleph";
+    /** The configuration name for the Aleph url.*/
+    public static final String CONF_ALEPH_URL = "aleph_url";
+    /** The configuration name for the Aleph base.*/
+    public static final String CONF_ALEPH_BASE = "aleph_base";
+    /** The configuration name for the directory for temporary storing aleph resources.*/
+    public static final String CONF_ALEPH_TEMP_DIR = "temp_dir";
+    
     /** The output directory for the ebooks.*/
     protected final File ebookOutputDir;
     /** The output directory for the audio-books.*/
@@ -79,6 +94,9 @@ public class Configuration {
     /** The list of formats for the audio books.*/
     protected List<String> audioFormats;
     
+    /** The Aleph configuration.*/
+    protected final AlephConfiguration alephConfiguration;
+    
     /**
      * Constructor.
      * @param confMap The YAML map for the configuration.
@@ -92,6 +110,8 @@ public class Configuration {
         validateThatMapContainsKey(confMap, CONF_AUDIO_FILE_DIR);
         validateThatMapContainsKey(confMap, CONF_EBOOK_FILE_DIR);
         validateThatMapContainsKey(confMap, CONF_AUDIO_FILE_DIR);
+        validateThatMapContainsKey(confMap, CONF_ALEPH_ROOT);
+        
         ebookOutputDir = FileUtils.createDirectory((String) confMap.get(CONF_EBOOK_OUTPUT_DIR));
         abookOutputDir = FileUtils.createDirectory((String) confMap.get(CONF_AUDIO_OUTPUT_DIR));
         licenseKey = (String) confMap.get(CONF_LICENSE_KEY);
@@ -103,6 +123,31 @@ public class Configuration {
         
         ebookFormats = (List<String>) confMap.get(CONF_EBOOK_FORMATS);
         audioFormats = (List<String>) confMap.get(CONF_AUDIO_FORMATS);
+        
+        this.alephConfiguration = getAlephConfiguration((Map<String, Object>) confMap.get(CONF_ALEPH_ROOT));
+    }
+    
+    /**
+     * Instantiates the AlephConfiguration from the given map.
+     * @param alephMap The map with the Aleph elements.
+     * @return The configuration for retrieving data from Aleph.
+     * @throws IOException If the temporary directory cannot be instantiated.
+     */
+    protected AlephConfiguration getAlephConfiguration(Map<String, Object> alephMap) throws IOException {
+        validateThatMapContainsKey(alephMap, CONF_ALEPH_URL);
+        validateThatMapContainsKey(alephMap, CONF_ALEPH_BASE);
+        validateThatMapContainsKey(alephMap, CONF_ALEPH_TEMP_DIR);
+        
+        String url = (String) alephMap.get(CONF_ALEPH_URL);
+        String base = (String) alephMap.get(CONF_ALEPH_BASE);
+        String tempDirPath = (String) alephMap.get(CONF_ALEPH_TEMP_DIR);
+        File tempDir = FileUtils.createDirectory(tempDirPath);
+        return new AlephConfiguration(url, base, tempDir);
+    }
+    
+    /** @return The aleph configuration. */
+    public AlephConfiguration getAlephConfiguration() {
+        return alephConfiguration;
     }
     
     /** @return The output directory for the ebook directories. */

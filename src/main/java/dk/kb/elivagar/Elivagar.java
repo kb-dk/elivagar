@@ -6,6 +6,8 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dk.kb.elivagar.config.Configuration;
+
 /**
  * Class for instantiating the Elivagar workflow.
  * Takes the following arguments:

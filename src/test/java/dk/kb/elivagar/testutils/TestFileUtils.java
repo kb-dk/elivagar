@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 public class TestFileUtils {
     
     protected static final String TEMPDIR_NAME = "tempDir";
+    protected static File tempDir = new File(TEMPDIR_NAME);
 
     public static String readFile(File file) throws IOException {
         try(BufferedReader br = new BufferedReader(new FileReader(file));) {
@@ -26,12 +27,16 @@ public class TestFileUtils {
         }
     }
     
-    public static File setupTempDir() throws IOException {
-        return createEmptyDirectory(TEMPDIR_NAME);
+    public static void setupTempDir() throws IOException {
+        tempDir = createEmptyDirectory(TEMPDIR_NAME);
     }
     
     public static void tearDown() {
-        deleteFile(new File(TEMPDIR_NAME));
+        deleteFile(tempDir);
+    }
+
+    public static File getTempDir() {
+        return tempDir;
     }
     
     public static File createEmptyDirectory(String dirPath) throws IOException {

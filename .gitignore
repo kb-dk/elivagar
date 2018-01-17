@@ -7,6 +7,9 @@ target/
 test-output/
 tempDir/
 
+aleph-conf.txt
+pubhub-license.txt
+
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

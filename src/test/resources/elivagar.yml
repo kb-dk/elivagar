@@ -10,3 +10,7 @@ elivagar:
     - epub
   audio_formats:
     - mp3
+  aleph: 
+    aleph_url: $ALEPH_URL
+    aleph_base: $ALEPH_BASE
+    temp_dir: tempDir/aleph

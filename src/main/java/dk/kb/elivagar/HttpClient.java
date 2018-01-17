@@ -6,6 +6,10 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +28,30 @@ public class HttpClient {
      */
     public HttpClient() {}
 
+    /**
+     * Method for extracting the content of a given URL.
+     * It will throw an exception, if the response status code is not in the 200-299 range.
+     * @param url The text URL to retrieve.
+     * @param out The output stream, where the content from the URL is delivered.
+     * @throws IOException If any connection issues occur.
+     */
+    public void retrieveUrlContent(String url, OutputStream out) throws IOException {
+        CloseableHttpClient client = HttpClients.createDefault();
+        try {
+            HttpGet getMethod = new HttpGet(url);
+            
+            CloseableHttpResponse response = client.execute(getMethod);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if(statusCode < 200 || statusCode > 300) {
+                throw new IllegalStateException("Received erroneous status code for url " + url + ", " + statusCode);
+            }
+            
+            StreamUtils.copyInputStreamToOutputStream(response.getEntity().getContent(), out);
+        } finally {
+            client.close();
+        }
+    }
+    
     /**
      * Retrieves the data from a given url and puts it onto a given outputstream. 
      * It has to be a 'HTTP' url, since the data is retrieved through a HTTP-request.

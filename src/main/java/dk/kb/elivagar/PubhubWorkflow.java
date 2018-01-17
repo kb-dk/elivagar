@@ -11,6 +11,7 @@ import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
 import dk.kb.elivagar.pubhub.PubhubPacker;
 import dk.kb.elivagar.pubhub.PubhubStatistics;
@@ -147,8 +148,8 @@ public class PubhubWorkflow {
                             }
                         }
                     } catch (IOException e) {
-                        log.error("Failed to package the file '" + audioBookBaseDir.getAbsolutePath() + "' for a audio book. "
-                                + "Trying to continue with next audio book file.", e);
+                        log.error("Failed to package the file '" + audioBookBaseDir.getAbsolutePath() 
+                                + "' for a audio book. Trying to continue with next audio book file.", e);
                     }
                 }
             }

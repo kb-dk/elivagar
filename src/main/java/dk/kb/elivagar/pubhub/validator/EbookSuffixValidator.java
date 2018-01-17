@@ -1,6 +1,6 @@
 package dk.kb.elivagar.pubhub.validator;
 
-import dk.kb.elivagar.Configuration;
+import dk.kb.elivagar.config.Configuration;
 
 /**
  * Validates the suffix for ebooks.

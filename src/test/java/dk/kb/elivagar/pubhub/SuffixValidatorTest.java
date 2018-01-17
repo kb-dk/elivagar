@@ -9,7 +9,7 @@ import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import dk.kb.elivagar.Configuration;
+import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.pubhub.validator.AudioSuffixValidator;
 import dk.kb.elivagar.pubhub.validator.EbookSuffixValidator;
 import dk.kb.elivagar.script.CharacterizationScriptWrapper;

@@ -19,15 +19,14 @@ import dk.kb.elivagar.utils.StreamUtils;
 public class CharacterizationScriptWrapperTest extends ExtendedTestCase {
 
     File origScript;
-    File tempDir;
     File exampleScript;
 
     @BeforeClass
     public void setup() throws IOException {
-        tempDir = TestFileUtils.setupTempDir();    
+        TestFileUtils.setupTempDir();    
 
         origScript = new File("src/main/resources/bin/run_fits.sh");
-        exampleScript = new File(tempDir, origScript.getName());
+        exampleScript = new File(TestFileUtils.getTempDir(), origScript.getName());
 
         StreamUtils.copyInputStreamToOutputStream(new FileInputStream(origScript), new FileOutputStream(exampleScript));
     }
@@ -40,7 +39,7 @@ public class CharacterizationScriptWrapperTest extends ExtendedTestCase {
     @Test
     public void testScript() {
         addDescription("Test the characterization");
-        File outputFile = new File(tempDir, UUID.randomUUID().toString());
+        File outputFile = new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString());
         
         Assert.assertTrue(exampleScript.exists());
         Assert.assertFalse(outputFile.exists());
@@ -59,7 +58,7 @@ public class CharacterizationScriptWrapperTest extends ExtendedTestCase {
     @Test
     public void testScriptForOutFilenameContainingSpace() {
         addDescription("Test that characterization will not be run, when the output filename contains a space.");
-        File outputFile = new File(tempDir, UUID.randomUUID().toString() + " " + UUID.randomUUID().toString());
+        File outputFile = new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString() + " " + UUID.randomUUID().toString());
         
         Assert.assertTrue(exampleScript.exists());
         Assert.assertFalse(outputFile.exists());
@@ -77,8 +76,8 @@ public class CharacterizationScriptWrapperTest extends ExtendedTestCase {
     @Test
     public void testScriptForInFilenameContainingSpace() throws IOException {
         addDescription("Test that characterization will not be run, when the input filename contains a space.");
-        File outputFile = new File(tempDir, UUID.randomUUID().toString());
-        File inputFile = new File(tempDir, UUID.randomUUID().toString() + " " + UUID.randomUUID().toString());
+        File outputFile = new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString());
+        File inputFile = new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString() + " " + UUID.randomUUID().toString());
         TestFileUtils.createFile(inputFile, UUID.randomUUID().toString());
         
         Assert.assertTrue(inputFile.exists());

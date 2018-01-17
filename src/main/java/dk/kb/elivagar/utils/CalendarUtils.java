@@ -23,7 +23,7 @@ public class CalendarUtils {
      */
     public static XMLGregorianCalendar getXmlGregorianCalendar(Date date) {
         if(date == null) {
-            log.debug("Cannot convert the date '" + date + "'. Returning epoch instead.");
+            log.debug("Cannot convert a null date. Returning epoch instead.");
             date = new Date(0);
         }
         
