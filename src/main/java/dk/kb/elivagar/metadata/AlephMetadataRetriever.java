@@ -21,13 +21,12 @@ import org.xml.sax.SAXException;
 
 import dk.kb.elivagar.HttpClient;
 import dk.kb.elivagar.config.AlephConfiguration;
+import dk.kb.elivagar.utils.FileUtils;
 
 /**
  * Aleph Metadata Retriever.
  * Retrieves the metadata entries by first searching for the given ID, and then using
  * the search result to extract the actual metadata entry from Aleph.
- * 
- *  
  */
 public class AlephMetadataRetriever {
     /** The logger.*/
@@ -69,9 +68,6 @@ public class AlephMetadataRetriever {
      */
     public void retrieveMetadataForID(String id, OutputStream out) {
         String setNumber = getAlephSetNumber(id);
-        if(setNumber == null) {
-            throw new IllegalStateException("Could not locate any Aleph post for ID: " + id);
-        }
         downloadAlephMetadata(setNumber, out);
     }
     
@@ -94,16 +90,16 @@ public class AlephMetadataRetriever {
      * Searches Aleph for a set with the given ID.
      * Returns the SetNumber, which can be used for retrieving the actual metadata for the ID.
      * @param id The ID to locate.
-     * @return The SetNumber for retrieving the actual metadata. Or null, if the SetNumber could not be retrieved.
+     * @return The SetNumber for retrieving the actual metadata.
      */
     protected String getAlephSetNumber(String id) {
         File searchResult = performAlephSearch(id);
-        if(searchResult != null) {
+        try {
             String res = findSetNumberInFile(searchResult);
-            searchResult.delete();
             return res;
+        } finally {
+            FileUtils.deleteFile(searchResult);
         }
-        return null;
     }
     
     /**
@@ -154,8 +150,7 @@ public class AlephMetadataRetriever {
             
             return searchResultFile;
         } catch (IOException e) {
-            log.warn("Error occured while trying to search for the id: " + id, e);
-            return null;
+            throw new IllegalStateException("Error occured while trying to search for the id: " + id, e);
         }
     }
 }

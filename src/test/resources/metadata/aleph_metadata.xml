@@ -1,0 +1,134 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<present>
+	<record>
+		<record_header>
+			<set_entry>000000001</set_entry>
+		</record_header>
+		<doc_number>003431852</doc_number>
+		<metadata>
+			<oai_marc>
+				<fixfield id="FMT">BK</fixfield>
+				<fixfield id="LDR">01461name-22003370--450-</fixfield>
+				<varfield id="001" i1="0" i2="0">
+					<subfield label="a">x927762352</subfield>
+					<subfield label="f">a</subfield>
+				</varfield>
+				<varfield id="004" i1="0" i2="0">
+					<subfield label="r">n</subfield>
+					<subfield label="a">e</subfield>
+				</varfield>
+				<varfield id="008" i1="0" i2="0">
+					<subfield label="t">m</subfield>
+					<subfield label="u">f</subfield>
+					<subfield label="a">2009</subfield>
+					<subfield label="b">dk</subfield>
+					<subfield label="d">y</subfield>
+					<subfield label="l">dan</subfield>
+					<subfield label="n">b</subfield>
+					<subfield label="v">0</subfield>
+				</varfield>
+				<varfield id="009" i1="0" i2="0">
+					<subfield label="a">a</subfield>
+					<subfield label="g">xe</subfield>
+				</varfield>
+				<varfield id="021" i1="0" i2="0">
+					<subfield label="e">9788711436981</subfield>
+					<subfield label="d">kr. 199,00</subfield>
+				</varfield>
+				<varfield id="032" i1="0" i2="0">
+					<subfield label="a">IDO200923</subfield>
+					<subfield label="x">NET200923</subfield>
+					<subfield label="x">EBO200923</subfield>
+					<subfield label="x">DAT201207</subfield>
+					<subfield label="x">ERE201207</subfield>
+				</varfield>
+				<varfield id="041" i1="0" i2="0">
+					<subfield label="a">dan</subfield>
+					<subfield label="c">eng</subfield>
+				</varfield>
+				<varfield id="096" i1="0" i2="0">
+					<subfield label="a"></subfield>
+				</varfield>
+				<varfield id="100" i1="0" i2="0">
+					<subfield label="a">Lomborg</subfield>
+					<subfield label="h">Bjørn</subfield>
+				</varfield>
+				<varfield id="241" i1="0" i2="0">
+					<subfield label="a">Cool it</subfield>
+				</varfield>
+				<varfield id="245" i1="0" i2="0">
+					<subfield label="a">Køl af</subfield>
+					<subfield label="c">sandheder og skrøner om den globale opvarmning</subfield>
+					<subfield label="e">Bjørn Lomborg</subfield>
+					<subfield label="f">på dansk ved Lisbeth Møller-Madsen</subfield>
+				</varfield>
+				<varfield id="260" i1="0" i2="0">
+					<subfield label="b">Lindhardt og Ringhof</subfield>
+					<subfield label="c">[2009]</subfield>
+				</varfield>
+				<varfield id="504" i1="0" i2="0">
+					<subfield label="a">Forfatteren argumenterer for at det er
+						nødvendigt at se den globale opvarmning i et helhedsperspektiv i
+						stedet for at fokusere på kostbare løsninger om begrænsning af
+						CO2-udslippet som iflg. forfatteren kun vil have ringe effekt på
+						længere sigt</subfield>
+				</varfield>
+				<varfield id="512" i1="0" i2="0">
+					<subfield label="a">Downloades i PDF-format</subfield>
+				</varfield>
+				<varfield id="520" i1="0" i2="0">
+					<subfield label="a">Onlineversion af bogen (2007)</subfield>
+				</varfield>
+				<varfield id="532" i1="0" i2="0">
+					<subfield label="a">Med litteraturhenvisninger og internetadresser</subfield>
+				</varfield>
+				<varfield id="595" i1="0" i2="0">
+					<subfield label="a">e-pligt</subfield>
+				</varfield>
+				<varfield id="631" i1="0" i2="0">
+					<subfield label="a">klimaændringer</subfield>
+				</varfield>
+				<varfield id="631" i1="0" i2="0">
+					<subfield label="a">klimapolitik</subfield>
+				</varfield>
+				<varfield id="631" i1="0" i2="0">
+					<subfield label="a">global opvarmning</subfield>
+				</varfield>
+				<varfield id="631" i1="0" i2="0">
+					<subfield label="a">miljøpolitik</subfield>
+				</varfield>
+				<varfield id="631" i1="0" i2="0">
+					<subfield label="a">energipolitik</subfield>
+				</varfield>
+				<varfield id="631" i1="0" i2="0">
+					<subfield label="a">CO2-udledning</subfield>
+				</varfield>
+				<varfield id="652" i1="0" i2="0">
+					<subfield label="m">69.872</subfield>
+				</varfield>
+				<varfield id="856" i1="0" i2="0">
+					<subfield label="z">Adgangsmåde: Internet</subfield>
+					<subfield label="u">http://ebog.dk/apc/direct.php?ISBN=&quot;9788711436981&quot;</subfield>
+					<subfield label="z">Adgang til køb ved udgivelsen</subfield>
+				</varfield>
+				<varfield id="856" i1="0" i2="0">
+					<subfield label="z">Adgang til lån for biblioteksbrugere</subfield>
+					<subfield label="u">https://ereolen.dk/ting/object/150028%3A9788711436981</subfield>
+					<subfield label="y">EPUB-format</subfield>
+				</varfield>
+				<fixfield id="BAS">bcx</fixfield>
+				<varfield id="CAT" i1=" " i2=" ">
+					<subfield label="a">dig1207imp</subfield>
+					<subfield label="b"></subfield>
+					<subfield label="c">20170502</subfield>
+					<subfield label="l">KGL02</subfield>
+					<subfield label="h">1141</subfield>
+				</varfield>
+				<varfield id="UID" i1=" " i2=" ">
+					<subfield label="a">x927762352bcx</subfield>
+				</varfield>
+			</oai_marc>
+		</metadata>
+	</record>
+	<session-id>XK4R22IMV8PINQUD45XQMADY4MDF8H4XV2RRNYLV4UUS7TC3X7</session-id>
+</present>

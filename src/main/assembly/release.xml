@@ -27,6 +27,13 @@
 			<fileMode>0755</fileMode>
 			<filtered>true</filtered>
 		</fileSet>
+                <fileSet>
+                        <directory>${project.basedir}/src/main/resources/scripts</directory>
+                        <lineEnding>lf</lineEnding>
+                        <outputDirectory>${file.separator}scripts${file.separator}</outputDirectory>
+                        <fileMode>0744</fileMode>
+                        <filtered>true</filtered>
+                </fileSet>
 		<!-- Move licenses into assembly -->
 		<fileSet>
 			<directory>${project.basedir}/src/main/resources</directory>

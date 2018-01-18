@@ -51,6 +51,7 @@ public class PubhubWorkflow {
             script = new CharacterizationScriptWrapper(conf.getCharacterizationScriptFile()); 
         }
         this.packer = new PubhubPacker(conf, retriever.getServiceNamespace(), script);
+        
     }
 
     /**

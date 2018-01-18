@@ -24,4 +24,18 @@ public class FileUtils {
         }
         return new File(dirPath);
     }
+    
+    /**
+     * Delete method, which validates that the file is actually not present afterwards.
+     * @param f The file to delete.
+     */
+    public static void deleteFile(File f) {
+        if(f == null || !f.exists()) {
+            return;
+        }
+        boolean success = f.delete();
+        if(!success) {
+            throw new IllegalStateException("Could not delete the file '" + f.getAbsolutePath() + "'");
+        }
+    }
 }
