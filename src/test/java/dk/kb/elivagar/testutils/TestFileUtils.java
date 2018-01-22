@@ -2,12 +2,15 @@ package dk.kb.elivagar.testutils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import dk.kb.elivagar.utils.StreamUtils;
 
 public class TestFileUtils {
     
@@ -61,5 +64,13 @@ public class TestFileUtils {
         try (FileOutputStream fos = new FileOutputStream(outputFile)) {
             fos.write(content.getBytes());
         }
+    }
+    
+    public static File copyFileToTemp(File f) throws IOException {
+        File res = new File(tempDir, f.getName());
+        
+        StreamUtils.copyInputStreamToOutputStream(new FileInputStream(f), new FileOutputStream(res));
+        
+        return res;
     }
 }

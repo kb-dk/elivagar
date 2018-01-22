@@ -13,6 +13,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.metadata.xsl.XslErrorListener;
 import dk.kb.elivagar.metadata.xsl.XslTransformer;
 import dk.kb.elivagar.metadata.xsl.XslUriResolver;
@@ -53,6 +54,7 @@ public class MetadataTransformer {
      * @param xsltDir The transformation directory.
      */
     public MetadataTransformer(File xsltDir) {
+        ArgumentCheck.checkExistsDirectory(xsltDir, "File xsltDir");
         this.xsltDir = xsltDir;
     }
     
