@@ -56,6 +56,9 @@ public class MetadataTransformerTest extends ExtendedTestCase {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         transformer.transformMetadata(new FileInputStream(intermediaryMarcFile), output, MetadataTransformer.TransformationType.MARC21_TO_MODS);
         
-        System.err.println(output);
+        String content = output.toString();
+        Assert.assertTrue(content.contains("<title>Køl af</title>"));
+        Assert.assertTrue(content.contains("<subTitle> sandheder og skrøner om den globale opvarmning</subTitle>"));
+        Assert.assertTrue(content.contains("<identifier type=\"isbn\">9788711436981</identifier>"));
     }
 }

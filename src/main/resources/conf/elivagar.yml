@@ -4,9 +4,13 @@ elivagar:
   ebook_orig_dir: /path/to/book/files/
   audio_orig_dir: /path/to/audio/files/
   license_key: LICENSE_KEY
-  characterization_script: bin/run_fits.sh
+  xslt_dir: scripts
   ebook_formats:
     - pdf
     - epub
   audio_formats:
     - mp3
+  aleph: 
+    aleph_url: $ALEPH_URL
+    aleph_base: $ALEPH_BASE
+    temp_dir: tempDir/aleph

@@ -80,7 +80,8 @@ public class TestConfigurations {
         confMap.put(Configuration.CONF_LICENSE_KEY, license);
         confMap.put(Configuration.CONF_AUDIO_FORMATS, Arrays.asList("mp3"));
         confMap.put(Configuration.CONF_EBOOK_FORMATS, Arrays.asList("pdf", "epub"));
-
+        confMap.put(Configuration.CONF_XSLT_DIR, TestFileUtils.getTempDir().getAbsolutePath());
+        
         confMap.put(Configuration.CONF_ALEPH_ROOT, getAlephMap());
         
         return new Configuration(confMap);

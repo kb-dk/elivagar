@@ -26,6 +26,7 @@ import dk.kb.elivagar.utils.YamlUtils;
  *     <li>audio_orig_dir: /path/to/orig/audio/dir/</li>
  *     <li>license_key: DO_NOT_PUT_LICENSE_IN_GITHUB_FILE</li>
  *     <li>characterization_script: bin/run_fits.sh (optional)</li>
+ *     <li>xslt_dir: scripts</li>
  *     <li>ebook_formats:</li>
  *     <ul>
  *       <li>- pdf</li>
@@ -62,6 +63,8 @@ public class Configuration {
     public static final String CONF_AUDIO_FILE_DIR = "audio_orig_dir";
     /** The configuration name for the characterization script file path.*/
     public static final String CONF_CHARACTERIZATION_SCRIPT = "characterization_script";
+    /** The configuration name for the characterization script file path.*/
+    public static final String CONF_XSLT_DIR = "xslt_dir";
     /** The configuration name for the list of formats for the ebooks.*/
     public static final String CONF_EBOOK_FORMATS = "ebook_formats";
     /** The configuration name for the list of formats for the audio books.*/
@@ -88,6 +91,8 @@ public class Configuration {
     protected final File audioFileDir;
     /** The script for performing the characterization.*/
     protected File scriptFile;
+    /** The directory containing the XSLT files for transforming the metadata.*/
+    protected final File xsltFileDir;
     
     /** The list of formats for the ebooks.*/
     protected List<String> ebookFormats;
@@ -110,6 +115,7 @@ public class Configuration {
         validateThatMapContainsKey(confMap, CONF_AUDIO_FILE_DIR);
         validateThatMapContainsKey(confMap, CONF_EBOOK_FILE_DIR);
         validateThatMapContainsKey(confMap, CONF_AUDIO_FILE_DIR);
+        validateThatMapContainsKey(confMap, CONF_XSLT_DIR);
         validateThatMapContainsKey(confMap, CONF_ALEPH_ROOT);
         
         ebookOutputDir = FileUtils.createDirectory((String) confMap.get(CONF_EBOOK_OUTPUT_DIR));
@@ -120,6 +126,7 @@ public class Configuration {
         if(confMap.containsKey(CONF_CHARACTERIZATION_SCRIPT)) {
             scriptFile = new File((String) confMap.get(CONF_CHARACTERIZATION_SCRIPT));
         }
+        xsltFileDir = FileUtils.createDirectory((String) confMap.get(CONF_XSLT_DIR));
         
         ebookFormats = (List<String>) confMap.get(CONF_EBOOK_FORMATS);
         audioFormats = (List<String>) confMap.get(CONF_AUDIO_FORMATS);
@@ -178,6 +185,11 @@ public class Configuration {
     /** @return The file for the characterization. */
     public File getCharacterizationScriptFile() {
         return scriptFile;
+    }
+    
+    /** @return The directory with the XSLT files.*/
+    public File getXsltFileDir() {
+        return xsltFileDir;
     }
     
     /** @return The list of formats for the ebooks.*/

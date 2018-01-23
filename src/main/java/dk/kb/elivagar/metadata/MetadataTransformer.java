@@ -26,7 +26,7 @@ public class MetadataTransformer {
     /**
      * Different types of transformations currently supported by Elivagar.
      */
-    enum TransformationType {
+    public enum TransformationType {
         /** The transformation from the OAI-MARC format, which is delivered from Aleph, into MARC 21.*/
         ALEPH_TO_MARC21 ("oaimarc2slimmarc.xsl"),
         /** The transformation from MARC 21 into MODS.*/

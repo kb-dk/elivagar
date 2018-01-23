@@ -17,6 +17,9 @@ import javax.xml.transform.stream.StreamSource;
 
 import dk.kb.elivagar.exception.ArgumentCheck;
 
+/**
+ * Transformations of XML by XSLT scripts.
+ */
 public class XslTransformer {
 
     /** XSL transformer factory object. */
