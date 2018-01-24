@@ -45,13 +45,15 @@ public class PubhubStatistics {
      * This should be run before retrieving the values.
      */
     public void calculateStatistics() {
-        log.info("Calculating the statistics on the books in directory '" + baseDir.getAbsolutePath()
-                + "'. Expecting '" + baseDir.list().length + "' books.");
-        for(File dir : baseDir.listFiles()) {
-            if(dir.isDirectory()) {
+        File[] directories = baseDir.listFiles();
+        if(directories == null) {
+            log.warn("No directories to make statistics on.");
+            return;
+        } else {
+            log.info("Calculating the statistics on the books in directory '" + baseDir.getAbsolutePath()
+                    + "'. Expecting '" + directories.length + "' books.");
+            for(File dir : directories) {
                 calculateStatisticsOnBookDir(dir);
-            } else {
-                log.warn("Expected the file '" + dir.getAbsolutePath() + "' to be a directory for a book. Continues.");
             }
         }
     }
@@ -63,26 +65,33 @@ public class PubhubStatistics {
      * @param dir The directory to calculate the statistics upon.
      */
     protected void calculateStatisticsOnBookDir(File dir) {
-        count++;
-        boolean hasMetadata = false;
-        boolean hasFile = false;
-        for(File f : dir.listFiles()) {
-            String filename = f.getName().toLowerCase();
-            if(filename.endsWith(PubhubPacker.XML_SUFFIX)) {
-                // TODO perhaps only, if the file has the name ${book-id}.xml, where book-id is the dir-name.
-                hasMetadata = true;
-            } else if(validator.hasValidSuffix(f)) {
-                hasFile = true;
-            }
-        }
-        if(hasMetadata && hasFile) {
-            bothDataCount++;
-        } else if(hasMetadata && !hasFile) {
-            onlyMetadata++;
-        } else if(!hasMetadata && hasFile) {
-            onlyBookFile++;
+        File[] files = dir.listFiles();
+        if(files == null) {
+            log.warn("Expected the file '" + dir.getAbsolutePath() + "' to be a directory for a book. "
+                    + "Continue to next.");
+            return;
         } else {
-            neitherData++;
+            count++;
+            boolean hasMetadata = false;
+            boolean hasFile = false;
+            for(File f : files) {
+                String filename = f.getName().toLowerCase();
+                if(filename.endsWith(PubhubPacker.XML_SUFFIX)) {
+                    // TODO perhaps only, if the file has the name ${book-id}.xml, where book-id is the dir-name.
+                    hasMetadata = true;
+                } else if(validator.hasValidSuffix(f)) {
+                    hasFile = true;
+                }
+            }
+            if(hasMetadata && hasFile) {
+                bothDataCount++;
+            } else if(hasMetadata && !hasFile) {
+                onlyMetadata++;
+            } else if(!hasMetadata && hasFile) {
+                onlyBookFile++;
+            } else {
+                neitherData++;
+            }
         }
     }
     /** @return The number of directories containing both book file and metadata file.*/

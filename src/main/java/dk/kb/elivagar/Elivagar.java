@@ -7,6 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.config.Configuration;
+import dk.kb.elivagar.metadata.AlephMetadataRetriever;
+import dk.kb.elivagar.metadata.AlephPacker;
+import dk.kb.elivagar.metadata.MetadataTransformer;
 
 /**
  * Class for instantiating the Elivagar workflow.
@@ -77,18 +80,24 @@ public class Elivagar {
 
         try {
             Configuration conf = Configuration.createFromYAMLFile(confFile);
-            PubhubWorkflow workflow = new PubhubWorkflow(conf);
+            PubhubWorkflow pubhubWorkflow = new PubhubWorkflow(conf);
+            
+            MetadataTransformer transformer = new MetadataTransformer(conf.getXsltFileDir());
+            AlephMetadataRetriever alephRetriever = new AlephMetadataRetriever(conf.getAlephConfiguration(), 
+                    new HttpClient());
+            AlephPacker alephWorkflow = new AlephPacker(conf, alephRetriever, transformer);
 
             if(modifyDate < 0) {
-                workflow.retrieveAllBooks(maxDownloads);
+                pubhubWorkflow.retrieveAllBooks(maxDownloads);
             } else if(modifyDate > 0) {
                 Date d = new Date(System.currentTimeMillis() - modifyDate);
-                workflow.retrieveModifiedBooks(d, maxDownloads);
+                pubhubWorkflow.retrieveModifiedBooks(d, maxDownloads);
             } else {
                 log.debug("No data retrieval.");
             }
-            workflow.packFilesForBooks();
-            workflow.makeStatistics(System.out);
+            pubhubWorkflow.packFilesForBooks();
+            alephWorkflow.packAlephMetadataForBooks();
+            pubhubWorkflow.makeStatistics(System.out);
         } catch (Exception e) {
             log.error("Failure to run the workflow. \nThe waters of Elivagar must have frozen over!", e);
             System.exit(-1);

@@ -62,7 +62,7 @@ public class AlephExtract {
         try {
             File alephMetadataFile = new File(conf.getAlephConfiguration().getTempDir(), isbn + ".aleph.xml");
             try (OutputStream out = new FileOutputStream(alephMetadataFile)) {
-                retriever.retrieveMetadataForID(isbn, out);
+                retriever.retrieveMetadataForISBN(isbn, out);
             }
             
             File marcMetadataFile = new File(conf.getAlephConfiguration().getTempDir(), isbn + ".marc.xml");

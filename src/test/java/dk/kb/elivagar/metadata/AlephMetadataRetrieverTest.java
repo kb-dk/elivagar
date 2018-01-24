@@ -33,7 +33,7 @@ public class AlephMetadataRetrieverTest extends ExtendedTestCase {
         AlephMetadataRetriever retriever = new AlephMetadataRetriever(configuration, httpClient);
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        retriever.retrieveMetadataForID(ID, baos);
+        retriever.retrieveMetadataForISBN(ID, baos);
         
         String extractedMetadata = baos.toString();
         

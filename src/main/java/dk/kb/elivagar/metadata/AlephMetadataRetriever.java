@@ -21,7 +21,6 @@ import org.xml.sax.SAXException;
 
 import dk.kb.elivagar.HttpClient;
 import dk.kb.elivagar.config.AlephConfiguration;
-import dk.kb.elivagar.utils.FileUtils;
 
 /**
  * Aleph Metadata Retriever.
@@ -41,7 +40,9 @@ public class AlephMetadataRetriever {
     /** The Aleph present argument for only extracting the first entry from the entry set.*/
     protected static final String SET_ENTRY_SINGLE_RANGE = "set_entry=000000001-000000001";
     
-    /** The XPATH for extracing the SetNumber from the Aleph search results.*/
+    /** The XPATH for extracting any error from the Aleph search results.*/
+    protected static final String XPATH_FIND_ERROR = "/find/error/text()";
+    /** The XPATH for extracting the SetNumber from the Aleph search results.*/
     protected static final String XPATH_FIND_SET_NUMBER = "/find/set_number/text()";
     /** The XPATH for extracting the number of entries in the Aleph search results.*/
     protected static final String XPATH_FIND_NUMBER_OF_ENTRIES = "/find/no_entries/text()";
@@ -63,12 +64,17 @@ public class AlephMetadataRetriever {
     
     /**
      * Retrieves the Aleph metadata for a given ID.
-     * @param id The ID to retrieve the Aleph metadata for.
+     * @param isbn The ID to retrieve the Aleph metadata for.
      * @param out The output stream, where the Aleph metadata will be written.
      */
-    public void retrieveMetadataForID(String id, OutputStream out) {
-        String setNumber = getAlephSetNumber(id);
-        downloadAlephMetadata(setNumber, out);
+    public void retrieveMetadataForISBN(String isbn, OutputStream out) {
+        log.debug("Retrieve Aleph metadata for ISBN: " + isbn);
+        String setNumber = getAlephSetNumber(isbn);
+        if(setNumber != null) {
+            downloadAlephMetadata(setNumber, out);
+        } else {
+            throw new IllegalStateException("Could not extract Aleph metadata for ISBN: " + isbn);
+        }
     }
     
     /**
@@ -98,7 +104,7 @@ public class AlephMetadataRetriever {
             String res = findSetNumberInFile(searchResult);
             return res;
         } finally {
-            FileUtils.deleteFile(searchResult);
+            searchResult.deleteOnExit();
         }
     }
     
@@ -114,21 +120,27 @@ public class AlephMetadataRetriever {
             Document doc = builder.parse(f);
             XPathFactory xPathfactory = XPathFactory.newInstance();
             XPath xpath = xPathfactory.newXPath();
+            XPathExpression errorXpath = xpath.compile(XPATH_FIND_ERROR);
             XPathExpression setNumberXpath = xpath.compile(XPATH_FIND_SET_NUMBER);
             XPathExpression noEntriesXpath = xpath.compile(XPATH_FIND_NUMBER_OF_ENTRIES);
+            String error = (String) errorXpath.evaluate(doc, XPathConstants.STRING);
+            if(error != null && !error.isEmpty()) {
+                log.debug("Aleph search gave the following error: " + error);
+                return null;
+            }
             String numberOfEntriesText = (String) noEntriesXpath.evaluate(doc, XPathConstants.STRING);
             int numberOfEntries = Integer.parseInt(numberOfEntriesText);
             if(numberOfEntries < 1) {
-                log.warn("No entries found.");
+                log.info("No entries found.");
                 return null;
             }
             if(numberOfEntries > 1) {
-                log.info("Found more than 1 entry. Retrieving only the first.");
+                log.debug("Found more than 1 entry. Retrieving only the first.");
             }
             return setNumberXpath.evaluate(doc);
-        } catch (IOException | XPathExpressionException | ParserConfigurationException | SAXException e) {
-            log.warn("Could not extract the SetNumber from the file '" + f + "'", e);
-            return null;
+        } catch (IOException | XPathExpressionException | ParserConfigurationException | SAXException 
+                | NumberFormatException e) {
+            throw new IllegalStateException("Could not extract the SetNumber from the file '" + f + "'", e);
         }
     }
     

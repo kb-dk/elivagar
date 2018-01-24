@@ -38,7 +38,7 @@ public class PubhubWorkflow {
     protected final PubhubMetadataRetriever retriever;
     /** The packer of the Pubhub data.*/
     protected final PubhubPacker packer;
-
+    
     /**
      * Constructor. 
      * @param conf The elivagar configuration. 
@@ -98,20 +98,22 @@ public class PubhubWorkflow {
      * It is asserted, that the book files is named with the id as the prefix.
      */
     protected void packFilesForEbooks() {
-        if(conf.getEbookFileDir().listFiles() == null) {
+        File[] eBooks = conf.getEbookFileDir().listFiles();
+        if(eBooks == null) {
             log.info("No book files to package.");
             return;
-        }
-        for(File fileForBook : conf.getEbookFileDir().listFiles()) {
-            try {
-                if(fileForBook.isFile()) {
-                    packer.packFileForEbook(fileForBook);
-                } else {
-                    log.trace("Cannot package directory: " + fileForBook.getAbsolutePath());
+        } else {
+            for(File fileForBook : eBooks) {
+                try {
+                    if(fileForBook.isFile()) {
+                        packer.packFileForEbook(fileForBook);
+                    } else {
+                        log.trace("Cannot package directory: " + fileForBook.getAbsolutePath());
+                    }
+                } catch (IOException e) {
+                    log.error("Failed to package the file '" + fileForBook.getAbsolutePath() + "' for a book. "
+                            + "Trying to continue with next book file.", e);
                 }
-            } catch (IOException e) {
-                log.error("Failed to package the file '" + fileForBook.getAbsolutePath() + "' for a book. "
-                        + "Trying to continue with next book file.", e);
             }
         }
     }
@@ -124,33 +126,36 @@ public class PubhubWorkflow {
      * It is asserted, that the book files is named with the id as the prefix.
      */
     protected void packFilesForAudioBooks() {
-        if(conf.getAudioFileDir().listFiles() == null) {
+        File[] audioBooks = conf.getAudioFileDir().listFiles();
+        if(audioBooks == null) {
             log.info("No audio files to package.");
             return;
-        }
-        for(File audioBookBaseDir : conf.getAudioFileDir().listFiles()) {
-            String id = audioBookBaseDir.getName();
-            File audioBookFileDir = new File(audioBookBaseDir, AUDIO_SUB_DIR_PATH);
-            if(!audioBookFileDir.isDirectory()) {
-                log.trace("Cannot handle non-existing Audio-book file: " 
-                        + audioBookFileDir.getAbsolutePath());
-            } else {
-                for(File audioBookFile : audioBookFileDir.listFiles()) {
-                    try {
-                        if(!audioBookFile.getName().startsWith(id)) {
-                            log.info("Ignores the file '" + audioBookFile.getAbsolutePath() + " since it does not "
-                                    + "comply with the format '{ID}/" + AUDIO_SUB_DIR_PATH + "{ID}.{suffix}");
-                        } else {
-                            if(audioBookFile.isFile()) {
-                                packer.packFileForAudio(audioBookFile);
+        } else {
+            for(File audioBookBaseDir : audioBooks) {
+                String id = audioBookBaseDir.getName();
+                File audioBookFileDir = new File(audioBookBaseDir, AUDIO_SUB_DIR_PATH);
+                File[] audioBookFiles = audioBookFileDir.listFiles();
+                if(audioBookFiles == null) {
+                    log.trace("Cannot handle non-existing Audio-book file: " 
+                            + audioBookFileDir.getAbsolutePath());
+                } else {
+                    for(File audioBookFile : audioBookFiles) {
+                        try {
+                            if(!audioBookFile.getName().startsWith(id)) {
+                                log.info("Ignores the file '" + audioBookFile.getAbsolutePath() + " since it does not "
+                                        + "comply with the format '{ID}/" + AUDIO_SUB_DIR_PATH + "{ID}.{suffix}");
                             } else {
-                                log.trace("Cannot handle directory: " 
-                                        + audioBookFile.getAbsolutePath());
+                                if(audioBookFile.isFile()) {
+                                    packer.packFileForAudio(audioBookFile);
+                                } else {
+                                    log.trace("Cannot handle directory: " 
+                                            + audioBookFile.getAbsolutePath());
+                                }
                             }
+                        } catch (IOException e) {
+                            log.error("Failed to package the file '" + audioBookBaseDir.getAbsolutePath() 
+                                    + "' for a audio book. Trying to continue with next audio book file.", e);
                         }
-                    } catch (IOException e) {
-                        log.error("Failed to package the file '" + audioBookBaseDir.getAbsolutePath() 
-                                + "' for a audio book. Trying to continue with next audio book file.", e);
                     }
                 }
             }

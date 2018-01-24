@@ -36,6 +36,7 @@ public class HttpClient {
      * @throws IOException If any connection issues occur.
      */
     public void retrieveUrlContent(String url, OutputStream out) throws IOException {
+        log.debug("Retrieving content from URL: " + url);
         CloseableHttpClient client = HttpClients.createDefault();
         try {
             HttpGet getMethod = new HttpGet(url);
