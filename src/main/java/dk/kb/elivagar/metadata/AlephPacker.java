@@ -9,17 +9,14 @@ import java.io.OutputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.pubhub.PubhubPacker;
@@ -41,6 +38,13 @@ public class AlephPacker {
     protected static final String XPATH_FIND_IDENTIFIER = "/Book/Identifier/text()";
     /** The XPATH for extracting the IdentifierType from the pubhub Book xml file.*/
     protected static final String XPATH_FIND_IDENTIFIER_TYPE = "/Book/IdentifierType/text()";
+    
+    /** The suffix for the MARC21 files.*/
+    protected static final String SUFFIX_MARC_FILES = ".marc.xml";
+    /** The suffix for the Aleph DanMarc2 files.*/
+    protected static final String SUFFIX_ALEPH_FILES = ".aleph.xml";
+    /** The suffix for the MODS files.*/
+    protected static final String SUFFIX_MODS_FILES = ".mods.xml";
 
     /** The configuration.*/
     protected final Configuration conf;
@@ -101,7 +105,7 @@ public class AlephPacker {
      */
     protected void packageMetadataForBook(File dir) {
         try {
-            File modsMetadata = new File(dir, dir.getName() + ".mods.xml");
+            File modsMetadata = new File(dir, dir.getName() + SUFFIX_MODS_FILES);
             if(modsMetadata.exists()) {
                 log.trace("Already retrieved MODS file.");
                 return;
@@ -155,8 +159,7 @@ public class AlephPacker {
                 return null;
             }
             return (String) identifierXpath.evaluate(doc, XPathConstants.STRING);
-        } catch (IOException | XPathExpressionException | ParserConfigurationException | SAXException 
-                | NumberFormatException e) {
+        } catch (Exception e) {
             log.info("Could not extract the ISBN number from the file '" + pubhubMetadataFile + "'", e);
             return null;
         }
@@ -169,7 +172,7 @@ public class AlephPacker {
      * @throws IOException If it somehow fails to retrieve or write the output file.
      */
     protected File getAlephMetadata(String isbn) throws IOException {
-        File res = new File(conf.getAlephConfiguration().getTempDir(), isbn + ".aleph.xml");
+        File res = new File(conf.getAlephConfiguration().getTempDir(), isbn + SUFFIX_ALEPH_FILES);
         try (OutputStream out = new FileOutputStream(res)) {
             metadataRetriever.retrieveMetadataForISBN(isbn, out);
             out.flush();
@@ -185,7 +188,7 @@ public class AlephPacker {
      * @throws IOException If it somehow fails to make the transformation.
      */
     protected File transformAlephMetadataToMarc(File alephMetadata, String isbn) throws IOException {
-        File res = new File(conf.getAlephConfiguration().getTempDir(), isbn + ".marc.xml");
+        File res = new File(conf.getAlephConfiguration().getTempDir(), isbn + SUFFIX_MARC_FILES);
         try (InputStream in = new FileInputStream(alephMetadata);
                 OutputStream out = new FileOutputStream(res)) {
             transformer.transformMetadata(in, out, MetadataTransformer.TransformationType.ALEPH_TO_MARC21);

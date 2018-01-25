@@ -7,17 +7,14 @@ import java.io.OutputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import dk.kb.elivagar.HttpClient;
 import dk.kb.elivagar.config.AlephConfiguration;
@@ -124,7 +121,7 @@ public class AlephMetadataRetriever {
             XPathExpression setNumberXpath = xpath.compile(XPATH_FIND_SET_NUMBER);
             XPathExpression noEntriesXpath = xpath.compile(XPATH_FIND_NUMBER_OF_ENTRIES);
             String error = (String) errorXpath.evaluate(doc, XPathConstants.STRING);
-            if(error != null && !error.isEmpty()) {
+            if(!error.isEmpty()) {
                 log.debug("Aleph search gave the following error: " + error);
                 return null;
             }
@@ -138,8 +135,7 @@ public class AlephMetadataRetriever {
                 log.debug("Found more than 1 entry. Retrieving only the first.");
             }
             return setNumberXpath.evaluate(doc);
-        } catch (IOException | XPathExpressionException | ParserConfigurationException | SAXException 
-                | NumberFormatException e) {
+        } catch (Exception e) {
             throw new IllegalStateException("Could not extract the SetNumber from the file '" + f + "'", e);
         }
     }

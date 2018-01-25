@@ -1,5 +1,6 @@
 package dk.kb.elivagar.metadata;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +15,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import dk.kb.elivagar.exception.ArgumentCheck;
+import dk.kb.elivagar.metadata.MetadataTransformer.TransformationType;
+import dk.kb.elivagar.metadata.xsl.XslTransformer;
 import dk.kb.elivagar.testutils.TestFileUtils;
 
 public class MetadataTransformerTest extends ExtendedTestCase {
@@ -60,5 +63,54 @@ public class MetadataTransformerTest extends ExtendedTestCase {
         Assert.assertTrue(content.contains("<title>Køl af</title>"));
         Assert.assertTrue(content.contains("<subTitle> sandheder og skrøner om den globale opvarmning</subTitle>"));
         Assert.assertTrue(content.contains("<identifier type=\"isbn\">9788711436981</identifier>"));
+    }
+    
+    @Test
+    public void testTransformationTypes() {
+        addDescription("Test the different types of transformations.");
+        for(MetadataTransformer.TransformationType type : MetadataTransformer.TransformationType.values()) {
+            Assert.assertEquals(type, MetadataTransformer.TransformationType.valueOf(type.name()));
+        }
+    }
+
+    @Test
+    public void testGetTransformationFileTwice() throws Exception {
+        addDescription("Test that the getTransformationFile method delivers the same transformer, when asked twice.");
+        MetadataTransformer transformer = new MetadataTransformer(TestFileUtils.getTempDir());
+        
+        XslTransformer xslTransformer = transformer.getTransformationFile(TransformationType.ALEPH_TO_MARC21);
+        Assert.assertEquals(xslTransformer, transformer.getTransformationFile(TransformationType.ALEPH_TO_MARC21));
+    }
+    
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testGetTransformationFileWhenMissing() throws Exception {
+        addDescription("Test the getTransformationFile method when the XSLT files are missing.");
+        File emptyDir = TestFileUtils.createEmptyDirectory(TestFileUtils.getTempDir() + "/" + UUID.randomUUID().toString());
+        
+        MetadataTransformer transformer = new MetadataTransformer(emptyDir);
+        
+        transformer.getTransformationFile(TransformationType.ALEPH_TO_MARC21);
+    }
+    
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testGetTransformationFileWhenNotXsltFile() throws Exception {
+        addDescription("Test the getTransformationFile method when the XSLT files are not proper XSLT files.");
+        File dir = TestFileUtils.createEmptyDirectory(TestFileUtils.getTempDir() + "/" + UUID.randomUUID().toString());
+        File xsltFile = new File(dir, TransformationType.ALEPH_TO_MARC21.scriptName);
+        TestFileUtils.createFile(xsltFile, UUID.randomUUID().toString());
+        
+        MetadataTransformer transformer = new MetadataTransformer(dir);
+        
+        transformer.getTransformationFile(TransformationType.ALEPH_TO_MARC21);
+    }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testTransformMetadata() throws Exception {
+        addDescription("Test trying to transform bad XML");
+        MetadataTransformer transformer = new MetadataTransformer(TestFileUtils.getTempDir());
+        
+        ByteArrayInputStream input = new ByteArrayInputStream(UUID.randomUUID().toString().getBytes());
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        transformer.transformMetadata(input, output, TransformationType.ALEPH_TO_MARC21);
     }
 }

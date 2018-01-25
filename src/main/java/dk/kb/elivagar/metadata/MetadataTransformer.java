@@ -33,13 +33,13 @@ public class MetadataTransformer {
         MARC21_TO_MODS ("marcToMODS.xsl");
         
         /** The name of the associated transformation file.*/
-        protected final String name;
+        protected final String scriptName;
         /**
          * Constructor.
-         * @param name The name of the transformation file for this transformation.
+         * @param scriptName The name of the transformation file for this transformation.
          */
-        TransformationType(String name) {
-            this.name = name;
+        TransformationType(String scriptName) {
+            this.scriptName = scriptName;
         }
     }
     
@@ -98,7 +98,7 @@ public class MetadataTransformer {
     protected XslTransformer getTransformationFile(TransformationType type) {
         if(!transformers.containsKey(type)) {
             try {
-                File res = new File(xsltDir, type.name);
+                File res = new File(xsltDir, type.scriptName);
                 if(!res.isFile()) {
                     throw new IllegalStateException("Could not find the transformation file: " + res.getAbsolutePath());
                 }

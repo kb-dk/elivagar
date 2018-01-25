@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import dk.kb.elivagar.utils.StreamUtils;
 
@@ -30,8 +31,12 @@ public class TestFileUtils {
         }
     }
     
-    public static void setupTempDir() throws IOException {
-        tempDir = createEmptyDirectory(TEMPDIR_NAME);
+    public static void setupTempDir() {
+        try {
+            tempDir = createEmptyDirectory(TEMPDIR_NAME);
+        } catch (Exception e) {
+            throw new RuntimeException("FAIL", e);
+        }
     }
     
     public static void tearDown() {
@@ -65,12 +70,24 @@ public class TestFileUtils {
             fos.write(content.getBytes());
         }
     }
-    
+
+    public static File createTempFile(String content) throws IOException {
+        File outputFile = new File(tempDir, UUID.randomUUID().toString());
+        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            fos.write(content.getBytes());
+        }
+        return outputFile;
+    }
+
     public static File copyFileToTemp(File f) throws IOException {
         File res = new File(tempDir, f.getName());
         
-        StreamUtils.copyInputStreamToOutputStream(new FileInputStream(f), new FileOutputStream(res));
+        copyFile(f, res);
         
         return res;
+    }
+    
+    public static void copyFile(File from, File to) throws IOException {
+        StreamUtils.copyInputStreamToOutputStream(new FileInputStream(from), new FileOutputStream(to));
     }
 }

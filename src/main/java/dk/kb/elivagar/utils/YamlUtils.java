@@ -16,7 +16,6 @@ public class YamlUtils {
      * @return the loaded settings as a {@link LinkedHashMap}
      */
     public static LinkedHashMap<String, LinkedHashMap> loadYamlSettings(File ymlFile) {
-        
         Object loadedSettings = null;
         try (InputStream input = new FileInputStream(ymlFile)){
             loadedSettings = new Yaml().load(input);
