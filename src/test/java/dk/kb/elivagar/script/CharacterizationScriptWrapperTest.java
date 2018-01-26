@@ -23,7 +23,7 @@ public class CharacterizationScriptWrapperTest extends ExtendedTestCase {
 
     @BeforeClass
     public void setup() throws IOException {
-        TestFileUtils.setupTempDir();    
+        TestFileUtils.setup();    
 
         origScript = new File("src/main/resources/bin/run_fits.sh");
         exampleScript = new File(TestFileUtils.getTempDir(), origScript.getName());

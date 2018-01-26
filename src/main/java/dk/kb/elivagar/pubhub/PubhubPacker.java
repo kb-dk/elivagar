@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,12 +64,14 @@ public class PubhubPacker {
      * @param conf The Configuration with the base directories for the files to be packed.
      * @param serviceNamespace The namespace for the service.
      * @param script The script for characterizing the book files. May be null, for no characterization.
+     * @param httpClient The http client.
      */
-    public PubhubPacker(Configuration conf, String serviceNamespace, CharacterizationScriptWrapper script) {
+    public PubhubPacker(Configuration conf, String serviceNamespace, CharacterizationScriptWrapper script, 
+            HttpClient httpClient) {
         this.conf = conf;
         this.namespace = serviceNamespace;
         this.marshallers = new HashMap<String, Marshaller>();
-        this.httpClient = new HttpClient();
+        this.httpClient = httpClient;
         this.characterizationScript = script;
         this.audioSuffixValidator = new AudioSuffixValidator(conf);
         this.ebookSuffixValidator = new EbookSuffixValidator(conf);
@@ -120,7 +121,7 @@ public class PubhubPacker {
                 File imageFile = new File(bookDir, book.getBookId() + "_" + image.getType() + "." + suffix);
 
                 try (OutputStream os = new FileOutputStream(imageFile)) {
-                    httpClient.performDownload(os, new URL(image.getValue()));
+                    httpClient.retrieveUrlContent(image.getValue(), os);
                 }
             } catch (Exception e) {
                 log.warn("Failed to download the images '" + image.getValue() + "'. Continues without it.", e);

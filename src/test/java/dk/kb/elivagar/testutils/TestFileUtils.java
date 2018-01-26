@@ -31,7 +31,7 @@ public class TestFileUtils {
         }
     }
     
-    public static void setupTempDir() {
+    public static void setup() {
         try {
             tempDir = createEmptyDirectory(TEMPDIR_NAME);
         } catch (Exception e) {

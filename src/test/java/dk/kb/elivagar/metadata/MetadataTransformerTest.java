@@ -26,7 +26,7 @@ public class MetadataTransformerTest extends ExtendedTestCase {
     
     @BeforeClass
     public void setup() throws IOException {
-        TestFileUtils.setupTempDir();
+        TestFileUtils.setup();
         marcToMods = TestFileUtils.copyFileToTemp(new File("src/main/resources/scripts/marcToMODS.xsl"));
         alephToMarc = TestFileUtils.copyFileToTemp(new File("src/main/resources/scripts/oaimarc2slimmarc.xsl"));
         TestFileUtils.copyFileToTemp(new File("src/main/resources/scripts/MARC21slimUtils.xsl"));

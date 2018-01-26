@@ -193,7 +193,7 @@ public class ArgumentCheckTest extends ExtendedTestCase {
     @Test
     public void testDirectorySuccess() {
         addDescription("Test the directory test on a directory");
-        TestFileUtils.setupTempDir();
+        TestFileUtils.setup();
         assertTrue(TestFileUtils.getTempDir().isDirectory());
         ArgumentCheck.checkExistsDirectory(TestFileUtils.getTempDir(), "TEST");
     }
@@ -209,7 +209,7 @@ public class ArgumentCheckTest extends ExtendedTestCase {
     @Test(expectedExceptions = ArgumentCheck.class)
     public void testFileFailureDirectory() {
         addDescription("Test that the file test failes on a directory");
-        TestFileUtils.setupTempDir();
+        TestFileUtils.setup();
         assertTrue(TestFileUtils.getTempDir().isDirectory());
         ArgumentCheck.checkExistsNormalFile(TestFileUtils.getTempDir(), "TEST");
     }

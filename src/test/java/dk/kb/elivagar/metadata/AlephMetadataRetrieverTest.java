@@ -36,7 +36,7 @@ public class AlephMetadataRetrieverTest extends ExtendedTestCase {
 
     @BeforeClass
     public void setup() throws IOException {
-        TestFileUtils.setupTempDir();
+        TestFileUtils.setup();
         configuration = TestConfigurations.getAlephConfigurationForTest();
     }
 

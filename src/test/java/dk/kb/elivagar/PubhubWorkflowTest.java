@@ -34,7 +34,7 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
 
     @BeforeMethod
     public void setupMethod() throws Exception {
-        TestFileUtils.setupTempDir();        
+        TestFileUtils.setup();        
     }
 
     @Test(enabled = false)

@@ -15,7 +15,7 @@ public class FileUtilsTest extends ExtendedTestCase {
 
     @BeforeClass
     public void setup() throws Exception {
-        TestFileUtils.setupTempDir();
+        TestFileUtils.setup();
     }
     
     @AfterClass

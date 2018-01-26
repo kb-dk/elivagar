@@ -47,8 +47,8 @@ public class PubhubStatistics {
     public void calculateStatistics() {
         File[] directories = baseDir.listFiles();
         if(directories == null) {
-            log.warn("No directories to make statistics on.");
-            return;
+            throw new IllegalStateException("No directories at '" + baseDir.getAbsolutePath() 
+                    + "' to make statistics on.");
         } else {
             log.info("Calculating the statistics on the books in directory '" + baseDir.getAbsolutePath()
                     + "'. Expecting '" + directories.length + "' books.");
@@ -69,14 +69,13 @@ public class PubhubStatistics {
         if(files == null) {
             log.warn("Expected the file '" + dir.getAbsolutePath() + "' to be a directory for a book. "
                     + "Continue to next.");
-            return;
         } else {
             count++;
             boolean hasMetadata = false;
             boolean hasFile = false;
             for(File f : files) {
-                String filename = f.getName().toLowerCase();
-                if(filename.endsWith(PubhubPacker.XML_SUFFIX)) {
+                String filename = f.getName();
+                if(filename.equalsIgnoreCase(dir.getName() + PubhubPacker.XML_SUFFIX)) {
                     // TODO perhaps only, if the file has the name ${book-id}.xml, where book-id is the dir-name.
                     hasMetadata = true;
                 } else if(validator.hasValidSuffix(f)) {
@@ -85,15 +84,16 @@ public class PubhubStatistics {
             }
             if(hasMetadata && hasFile) {
                 bothDataCount++;
-            } else if(hasMetadata && !hasFile) {
+            } else if(hasMetadata) {
                 onlyMetadata++;
-            } else if(!hasMetadata && hasFile) {
+            } else if(hasFile) {
                 onlyBookFile++;
             } else {
                 neitherData++;
             }
         }
     }
+    
     /** @return The number of directories containing both book file and metadata file.*/
     public long getBothDataCount() {
         return bothDataCount;

@@ -40,7 +40,7 @@ public class AlephPackerTest extends ExtendedTestCase {
 
     @BeforeClass
     public void setup() throws Exception {
-        TestFileUtils.setupTempDir();
+        TestFileUtils.setup();
         configuration = TestConfigurations.getConfigurationForTest();
     }
     

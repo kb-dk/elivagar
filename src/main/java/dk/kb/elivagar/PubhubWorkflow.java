@@ -38,6 +38,8 @@ public class PubhubWorkflow {
     protected final PubhubMetadataRetriever retriever;
     /** The packer of the Pubhub data.*/
     protected final PubhubPacker packer;
+    /** The HTTP client.*/
+    protected final HttpClient httpClient;
     
     /**
      * Constructor. 
@@ -50,8 +52,8 @@ public class PubhubWorkflow {
         if(conf.getCharacterizationScriptFile() != null) {
             script = new CharacterizationScriptWrapper(conf.getCharacterizationScriptFile()); 
         }
-        this.packer = new PubhubPacker(conf, retriever.getServiceNamespace(), script);
-        
+        this.httpClient = new HttpClient();
+        this.packer = new PubhubPacker(conf, retriever.getServiceNamespace(), script, httpClient);
     }
 
     /**
