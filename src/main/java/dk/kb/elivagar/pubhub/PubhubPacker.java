@@ -41,7 +41,7 @@ public class PubhubPacker {
     /** The suffix of XML files.*/
     public static final String XML_SUFFIX = ".xml";
     /** The suffix for the fits characterization metadata output files.*/
-    public static final String FITS_SUFFIX = ".fits";
+    public static final String FITS_SUFFIX = ".fits.xml";
 
     /** The Configuration with the base directories for the files to be packed.*/
     protected final Configuration conf;
