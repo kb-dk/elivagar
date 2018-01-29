@@ -13,6 +13,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.utils.StreamUtils;
 
 /**
@@ -36,6 +37,9 @@ public class HttpClient {
      * @throws IOException If any connection issues occur.
      */
     public void retrieveUrlContent(String url, OutputStream out) throws IOException {
+        ArgumentCheck.checkNotNullOrEmpty(url, "String url");
+        ArgumentCheck.checkNotNull(out, "OutputStream out");
+        
         log.debug("Retrieving content from URL: " + url);
         CloseableHttpClient client = HttpClients.createDefault();
         try {
@@ -61,11 +65,10 @@ public class HttpClient {
      * @param url The url for where the data should be retrieved.
      * @throws IOException If any problems occurs during the retrieval of the data.
      */
-    public void performDownload(OutputStream out, URL url)
-            throws IOException {
-        if(out == null || url == null) {
-            throw new IllegalArgumentException("OutputStream out: '" + out + "', URL: '" + url + "'");
-        }
+    public void performDownload(OutputStream out, URL url) throws IOException {
+        ArgumentCheck.checkNotNull(out, "OutputStream out");
+        ArgumentCheck.checkNotNull(url, "URL url");
+        
         InputStream is = retrieveStream(url);
         StreamUtils.copyInputStreamToOutputStream(is, out);
     }
@@ -78,6 +81,8 @@ public class HttpClient {
      * @throws IOException If any problems occurs during the retrieval.
      */
     protected InputStream retrieveStream(URL url) throws IOException {
+        ArgumentCheck.checkNotNull(url, "URL url");
+        
         HttpURLConnection conn = getConnection(url);
         conn.setDoInput(true);
         conn.setRequestMethod("GET");
@@ -95,6 +100,8 @@ public class HttpClient {
      * @return The HTTP connection to the given URL.
      */
     protected HttpURLConnection getConnection(URL url) {
+        ArgumentCheck.checkNotNull(url, "URL url");
+
         try {
             return (HttpURLConnection) url.openConnection();
         } catch (IOException e) {

@@ -10,6 +10,8 @@ import org.jaccept.structure.ExtendedTestCase;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
+
 public class StreamUtilsTest extends ExtendedTestCase {
 
     @Test
@@ -56,13 +58,13 @@ public class StreamUtilsTest extends ExtendedTestCase {
         Assert.assertEquals(os.toString(), tekst);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(expectedExceptions = ArgumentCheck.class)
     public void testCopyStreamFailureInputStreamNull() throws Exception {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         StreamUtils.copyInputStreamToOutputStream(null, os);
     }
     
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(expectedExceptions = ArgumentCheck.class)
     public void testCopyStreamFailureOutputStreamNull() throws Exception {
         ByteArrayInputStream is = new ByteArrayInputStream(new byte[0]);
         StreamUtils.copyInputStreamToOutputStream(is, null);

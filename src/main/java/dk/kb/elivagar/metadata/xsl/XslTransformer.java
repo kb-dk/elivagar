@@ -19,6 +19,8 @@ import dk.kb.elivagar.exception.ArgumentCheck;
 
 /**
  * Transformations of XML by XSLT scripts.
+ * 
+ * Copied from Yggdrasil.
  */
 public class XslTransformer {
 
@@ -75,8 +77,9 @@ public class XslTransformer {
      */
     public void transform(Source xmlSource, URIResolver uriResolver, ErrorListener errorListener, 
             Result outputTarget) throws TransformerException {
-        ArgumentCheck.checkNotNull(xmlSource, "xmlSource");
-        ArgumentCheck.checkNotNull(outputTarget, "outputTarget");
+        ArgumentCheck.checkNotNull(xmlSource, "Source xmlSource");
+        ArgumentCheck.checkNotNull(errorListener, "ErrorListener errorListener");
+        ArgumentCheck.checkNotNull(outputTarget, "Result outputTarget");
         transformerImpl.reset();
         transformerImpl.setOutputProperty(OutputKeys.INDENT, "yes");
         transformerImpl.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
@@ -94,9 +97,10 @@ public class XslTransformer {
      * @return byte array of the result
      * @throws TransformerException if an exception occurs while transforming
      */
-    public byte[] transform(Source xmlSource, URIResolver uriResolver, 
-            ErrorListener errorListener) throws TransformerException {
-        ArgumentCheck.checkNotNull(xmlSource, "xmlSource");
+    public byte[] transform(Source xmlSource, URIResolver uriResolver, ErrorListener errorListener) 
+            throws TransformerException {
+        ArgumentCheck.checkNotNull(xmlSource, "Source xmlSource");
+        ArgumentCheck.checkNotNull(errorListener, "ErrorListener errorListener");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         StreamResult result = new StreamResult(out);
         transform(xmlSource, uriResolver, errorListener, result);

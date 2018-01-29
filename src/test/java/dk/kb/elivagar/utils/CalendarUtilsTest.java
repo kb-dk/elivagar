@@ -25,12 +25,6 @@ public class CalendarUtilsTest extends ExtendedTestCase {
     }
     
     @Test
-    public void testDateConvertedFromXmlEpoc() throws Exception {
-        Date date = CalendarUtils.getDateFromXmlGregorianCalendar(xmlEpoc);
-        Assert.assertEquals(date.getTime(), 0);
-    }
-    
-    @Test
     public void testConstructor() {
         new CalendarUtils();
     }

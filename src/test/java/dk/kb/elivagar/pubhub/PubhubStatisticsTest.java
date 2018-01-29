@@ -10,6 +10,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.pubhub.validator.FileSuffixValidator;
 import dk.kb.elivagar.testutils.TestFileUtils;
 
@@ -37,7 +38,7 @@ public class PubhubStatisticsTest extends ExtendedTestCase {
         verifyZeroInteractions(validator);
     }
     
-    @Test(expectedExceptions = IllegalStateException.class)
+    @Test(expectedExceptions = ArgumentCheck.class)
     public void testCalculateStatisticsBadBaseDir() throws Exception {
         addDescription("Test the calculateStatistics method, when the base directory is a single file.");
         File baseDir = new File(TestFileUtils.getTempDir().getAbsolutePath() + "/" + UUID.randomUUID().toString());

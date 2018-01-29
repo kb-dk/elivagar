@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
+
 /**
  * Utility class for handling standard stream issues.
  */
@@ -23,12 +25,9 @@ public final class StreamUtils {
      * @param out The output stream where the input stream should be copied.
      * @throws IOException If any problems occur with transferring the data between the streams.
      */
-    public static void copyInputStreamToOutputStream(InputStream in,
-            OutputStream out) throws IOException {
-        if(in == null || out == null) {
-            throw new IllegalArgumentException("InputStream: " + in 
-                    + ", OutputStream: " + out);
-        }
+    public static void copyInputStreamToOutputStream(InputStream in, OutputStream out) throws IOException {
+        ArgumentCheck.checkNotNull(in, "InputStream in");
+        ArgumentCheck.checkNotNull(out, "OutputStream out");
         
         try {
             byte[] buf = new byte[IO_BUFFER_SIZE];
@@ -46,13 +45,14 @@ public final class StreamUtils {
 
     /**
      * Extracts the content of an input stream as lines.
-     * @param is The input stream.
+     * @param in The input stream.
      * @return A list of all the lines from the inputstream.
      * @throws IOException If it fails.
      */
-    public static List<String> extractInputStreamAsLines(InputStream is) throws IOException {
+    public static List<String> extractInputStreamAsLines(InputStream in) throws IOException {
+        ArgumentCheck.checkNotNull(in, "InputStream in");
         List<String> res = new ArrayList<String>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
             String line;
             while((line = br.readLine()) != null) {
                 res.add(line);
@@ -63,13 +63,14 @@ public final class StreamUtils {
     
     /**
      * Extracts the content of an input stream as a string.
-     * @param is The input stream to extract.
+     * @param in The input stream to extract.
      * @return The string of the input stream.
      * @throws IOException If the input stream cannot be read.
      */
-    public static String extractInputStreamAsString(InputStream is) throws IOException {
+    public static String extractInputStreamAsString(InputStream in) throws IOException {
+        ArgumentCheck.checkNotNull(in, "InputStream in");
         StringBuffer res = new StringBuffer();
-        for(String s : extractInputStreamAsLines(is)) {
+        for(String s : extractInputStreamAsLines(in)) {
             res.append(s + "\n");
         }
         

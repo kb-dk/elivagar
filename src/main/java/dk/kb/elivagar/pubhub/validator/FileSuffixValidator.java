@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.utils.StringUtils;
 
 /**
@@ -18,6 +19,7 @@ public abstract class FileSuffixValidator {
      * @param validSuffices The list of valid suffices.
      */
     protected FileSuffixValidator(List<String> validSuffices) {
+        ArgumentCheck.checkNotNull(validSuffices, "List<String> validSuffices");
         this.validSuffices = new ArrayList<String>(validSuffices);
     }
 
@@ -27,6 +29,7 @@ public abstract class FileSuffixValidator {
      * @return Whether it was valid or not.
      */
     public boolean hasValidSuffix(File fileToValidate) {
+        ArgumentCheck.checkExistsNormalFile(fileToValidate, "File fileToValidate");
         String suffix = StringUtils.getSuffix(fileToValidate.getAbsolutePath());
         for(String validSuffix : validSuffices) {
             if(suffix.equalsIgnoreCase(validSuffix)) {

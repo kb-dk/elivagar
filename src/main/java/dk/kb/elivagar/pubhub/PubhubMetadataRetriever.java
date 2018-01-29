@@ -8,6 +8,7 @@ import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.utils.CalendarUtils;
 import dk.pubhub.service.ArrayOfBook;
 import dk.pubhub.service.MediaServiceAsmx;
@@ -34,6 +35,7 @@ public class PubhubMetadataRetriever {
      * @param licenseKey The license key for pubhub.
      */
     public PubhubMetadataRetriever(String licenseKey) {
+        ArgumentCheck.checkNotNullOrEmpty(licenseKey, "String licenseKey");
         this.licenseKey = licenseKey;
         
         MediaServiceAsmx mediaServiceAsmx = new MediaServiceAsmx();
@@ -60,7 +62,7 @@ public class PubhubMetadataRetriever {
     
     /**
      * Retrieves all the metadata for the books which have been modified after a given date.
-     * @param earliestDate The date limit for the modified books.
+     * @param earliestDate The date limit for the modified books. If null, then all books newer than epoc is returned.
      * @return The list of modified book metadata.
      */
     public ModifiedBookList downloadBookMetadataAfterModifyDate(Date earliestDate) {

@@ -10,6 +10,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.testutils.TestFileUtils;
 
 public class YamlUtilsTest extends ExtendedTestCase {
@@ -33,7 +34,7 @@ public class YamlUtilsTest extends ExtendedTestCase {
         Assert.assertFalse(map.isEmpty());
     }
     
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(expectedExceptions = ArgumentCheck.class)
     public void testLoadMissingFile() throws Exception {
         addDescription("Fail when loading a file, which does not exist.");
         YamlUtils.loadYamlSettings(new File(UUID.randomUUID().toString()));

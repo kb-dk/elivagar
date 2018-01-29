@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implements an XSL URI resolver which can be used to resolve external XSL files.
- * Unused - so a project for those dark January nights.
+ * 
+ * Copied from Yggdrasil.
  */
 public class XslUriResolver implements URIResolver {
     /** The logger.*/

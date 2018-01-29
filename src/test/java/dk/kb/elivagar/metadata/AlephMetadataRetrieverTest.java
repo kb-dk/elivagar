@@ -261,7 +261,7 @@ public class AlephMetadataRetrieverTest extends ExtendedTestCase {
         verifyZeroInteractions(httpClient);
     }
     
-    @Test
+    @Test(expectedExceptions = IllegalStateException.class)
     public void testFindSetNumberInFileErrorFromAleph() throws Exception {
         addDescription("Test the findSetNumberInFile method, when Aleph delivers an error");
         HttpClient httpClient = mock(HttpClient.class);
@@ -269,13 +269,10 @@ public class AlephMetadataRetrieverTest extends ExtendedTestCase {
         
         File f = TestFileUtils.copyFileToTemp(new File("src/test/resources/metadata/aleph_search_failure.xml"));
         
-        String setNumber = retriever.findSetNumberInFile(f);
-        
-        Assert.assertNull(setNumber);
-        verifyZeroInteractions(httpClient);
+        retriever.findSetNumberInFile(f);
     }
     
-    @Test
+    @Test(expectedExceptions = IllegalStateException.class)
     public void testFindSetNumberInFileNoResults() throws Exception {
         addDescription("Test the findSetNumberInFile method, when Aleph delivers no results");
         HttpClient httpClient = mock(HttpClient.class);
@@ -283,10 +280,7 @@ public class AlephMetadataRetrieverTest extends ExtendedTestCase {
         
         File f = TestFileUtils.copyFileToTemp(new File("src/test/resources/metadata/aleph_search_no_entries.xml"));
         
-        String setNumber = retriever.findSetNumberInFile(f);
-        
-        Assert.assertNull(setNumber);
-        verifyZeroInteractions(httpClient);
+        retriever.findSetNumberInFile(f);
     }
     
     @Test(expectedExceptions = IllegalStateException.class)

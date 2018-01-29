@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.utils.StreamUtils;
 
 /**
@@ -23,9 +24,7 @@ public class ScriptWrapper {
      * @param scriptFile The script for to be called.
      */
     public ScriptWrapper(File scriptFile) {
-        if(!scriptFile.isFile()) {
-            throw new IllegalStateException("The file '" + scriptFile.getAbsolutePath() + "' is not valid.");
-        }
+        ArgumentCheck.checkExistsNormalFile(scriptFile, "File scriptFile");
         this.scriptFile = scriptFile;
     }
     

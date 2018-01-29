@@ -10,6 +10,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.utils.FileUtils;
 import dk.kb.elivagar.utils.YamlUtils;
 
@@ -107,16 +108,19 @@ public class Configuration {
      * @param confMap The YAML map for the configuration.
      * @throws IOException If the output directory does not exist and cannot be created.
      */
+    @SuppressWarnings("unchecked")
     public Configuration(Map<String, Object> confMap) throws IOException {
-        validateThatMapContainsKey(confMap, CONF_EBOOK_OUTPUT_DIR);
-        validateThatMapContainsKey(confMap, CONF_AUDIO_OUTPUT_DIR);
-        validateThatMapContainsKey(confMap, CONF_LICENSE_KEY);
-        validateThatMapContainsKey(confMap, CONF_EBOOK_FILE_DIR);
-        validateThatMapContainsKey(confMap, CONF_AUDIO_FILE_DIR);
-        validateThatMapContainsKey(confMap, CONF_EBOOK_FILE_DIR);
-        validateThatMapContainsKey(confMap, CONF_AUDIO_FILE_DIR);
-        validateThatMapContainsKey(confMap, CONF_XSLT_DIR);
-        validateThatMapContainsKey(confMap, CONF_ALEPH_ROOT);
+        ArgumentCheck.checkNotNullOrEmpty(confMap, "Map<String, Object> confMap");
+        
+        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_EBOOK_OUTPUT_DIR, "confMap");
+        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_AUDIO_OUTPUT_DIR, "confMap");
+        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_LICENSE_KEY, "confMap");
+        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_EBOOK_FILE_DIR, "confMap");
+        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_AUDIO_FILE_DIR, "confMap");
+        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_EBOOK_FILE_DIR, "confMap");
+        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_AUDIO_FILE_DIR, "confMap");
+        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_XSLT_DIR, "confMap");
+        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_ALEPH_ROOT, "confMap");
         
         ebookOutputDir = FileUtils.createDirectory((String) confMap.get(CONF_EBOOK_OUTPUT_DIR));
         abookOutputDir = FileUtils.createDirectory((String) confMap.get(CONF_AUDIO_OUTPUT_DIR));
@@ -141,9 +145,9 @@ public class Configuration {
      * @throws IOException If the temporary directory cannot be instantiated.
      */
     protected AlephConfiguration getAlephConfiguration(Map<String, Object> alephMap) throws IOException {
-        validateThatMapContainsKey(alephMap, CONF_ALEPH_URL);
-        validateThatMapContainsKey(alephMap, CONF_ALEPH_BASE);
-        validateThatMapContainsKey(alephMap, CONF_ALEPH_TEMP_DIR);
+        ArgumentCheck.checkThatMapContainsKey(alephMap, CONF_ALEPH_URL, "alephMap");
+        ArgumentCheck.checkThatMapContainsKey(alephMap, CONF_ALEPH_BASE, "alephMap");
+        ArgumentCheck.checkThatMapContainsKey(alephMap, CONF_ALEPH_TEMP_DIR, "alephMap");
         
         String url = (String) alephMap.get(CONF_ALEPH_URL);
         String base = (String) alephMap.get(CONF_ALEPH_BASE);
@@ -203,26 +207,15 @@ public class Configuration {
     }
     
     /**
-     * Validates that the map contains a given key.
-     * @param map The map to validate.
-     * @param key The key which must be present and have a value in it.
-     */
-    protected void validateThatMapContainsKey(Map<String, Object> map, String key) {
-        if(!map.containsKey(key)) {
-            throw new IllegalStateException("The configuration must include '" + key + "'");
-        }
-        if(map.get(key) == null) {
-            throw new IllegalStateException("The configuration field '" + key + "' must have a value.");
-        }
-    }
-    
-    /**
      * Creates a configuration from a file.
      * @param yamlFile The YAML file with the configuration.
      * @return The configuration.
      * @throws IOException If it fails to load, or the configured elements cannot be instantiated.
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public static Configuration createFromYAMLFile(File yamlFile) throws IOException {
+        ArgumentCheck.checkExistsNormalFile(yamlFile, "File yamlFile");
+        
         log.debug("Loading configuration from file '" + yamlFile.getAbsolutePath() + "'");
         LinkedHashMap<String, LinkedHashMap> map = YamlUtils.loadYamlSettings(yamlFile);
         Map<String, Object> confMap = (Map<String, Object>) map.get(CONF_ELIVAGAR);

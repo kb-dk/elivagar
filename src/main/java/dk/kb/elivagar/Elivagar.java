@@ -100,7 +100,7 @@ public class Elivagar {
             pubhubWorkflow.makeStatistics(System.out);
         } catch (Exception e) {
             log.error("Failure to run the workflow. \nThe waters of Elivagar must have frozen over!", e);
-            System.exit(-1);
+            System.exit(1);
         }
     }
 }

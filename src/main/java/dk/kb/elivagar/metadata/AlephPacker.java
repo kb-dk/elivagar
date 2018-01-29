@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import dk.kb.elivagar.config.Configuration;
-import dk.kb.elivagar.pubhub.PubhubPacker;
+import dk.kb.elivagar.exception.ArgumentCheck;
 
 /**
  * The Aleph packer.
@@ -32,7 +32,7 @@ import dk.kb.elivagar.pubhub.PubhubPacker;
  */
 public class AlephPacker {
     /** The logger.*/
-    private static final Logger log = LoggerFactory.getLogger(PubhubPacker.class);
+    private static final Logger log = LoggerFactory.getLogger(AlephPacker.class);
 
     /** The XPATH for extracting the Identifier from the pubhub Book xml file.*/
     protected static final String XPATH_FIND_IDENTIFIER = "/Book/Identifier/text()";
@@ -60,6 +60,9 @@ public class AlephPacker {
      * @param transformer The metadata transformer.
      */
     public AlephPacker(Configuration conf, AlephMetadataRetriever alephRetriever, MetadataTransformer transformer) {
+        ArgumentCheck.checkNotNull(conf, "Configuration conf");
+        ArgumentCheck.checkNotNull(alephRetriever, "AlephMetadataRetriever alephRetriever");
+        ArgumentCheck.checkNotNull(transformer, "MetadataTransformer transformer");
         this.conf = conf;
         this.metadataRetriever = alephRetriever;
         this.transformer = transformer;
@@ -75,7 +78,7 @@ public class AlephPacker {
     public void packAlephMetadataForBooks() {
         traverseBooksInFolder(conf.getEbookOutputDir());
         if(conf.getEbookOutputDir().getAbsolutePath().equals(conf.getAudioOutputDir().getAbsolutePath())) {
-            log.debug("Ebooks and Audio books have same base-dir, so they want be traversed twice.");
+            log.debug("Ebooks and Audio books have same base-dir.");
         } else {
             traverseBooksInFolder(conf.getAudioOutputDir());            
         }
@@ -142,7 +145,8 @@ public class AlephPacker {
     protected String getIsbn(File dir) {
         File pubhubMetadataFile = new File(dir, dir.getName() + ".xml");
         if(!pubhubMetadataFile.isFile()) {
-            log.info("No pubhub metadata file for '" + dir.getName() + "', thus cannot extract ISBN.");
+            log.warn("No pubhub metadata file for '" + dir.getName() + "', thus cannot extract ISBN. "
+                    + "Returning a null.");
             return null;            
         }
         try {
@@ -155,12 +159,13 @@ public class AlephPacker {
             XPathExpression identifierTypeXpath = xpath.compile(XPATH_FIND_IDENTIFIER_TYPE);
             String idType = (String) identifierTypeXpath.evaluate(doc, XPathConstants.STRING);
             if(!idType.startsWith("ISBN")) {
-                log.info("Not an ISBN type of identifier.");
+                log.info("Not an ISBN type of identifier. Found: '" + idType + "'. Returning a null.");
                 return null;
             }
             return (String) identifierXpath.evaluate(doc, XPathConstants.STRING);
         } catch (Exception e) {
-            log.info("Could not extract the ISBN number from the file '" + pubhubMetadataFile + "'", e);
+            log.info("Could not extract the ISBN number from the file '" + pubhubMetadataFile + "'. Returning a null", 
+                    e);
             return null;
         }
     }

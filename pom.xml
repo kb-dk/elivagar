@@ -57,7 +57,13 @@
       <artifactId>commons-lang3</artifactId>
       <version>3.7</version>
     </dependency>
-
+<!--
+    <dependency>
+      <groupId>org.idpf</groupId>
+      <artifactId>epubcheck</artifactId>
+      <version>4.0.2</version>
+    </dependency>
+-->
     <!-- TESTING -->
     <dependency>
       <groupId>org.testng</groupId>

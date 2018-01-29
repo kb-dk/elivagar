@@ -2,6 +2,8 @@ package dk.kb.elivagar.config;
 
 import java.io.File;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
+
 /**
  * Configuration for Aleph.
  */
@@ -20,6 +22,10 @@ public class AlephConfiguration {
      * @param tempDir The directory for the temporary aleph resources.
      */
     public AlephConfiguration(String serverUrl, String base, File tempDir) {
+        ArgumentCheck.checkNotNullOrEmpty(serverUrl, "String serverUrl");
+        ArgumentCheck.checkNotNullOrEmpty(base, "String base");
+        ArgumentCheck.checkExistsDirectory(tempDir, "File tempDir");
+        
         if(serverUrl.endsWith("?")) {
             this.serverUrl = serverUrl;
         } else {

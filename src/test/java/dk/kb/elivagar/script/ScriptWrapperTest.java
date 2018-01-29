@@ -11,6 +11,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.script.ScriptWrapper;
 import dk.kb.elivagar.utils.FileUtils;
 import dk.kb.elivagar.utils.StreamUtils;
@@ -54,7 +55,7 @@ public class ScriptWrapperTest extends ExtendedTestCase {
         sw.callVoidScript(new String[0]);
     }
     
-    @Test(expectedExceptions = IllegalStateException.class)
+    @Test(expectedExceptions = ArgumentCheck.class)
     public void testFailureWhenBadScriptPath() throws IOException {
         File testScript = new File(UUID.randomUUID().toString());
         new ScriptWrapper(testScript);

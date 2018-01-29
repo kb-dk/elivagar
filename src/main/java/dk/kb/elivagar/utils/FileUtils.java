@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
+
 /**
  * Utility class for dealing with files.
  */
@@ -18,6 +20,7 @@ public class FileUtils {
      * @throws IOException When creating a directory fail
      */
     public static File createDirectory(String dirPath) throws IOException {
+        ArgumentCheck.checkNotNullOrEmpty(dirPath, "String dirPath");
         Path path = Paths.get(dirPath);
         if(!Files.exists(path)) {
             Files.createDirectories(path);

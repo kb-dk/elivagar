@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.HttpClient;
 import dk.kb.elivagar.config.Configuration;
+import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.pubhub.validator.AudioSuffixValidator;
 import dk.kb.elivagar.pubhub.validator.EbookSuffixValidator;
 import dk.kb.elivagar.script.CharacterizationScriptWrapper;
@@ -68,6 +69,9 @@ public class PubhubPacker {
      */
     public PubhubPacker(Configuration conf, String serviceNamespace, CharacterizationScriptWrapper script, 
             HttpClient httpClient) {
+        ArgumentCheck.checkNotNull(conf, "Configuration conf");
+        ArgumentCheck.checkNotNullOrEmpty(serviceNamespace, "String serviceNamespace");
+        ArgumentCheck.checkNotNull(httpClient, "HttpClient httpClient");
         this.conf = conf;
         this.namespace = serviceNamespace;
         this.marshallers = new HashMap<String, Marshaller>();
@@ -84,6 +88,7 @@ public class PubhubPacker {
      * @return The marshaller for the class.
      * @throws JAXBException If a marshaller for the class cannot be created.
      */
+    @SuppressWarnings("rawtypes")
     protected Marshaller getMarshallerForClass(Class c) throws JAXBException {
         if(!marshallers.containsKey(c.getSimpleName())) {
             log.debug("Instantiating marshaller for class '" + c.getName() + "'.");
@@ -104,6 +109,7 @@ public class PubhubPacker {
      * @throws IOException If an issue occurs when retrieving the directory, or creating or downloading the files.
      */
     public void packBook(Book book) throws JAXBException, IOException {
+        ArgumentCheck.checkNotNull(book, "Book book");
         log.info("Packaging book '" + book.getBookId() + "'.");
         File bookDir = getBookDir(book.getBookId(), book.getBookType());
 
@@ -141,6 +147,7 @@ public class PubhubPacker {
      * original ebook file cannot be created.
      */
     public void packFileForEbook(File bookFile) throws IOException {
+        ArgumentCheck.checkNotNull(bookFile, "File bookFile");
         if(!ebookSuffixValidator.hasValidSuffix(bookFile)) {
             log.trace("The file '" + bookFile.getAbsolutePath() + "' does not have a ebook suffix.");
             return;
@@ -176,6 +183,7 @@ public class PubhubPacker {
      * original audio file cannot be created.
      */
     public void packFileForAudio(File bookFile) throws IOException {
+        ArgumentCheck.checkNotNull(bookFile, "File bookFile");
         if(!audioSuffixValidator.hasValidSuffix(bookFile)) {
             log.trace("The file '" + bookFile.getAbsolutePath() + "' does not have a audio suffix.");
             return;

@@ -1,5 +1,7 @@
 package dk.kb.elivagar.utils;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
+
 /**
  * Utility class for String operations.
  */
@@ -11,6 +13,7 @@ public class StringUtils {
      * @return The suffix of the file.
      */
     public static String getSuffix(String path) {
+        ArgumentCheck.checkNotNullOrEmpty(path, "String path");
         if(path.contains(".")) {
             int end = path.lastIndexOf(".");
             return path.substring(end + 1);
@@ -26,6 +29,7 @@ public class StringUtils {
      * @return The prefix. Possibly the whole filename, if the file does not have a suffix.
      */
     public static String getPrefix(String filename) {
+        ArgumentCheck.checkNotNullOrEmpty(filename, "String filename");
         if(filename.contains(".")) {
             int end = filename.indexOf(".");
             return filename.substring(0, end);

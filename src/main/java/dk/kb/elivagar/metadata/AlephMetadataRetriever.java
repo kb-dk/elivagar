@@ -18,6 +18,7 @@ import org.w3c.dom.Document;
 
 import dk.kb.elivagar.HttpClient;
 import dk.kb.elivagar.config.AlephConfiguration;
+import dk.kb.elivagar.exception.ArgumentCheck;
 
 /**
  * Aleph Metadata Retriever.
@@ -49,14 +50,23 @@ public class AlephMetadataRetriever {
     /** The HTTP client for making the HTTP Get operations towards the Aleph server.*/
     protected final HttpClient httpClient;
     
+    /** The document builder factory.*/
+    protected final DocumentBuilderFactory documentBuilderFactory;
+    /** The XPath factory.*/
+    protected final XPathFactory xPathFactory;
+    
     /**
      * Constructor.
      * @param configuration The configurations regarding dealing with Aleph.
      * @param httpClient The HTTP client for performing the HTTP Get operations.
      */
     public AlephMetadataRetriever(AlephConfiguration configuration, HttpClient httpClient) {
+        ArgumentCheck.checkNotNull(configuration, "AlephConfiguration configuration");
+        ArgumentCheck.checkNotNull(httpClient, "HttpClient httpClient");
         this.conf= configuration;
         this.httpClient = httpClient;
+        documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        xPathFactory = XPathFactory.newInstance();
     }
     
     /**
@@ -65,13 +75,12 @@ public class AlephMetadataRetriever {
      * @param out The output stream, where the Aleph metadata will be written.
      */
     public void retrieveMetadataForISBN(String isbn, OutputStream out) {
+        ArgumentCheck.checkNotNullOrEmpty(isbn, "String isbn");
+        ArgumentCheck.checkNotNull(out, "OutputStream out");
+        
         log.debug("Retrieve Aleph metadata for ISBN: " + isbn);
         String setNumber = getAlephSetNumber(isbn);
-        if(setNumber != null) {
-            downloadAlephMetadata(setNumber, out);
-        } else {
-            throw new IllegalStateException("Could not extract Aleph metadata for ISBN: " + isbn);
-        }
+        downloadAlephMetadata(setNumber, out);
     }
     
     /**
@@ -112,24 +121,21 @@ public class AlephMetadataRetriever {
      */
     protected String findSetNumberInFile(File f) {
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
             Document doc = builder.parse(f);
-            XPathFactory xPathfactory = XPathFactory.newInstance();
-            XPath xpath = xPathfactory.newXPath();
+            XPath xpath = xPathFactory.newXPath();
             XPathExpression errorXpath = xpath.compile(XPATH_FIND_ERROR);
             XPathExpression setNumberXpath = xpath.compile(XPATH_FIND_SET_NUMBER);
             XPathExpression noEntriesXpath = xpath.compile(XPATH_FIND_NUMBER_OF_ENTRIES);
             String error = (String) errorXpath.evaluate(doc, XPathConstants.STRING);
             if(!error.isEmpty()) {
-                log.debug("Aleph search gave the following error: " + error);
-                return null;
+                throw new IllegalStateException("Could not fetch data from Aleph. "
+                        + "It gave the following error: " + error);
             }
             String numberOfEntriesText = (String) noEntriesXpath.evaluate(doc, XPathConstants.STRING);
             int numberOfEntries = Integer.parseInt(numberOfEntriesText);
             if(numberOfEntries < 1) {
-                log.info("No entries found.");
-                return null;
+                throw new IllegalStateException("No search result entries found from Aleph.");
             }
             if(numberOfEntries > 1) {
                 log.debug("Found more than 1 entry. Retrieving only the first.");

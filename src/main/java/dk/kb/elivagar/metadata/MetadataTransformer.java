@@ -65,6 +65,9 @@ public class MetadataTransformer {
      * @param type The type of transformation to perform.
      */
     public void transformMetadata(InputStream input, OutputStream output, TransformationType type) {
+        ArgumentCheck.checkNotNull(input, "InputStream input");
+        ArgumentCheck.checkNotNull(output, "OutputStream output");
+        ArgumentCheck.checkNotNull(type, "TransformationType type");
         try {
             XslTransformer transformer = getTransformationFile(type);
             

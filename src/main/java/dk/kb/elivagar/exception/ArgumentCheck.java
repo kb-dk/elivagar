@@ -2,6 +2,7 @@ package dk.kb.elivagar.exception;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Checks for argument validity.
@@ -54,6 +55,22 @@ public class ArgumentCheck extends RuntimeException {
 
         if (val.isEmpty()) {
             throw new ArgumentCheck("The value of the variable '" + name + "' must not be an empty string.");
+        }
+    }
+
+    /**
+     * Check if a Map argument is null or empty.
+     *
+     * @param val  the value to check
+     * @param name the name and type of the value being checked
+     * @throws ArgumentCheck if test fails
+     */
+    @SuppressWarnings("rawtypes")
+    public static void checkNotNullOrEmpty(Map val, String name) {
+        checkNotNull(val, name);
+
+        if (val.isEmpty()) {
+            throw new ArgumentCheck("The value of the variable '" + name + "' must not be an empty map.");
         }
     }
 
@@ -164,7 +181,7 @@ public class ArgumentCheck extends RuntimeException {
     public static void checkExistsDirectory(File aDir, String name) {
         checkNotNull(aDir, name);
         if (!aDir.isDirectory()) {
-            throw new ArgumentCheck("The file '" + aDir.getAbsolutePath() + "' does not exist or is not a directory.");
+            throw new ArgumentCheck("The path '" + aDir.getAbsolutePath() + "' does not exist or is not a directory.");
         }
     }
 
@@ -172,13 +189,30 @@ public class ArgumentCheck extends RuntimeException {
      * Check, if the given argument is an existing normal file.
      * @param aFile a given File object.
      * @param name Name of object
-     * @throws ArgumentCheck If aDir is not an existing file
+     * @throws ArgumentCheck If aFile is not an existing file
      */
     public static void checkExistsNormalFile(File aFile, String name) {
         checkNotNull(aFile, name);
         if (!aFile.isFile()) {
             throw new ArgumentCheck("The file '" + aFile.getAbsolutePath() + "' does not exist or is not a "
                     + "normal file.");
+        }
+    }
+    
+    /**
+     * Validates that the map contains a given key.
+     * @param map The map to validate.
+     * @param key The key which must be present and have a value in it.
+     * @param name The name of the argument to validate.
+     */
+    @SuppressWarnings("rawtypes")
+    public static void checkThatMapContainsKey(Map map, String key, String name) {
+        checkNotNull(map, name);
+        if(!map.containsKey(key)) {
+            throw new ArgumentCheck("The map '" + name + "' must include the key '" + key + "'");
+        }
+        if(map.get(key) == null) {
+            throw new ArgumentCheck("The map '" + name + "' must a value for the key '" + key + "'");
         }
     }
 }

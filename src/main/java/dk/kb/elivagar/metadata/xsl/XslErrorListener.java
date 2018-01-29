@@ -1,5 +1,6 @@
 package dk.kb.elivagar.metadata.xsl;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implements an XSL error listener which can be used while transforming XML files.
+ * 
+ * Copied from Yggdrasil.
  */
 public class XslErrorListener implements ErrorListener {
     /** The logger.*/
@@ -25,7 +28,7 @@ public class XslErrorListener implements ErrorListener {
     /** Fatal errors accumulated. */
     protected int numberOfFatalErrors;
 
-    /** Fatal errors messages. */
+    /** Fatal error messages. */
     protected List<String> fatalErrors = new LinkedList<String>();
 
     /** Warnings accumulated. */
@@ -72,7 +75,7 @@ public class XslErrorListener implements ErrorListener {
     public void fatalError(TransformerException exception) throws TransformerException {
         ++numberOfFatalErrors;
         fatalErrors.add(exception.getMessageAndLocation());
-        log.error("XLST processing error!", exception.getMessageAndLocation(), exception);
+        log.error("Fatal XLST processing error!", exception.getMessageAndLocation(), exception);
     }
 
     @Override
@@ -86,20 +89,20 @@ public class XslErrorListener implements ErrorListener {
      * @return The list of fatal errors.
      */
     public List<String> getFatalErrors() {
-        return new LinkedList<String>(fatalErrors);
+        return new ArrayList<String>(fatalErrors);
     }
     
     /**
      * @return The list of errors.
      */
     public List<String> getErrors() {
-        return new LinkedList<String>(errors);
+        return new ArrayList<String>(errors);
     }
     
     /**
      * @return The list of warnings.
      */
     public List<String> getWarnings() {
-        return new LinkedList<String>(warnings);
+        return new ArrayList<String>(warnings);
     }
 }

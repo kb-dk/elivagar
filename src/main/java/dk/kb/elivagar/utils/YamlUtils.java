@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 
 import org.yaml.snakeyaml.Yaml;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
+
 /** Class for reading YAML v 1.1 configuration files. */
 public class YamlUtils {
     /**
@@ -15,7 +17,9 @@ public class YamlUtils {
      * @param ymlFile The settings file in YAML format to load
      * @return the loaded settings as a {@link LinkedHashMap}
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public static LinkedHashMap<String, LinkedHashMap> loadYamlSettings(File ymlFile) {
+        ArgumentCheck.checkExistsNormalFile(ymlFile, "File ymlFile");
         Object loadedSettings = null;
         try (InputStream input = new FileInputStream(ymlFile)){
             loadedSettings = new Yaml().load(input);

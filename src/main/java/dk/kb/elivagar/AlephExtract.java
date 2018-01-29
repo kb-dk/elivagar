@@ -16,6 +16,10 @@ import dk.kb.elivagar.metadata.MetadataTransformer;
 
 /**
  * Extracts the metadata from Aleph and transform it into MARC and MODS.
+ * 
+ * Usage:
+ * dk.kb.elivagar.AlephExtract /PATH/TO/elivagar.yml [ISBN]+
+ * 
  */
 public class AlephExtract {
     /** The logger.*/
@@ -59,6 +63,7 @@ public class AlephExtract {
      */
     protected static void retrieveMetadataForIsbn(Configuration conf, MetadataTransformer transformer, 
             AlephMetadataRetriever retriever, String isbn) {
+        log.info("Retrieving the metadata for ISBN: '" + isbn + "'");
         try {
             File alephMetadataFile = new File(conf.getAlephConfiguration().getTempDir(), isbn + ".aleph.xml");
             try (OutputStream out = new FileOutputStream(alephMetadataFile)) {
@@ -76,6 +81,7 @@ public class AlephExtract {
                     OutputStream out = new FileOutputStream(modsMetadataFile)) {
                 transformer.transformMetadata(in, out, MetadataTransformer.TransformationType.MARC21_TO_MODS);
             }
+            log.info("Metadata for ISBN '" + isbn + "' can be found at: " + conf.getAlephConfiguration().getTempDir());
         } catch (IOException e) {
             log.warn("Issue occured when retrieving the metadata for ISBN: '" + isbn + "'", e);
         }

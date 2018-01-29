@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.config.Configuration;
+import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
 import dk.kb.elivagar.pubhub.PubhubPacker;
 import dk.kb.elivagar.pubhub.PubhubStatistics;
@@ -46,6 +47,8 @@ public class PubhubWorkflow {
      * @param conf The elivagar configuration. 
      */
     public PubhubWorkflow(Configuration conf) {
+        ArgumentCheck.checkNotNull(conf, "Configuration conf");
+
         this.conf = conf;
         this.retriever = new PubhubMetadataRetriever(conf.getLicenseKey());
         CharacterizationScriptWrapper script = null;
@@ -79,6 +82,8 @@ public class PubhubWorkflow {
      * @throws IOException If files cannot be created or downloaded.
      */
     public void retrieveModifiedBooks(Date earliestDate, long max) throws JAXBException, IOException {
+        ArgumentCheck.checkNotNull(earliestDate, "Date earliestDate");
+        
         List<Book> books = retriever.downloadBookMetadataAfterModifyDate(
                 earliestDate).getNewAndModifiedBooks().getBook();
         for(int i = 0; i < books.size() && i < max; i++) {
@@ -169,6 +174,8 @@ public class PubhubWorkflow {
      * @param printer The print stream where the output is written.
      */
     public void makeStatistics(PrintStream printer) {
+        ArgumentCheck.checkNotNull(printer, "PrintStream printer");
+        
         if(conf.getEbookOutputDir().list() != null) {
             makeStatisticsForDirectory(printer, conf.getEbookOutputDir(), new EbookSuffixValidator(conf));
         } else {

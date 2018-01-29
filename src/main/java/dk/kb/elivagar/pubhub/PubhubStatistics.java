@@ -5,6 +5,7 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.pubhub.validator.FileSuffixValidator;
 
 /**
@@ -36,6 +37,8 @@ public class PubhubStatistics {
      * @param validator The validator for which files are considered content-files.
      */
     public PubhubStatistics(File baseDir, FileSuffixValidator validator) {
+        ArgumentCheck.checkExistsDirectory(baseDir, "File baseDir");
+        ArgumentCheck.checkNotNull(validator, "FileSuffixValidator validator");
         this.baseDir = baseDir;
         this.validator = validator;
     }
@@ -67,7 +70,7 @@ public class PubhubStatistics {
     protected void calculateStatisticsOnBookDir(File dir) {
         File[] files = dir.listFiles();
         if(files == null) {
-            log.warn("Expected the file '" + dir.getAbsolutePath() + "' to be a directory for a book. "
+            log.warn("Expected the directory '" + dir.getAbsolutePath() + "' to be a directory for a book. "
                     + "Continue to next.");
         } else {
             count++;
@@ -76,7 +79,6 @@ public class PubhubStatistics {
             for(File f : files) {
                 String filename = f.getName();
                 if(filename.equalsIgnoreCase(dir.getName() + PubhubPacker.XML_SUFFIX)) {
-                    // TODO perhaps only, if the file has the name ${book-id}.xml, where book-id is the dir-name.
                     hasMetadata = true;
                 } else if(validator.hasValidSuffix(f)) {
                     hasFile = true;
