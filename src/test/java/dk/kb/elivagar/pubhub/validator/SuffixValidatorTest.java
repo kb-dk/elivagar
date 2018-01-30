@@ -12,11 +12,9 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import dk.kb.elivagar.Constants;
+import dk.kb.elivagar.characterization.FitsCharacterizer;
 import dk.kb.elivagar.config.Configuration;
-import dk.kb.elivagar.pubhub.PubhubPacker;
-import dk.kb.elivagar.pubhub.validator.AudioSuffixValidator;
-import dk.kb.elivagar.pubhub.validator.EbookSuffixValidator;
-import dk.kb.elivagar.script.CharacterizationScriptWrapper;
 import dk.kb.elivagar.testutils.TestFileUtils;
 
 public class SuffixValidatorTest extends ExtendedTestCase {
@@ -25,7 +23,7 @@ public class SuffixValidatorTest extends ExtendedTestCase {
     public static final String MP3_SUFFIX = ".mp3";
 
     String serviceNamespace = "" + UUID.randomUUID().toString();
-    CharacterizationScriptWrapper script = null;
+    FitsCharacterizer script = null;
 
     @BeforeClass
     public void setup() {
@@ -44,9 +42,9 @@ public class SuffixValidatorTest extends ExtendedTestCase {
         EbookSuffixValidator validator = new EbookSuffixValidator(conf);
 
         Assert.assertTrue(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + EPUB_SUFFIX)));
-        Assert.assertFalse(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + PubhubPacker.FITS_SUFFIX)));
+        Assert.assertFalse(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + Constants.FITS_METADATA_SUFFIX)));
         Assert.assertTrue(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + PDF_SUFFIX)));
-        Assert.assertFalse(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + PubhubPacker.XML_SUFFIX)));
+        Assert.assertFalse(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + Constants.PUBHUB_METADATA_SUFFIX)));
         Assert.assertFalse(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + MP3_SUFFIX)));
         Assert.assertFalse(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString())));
     }
@@ -58,9 +56,9 @@ public class SuffixValidatorTest extends ExtendedTestCase {
         AudioSuffixValidator validator = new AudioSuffixValidator(conf);
 
         Assert.assertFalse(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + EPUB_SUFFIX)));
-        Assert.assertFalse(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + PubhubPacker.FITS_SUFFIX)));
+        Assert.assertFalse(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + Constants.FITS_METADATA_SUFFIX)));
         Assert.assertFalse(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + PDF_SUFFIX)));
-        Assert.assertFalse(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + PubhubPacker.XML_SUFFIX)));
+        Assert.assertFalse(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + Constants.PUBHUB_METADATA_SUFFIX)));
         Assert.assertTrue(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString() + MP3_SUFFIX)));
         Assert.assertFalse(validator.hasValidSuffix(makeFile(UUID.randomUUID().toString())));
     }

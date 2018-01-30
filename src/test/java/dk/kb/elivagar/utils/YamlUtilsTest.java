@@ -52,4 +52,16 @@ public class YamlUtilsTest extends ExtendedTestCase {
         File yamlFile = TestFileUtils.createTempFile(UUID.randomUUID().toString());
         YamlUtils.loadYamlSettings(yamlFile);
     }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testLoadingReadOnlyYamlFile() throws Exception{
+        addDescription("Test a read-only Yaml file.");
+        File yamlFile = TestFileUtils.createTempFile(UUID.randomUUID().toString());
+        try {
+            yamlFile.setReadable(false);
+            YamlUtils.loadYamlSettings(yamlFile);
+        } finally {
+            yamlFile.setReadable(true);
+        }
+    }
 }

@@ -25,9 +25,10 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.HttpClient;
+import dk.kb.elivagar.characterization.CharacterizationHandler;
 import dk.kb.elivagar.config.Configuration;
-import dk.kb.elivagar.script.CharacterizationScriptWrapper;
 import dk.kb.elivagar.testutils.TestConfigurations;
 import dk.kb.elivagar.testutils.TestFileUtils;
 import dk.pubhub.service.ArrayOfImage;
@@ -57,9 +58,9 @@ public class PubhubPackerTest extends ExtendedTestCase {
     public void testGetMarshallerForClass() throws JAXBException {
         addDescription("Test the getMarshallerForClass method");
         String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
+        CharacterizationHandler characterizer = mock(CharacterizationHandler.class);
         HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
+        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, characterizer, httpClient);
         
         Assert.assertTrue(packer.marshallers.isEmpty());
         
@@ -74,7 +75,7 @@ public class PubhubPackerTest extends ExtendedTestCase {
         Assert.assertEquals(packer.marshallers.size(), 1);
         Assert.assertEquals(marshaller, marshaller2);
         
-        verifyZeroInteractions(script);
+        verifyZeroInteractions(characterizer);
         verifyZeroInteractions(httpClient);
     }
     
@@ -82,9 +83,9 @@ public class PubhubPackerTest extends ExtendedTestCase {
     public void testPackBook() throws Exception {
         addDescription("Test the packBook method");
         String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
+        CharacterizationHandler characterizer = mock(CharacterizationHandler.class);
         HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
+        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, characterizer, httpClient);
         
         String id = UUID.randomUUID().toString();
         Book book = new Book();
@@ -103,7 +104,7 @@ public class PubhubPackerTest extends ExtendedTestCase {
         book.setImages(images);
 
         File bookDir = new File(conf.getEbookOutputDir(), id);
-        File metadataFile = new File(bookDir, id + ".xml");
+        File metadataFile = new File(bookDir, id + Constants.PUBHUB_METADATA_SUFFIX);
         File imageFile = new File(bookDir, id + "_" + type + extension);
         
         Assert.assertFalse(bookDir.exists());
@@ -114,12 +115,12 @@ public class PubhubPackerTest extends ExtendedTestCase {
 
         Assert.assertTrue(bookDir.exists());
         Assert.assertTrue(bookDir.isDirectory());
-        Assert.assertTrue(metadataFile.exists());
+        Assert.assertTrue(metadataFile.exists(), metadataFile.getAbsolutePath());
         Assert.assertTrue(metadataFile.isFile());
         Assert.assertTrue(imageFile.exists());
         Assert.assertTrue(imageFile.isFile());
 
-        verifyZeroInteractions(script);
+        verifyZeroInteractions(characterizer);
         
         verify(httpClient).retrieveUrlContent(eq(imageUrl), any(OutputStream.class));
         verifyNoMoreInteractions(httpClient);
@@ -129,9 +130,9 @@ public class PubhubPackerTest extends ExtendedTestCase {
     public void testPackBookImageFailure() throws Exception {
         addDescription("Test the packBook method, when it fails to retrieve an image");
         String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
+        CharacterizationHandler characterizer = mock(CharacterizationHandler.class);
         HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
+        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, characterizer, httpClient);
         
         doAnswer(new Answer<Void>() {
             @Override
@@ -158,7 +159,7 @@ public class PubhubPackerTest extends ExtendedTestCase {
         book.setImages(images);
 
         File bookDir = new File(conf.getEbookOutputDir(), id);
-        File metadataFile = new File(bookDir, id + ".xml");
+        File metadataFile = new File(bookDir, id + Constants.PUBHUB_METADATA_SUFFIX);
         File imageFile = new File(bookDir, id + "_" + type + extension);
         
         Assert.assertFalse(bookDir.exists());
@@ -174,7 +175,7 @@ public class PubhubPackerTest extends ExtendedTestCase {
         Assert.assertTrue(imageFile.exists());
         Assert.assertTrue(imageFile.isFile());
 
-        verifyZeroInteractions(script);
+        verifyZeroInteractions(characterizer);
         
         verify(httpClient).retrieveUrlContent(eq(imageUrl), any(OutputStream.class));
         verifyNoMoreInteractions(httpClient);
@@ -184,9 +185,9 @@ public class PubhubPackerTest extends ExtendedTestCase {
     public void testPackFileForEbook() throws Exception {
         addDescription("Test the packFileForEbook method");
         String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
+        CharacterizationHandler characterizer = mock(CharacterizationHandler.class);
         HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
+        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, characterizer, httpClient);
         
         String id = UUID.randomUUID().toString();
         String extension = ".pdf";
@@ -201,17 +202,17 @@ public class PubhubPackerTest extends ExtendedTestCase {
         
         verifyZeroInteractions(httpClient);
         
-        verify(script).execute(any(File.class), any(File.class));
-        verifyNoMoreInteractions(script);
+        verify(characterizer).characterize(any(File.class));
+        verifyNoMoreInteractions(characterizer);
     }
 
     @Test
     public void testPackFileForEbookWrongExtension() throws Exception {
         addDescription("Test the packFileForEbook method, when the file has a wrong extension");
         String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
+        CharacterizationHandler characterize = mock(CharacterizationHandler.class);
         HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
+        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, characterize, httpClient);
         
         String id = UUID.randomUUID().toString();
         String extension = ".octetstream";
@@ -224,16 +225,16 @@ public class PubhubPackerTest extends ExtendedTestCase {
         Assert.assertFalse(linkFile.exists());
         
         verifyZeroInteractions(httpClient);
-        verifyZeroInteractions(script);
+        verifyZeroInteractions(characterize);
     }
     
     @Test
     public void testPackFileForEbookWhenLinkAlreadyExists() throws Exception {
         addDescription("Test the packFileForEbook method, when the link already exists");
         String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
+        CharacterizationHandler characterizer = mock(CharacterizationHandler.class);
         HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
+        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, characterizer, httpClient);
         
         String id = UUID.randomUUID().toString();
         String extension = ".pdf";
@@ -251,17 +252,17 @@ public class PubhubPackerTest extends ExtendedTestCase {
         
         verifyZeroInteractions(httpClient);
         
-        verify(script).execute(any(File.class), any(File.class));
-        verifyNoMoreInteractions(script);
+        verify(characterizer).characterize(any(File.class));
+        verifyNoMoreInteractions(characterizer);
     }
     
     @Test
     public void testPackFileForAudioBook() throws Exception {
         addDescription("Test the packFileForAudio method");
         String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
+        CharacterizationHandler characterizer = mock(CharacterizationHandler.class);
         HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
+        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, characterizer, httpClient);
         
         String id = UUID.randomUUID().toString();
         String extension = MP3_SUFFIX;
@@ -276,17 +277,17 @@ public class PubhubPackerTest extends ExtendedTestCase {
         
         verifyZeroInteractions(httpClient);
         
-        verify(script).execute(any(File.class), any(File.class));
-        verifyNoMoreInteractions(script);
+        verify(characterizer).characterize(any(File.class));
+        verifyNoMoreInteractions(characterizer);
     }
 
     @Test
     public void testPackFileForAudioWrongExtension() throws Exception {
         addDescription("Test the packFileForEbook method, when the file has a wrong extension");
         String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
+        CharacterizationHandler characterizer = mock(CharacterizationHandler.class);
         HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
+        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, characterizer, httpClient);
         
         String id = UUID.randomUUID().toString();
         String extension = ".octetstream";
@@ -299,16 +300,16 @@ public class PubhubPackerTest extends ExtendedTestCase {
         Assert.assertFalse(linkFile.exists());
         
         verifyZeroInteractions(httpClient);
-        verifyZeroInteractions(script);
+        verifyZeroInteractions(characterizer);
     }
     
     @Test
     public void testPackFileForAudioWhenLinkAlreadyExists() throws Exception {
         addDescription("Test the packFileForEbook method, when the link already exists");
         String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
+        CharacterizationHandler characterizer = mock(CharacterizationHandler.class);
         HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
+        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, characterizer, httpClient);
         
         String id = UUID.randomUUID().toString();
         String extension = MP3_SUFFIX;
@@ -325,109 +326,22 @@ public class PubhubPackerTest extends ExtendedTestCase {
         
         verifyZeroInteractions(httpClient);
         
-        verify(script).execute(any(File.class), any(File.class));
-        verifyNoMoreInteractions(script);
-    }
-    
-    @Test
-    public void testRunCharacterizationIfNeededWhenNoScript() {
-        addDescription("Test the runCharacterizationIfNeeded method, when no script is given");
-        String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = null;
-        HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
-
-        File dir = new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString());
-        File inputFile = new File(dir, UUID.randomUUID().toString());
-        File outputFile = new File(dir, UUID.randomUUID().toString());
-
-        Assert.assertFalse(outputFile.exists());
-        
-        packer.runCharacterizationIfNeeded(inputFile, outputFile);
-        
-        verifyZeroInteractions(httpClient);
-    }
-    
-    @Test
-    public void testRunCharacterizationIfNeededWhenNoOutputFile() {
-        addDescription("Test the runCharacterizationIfNeeded method, when the output file does not exist");
-        String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
-        HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
-
-        File dir = new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString());
-        File inputFile = new File(dir, UUID.randomUUID().toString());
-        File outputFile = new File(dir, UUID.randomUUID().toString());
-
-        Assert.assertFalse(outputFile.exists());
-        
-        packer.runCharacterizationIfNeeded(inputFile, outputFile);
-        
-        verify(script).execute(eq(inputFile), eq(outputFile));
-        verifyNoMoreInteractions(script);
-        verifyZeroInteractions(httpClient);
-    }
-    
-    @Test
-    public void testRunCharacterizationIfNeededWhenOutputFileIsOlderThanInputFile() throws Exception {
-        addDescription("Test the runCharacterizationIfNeeded method, when the output file is older than the input file.");
-        String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
-        HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
-
-        File dir = new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString());
-        TestFileUtils.createEmptyDirectory(dir.getAbsolutePath());
-        File outputFile = new File(dir, UUID.randomUUID().toString());
-        TestFileUtils.createFile(outputFile, UUID.randomUUID().toString());
-        File inputFile = new File(dir, UUID.randomUUID().toString());
-        TestFileUtils.createFile(inputFile, UUID.randomUUID().toString());
-
-        outputFile.setLastModified(0);
-        
-        packer.runCharacterizationIfNeeded(inputFile, outputFile);
-        
-        verify(script).execute(eq(inputFile), eq(outputFile));
-        verifyNoMoreInteractions(script);
-        verifyZeroInteractions(httpClient);
-    }
-    
-    @Test
-    public void testRunCharacterizationIfNeededWhenOutputFileIsNewerThanInputFile() throws Exception {
-        addDescription("Test the runCharacterizationIfNeeded method, when the output file is newer than the input file.");
-        String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
-        HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
-
-        File dir = new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString());
-        TestFileUtils.createEmptyDirectory(dir.getAbsolutePath());
-        File outputFile = new File(dir, UUID.randomUUID().toString());
-        TestFileUtils.createFile(outputFile, UUID.randomUUID().toString());
-        File inputFile = new File(dir, UUID.randomUUID().toString());
-        TestFileUtils.createFile(inputFile, UUID.randomUUID().toString());
-
-        inputFile.setLastModified(0);
-        
-        packer.runCharacterizationIfNeeded(inputFile, outputFile);
-        
-        verifyZeroInteractions(script);
-        verifyZeroInteractions(httpClient);
+        verify(characterizer).characterize(any(File.class));
+        verifyNoMoreInteractions(characterizer);
     }
     
     @Test
     public void testGetBookDirForEbog() throws Exception {
         addDescription("Test the runCharacterizationIfNeeded method, when the output file is newer than the input file.");
         String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
+        CharacterizationHandler characterizer = mock(CharacterizationHandler.class);
         HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
+        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, characterizer, httpClient);
 
         File dir = packer.getBookDir(UUID.randomUUID().toString(), BookTypeEnum.EBOG);
         Assert.assertEquals(dir.getParent(), conf.getEbookOutputDir().getAbsolutePath());
         
-        verifyZeroInteractions(script);
+        verifyZeroInteractions(characterizer);
         verifyZeroInteractions(httpClient);
     }
     
@@ -435,14 +349,14 @@ public class PubhubPackerTest extends ExtendedTestCase {
     public void testGetBookDirForAudioBook() throws Exception {
         addDescription("Test the runCharacterizationIfNeeded method, when the output file is newer than the input file.");
         String serviceNamespace = "test-" + UUID.randomUUID().toString();
-        CharacterizationScriptWrapper script = mock(CharacterizationScriptWrapper.class);
+        CharacterizationHandler characterizer = mock(CharacterizationHandler.class);
         HttpClient httpClient = mock(HttpClient.class);
-        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, script, httpClient);
+        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, characterizer, httpClient);
 
         File dir = packer.getBookDir(UUID.randomUUID().toString(), BookTypeEnum.LYDBOG);
         Assert.assertEquals(dir.getParent(), conf.getAudioOutputDir().getAbsolutePath());
         
-        verifyZeroInteractions(script);
+        verifyZeroInteractions(characterizer);
         verifyZeroInteractions(httpClient);
     }
 }

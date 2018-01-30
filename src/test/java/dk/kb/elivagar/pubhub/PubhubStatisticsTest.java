@@ -7,9 +7,11 @@ import java.util.UUID;
 
 import org.jaccept.structure.ExtendedTestCase;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.pubhub.validator.FileSuffixValidator;
 import dk.kb.elivagar.testutils.TestFileUtils;
@@ -19,6 +21,11 @@ public class PubhubStatisticsTest extends ExtendedTestCase {
     @BeforeClass
     public void setup() {
         TestFileUtils.setup();
+    }
+    
+    @AfterClass
+    public void tearDown() {
+        TestFileUtils.tearDown();
     }
     
     @Test
@@ -78,7 +85,7 @@ public class PubhubStatisticsTest extends ExtendedTestCase {
         
         File bookFile = new File(bookDir, id + ".pdf");
         TestFileUtils.createFile(bookFile, UUID.randomUUID().toString());
-        File metadataFile = new File(bookDir, id + ".xml");
+        File metadataFile = new File(bookDir, id + Constants.PUBHUB_METADATA_SUFFIX);
         TestFileUtils.createFile(metadataFile, UUID.randomUUID().toString());
         
         when(validator.hasValidSuffix(eq(bookFile))).thenReturn(true);
@@ -161,7 +168,7 @@ public class PubhubStatisticsTest extends ExtendedTestCase {
 
         File bookFile = new File(bookDir, id + ".pdf");
         TestFileUtils.createFile(bookFile, UUID.randomUUID().toString());
-        File metadataFile = new File(bookDir, id + ".xml");
+        File metadataFile = new File(bookDir, id + Constants.PUBHUB_METADATA_SUFFIX);
         TestFileUtils.createFile(metadataFile, UUID.randomUUID().toString());
         
         when(validator.hasValidSuffix(eq(bookFile))).thenReturn(false);

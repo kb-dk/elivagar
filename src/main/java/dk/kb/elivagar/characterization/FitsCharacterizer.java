@@ -1,4 +1,4 @@
-package dk.kb.elivagar.script;
+package dk.kb.elivagar.characterization;
 
 import java.io.File;
 
@@ -11,15 +11,15 @@ import dk.kb.elivagar.exception.ArgumentCheck;
  * Wrapper for the script for performing the characterization of the book files from PubHub.
  * Basically wraps the execution to require the specific number of arguments (2; input and output file).
  */
-public class CharacterizationScriptWrapper extends ScriptWrapper {
+public class FitsCharacterizer extends ScriptWrapper {
     /** The logger.*/
-    private static final Logger log = LoggerFactory.getLogger(CharacterizationScriptWrapper.class);
+    private static final Logger log = LoggerFactory.getLogger(FitsCharacterizer.class);
 
     /**
      * Constructor.
      * @param scriptFile The script.
      */
-    public CharacterizationScriptWrapper(File scriptFile) {
+    public FitsCharacterizer(File scriptFile) {
         super(scriptFile);
     }
 

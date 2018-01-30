@@ -11,6 +11,9 @@ import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dk.kb.elivagar.characterization.FitsCharacterizer;
+import dk.kb.elivagar.characterization.CharacterizationHandler;
+import dk.kb.elivagar.characterization.EpubCharacterizer;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
@@ -19,7 +22,6 @@ import dk.kb.elivagar.pubhub.PubhubStatistics;
 import dk.kb.elivagar.pubhub.validator.AudioSuffixValidator;
 import dk.kb.elivagar.pubhub.validator.EbookSuffixValidator;
 import dk.kb.elivagar.pubhub.validator.FileSuffixValidator;
-import dk.kb.elivagar.script.CharacterizationScriptWrapper;
 import dk.pubhub.service.Book;
 
 /**
@@ -41,6 +43,8 @@ public class PubhubWorkflow {
     protected final PubhubPacker packer;
     /** The HTTP client.*/
     protected final HttpClient httpClient;
+    /** The characterizer for performing the different kinds of characterization.*/
+    protected final CharacterizationHandler characterizer;
     
     /**
      * Constructor. 
@@ -51,12 +55,14 @@ public class PubhubWorkflow {
 
         this.conf = conf;
         this.retriever = new PubhubMetadataRetriever(conf.getLicenseKey());
-        CharacterizationScriptWrapper script = null;
+        FitsCharacterizer fitsCharacterizer = null;
         if(conf.getCharacterizationScriptFile() != null) {
-            script = new CharacterizationScriptWrapper(conf.getCharacterizationScriptFile()); 
+            fitsCharacterizer = new FitsCharacterizer(conf.getCharacterizationScriptFile()); 
         }
+        EpubCharacterizer epubCharacterizer = new EpubCharacterizer();
+        this.characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
         this.httpClient = new HttpClient();
-        this.packer = new PubhubPacker(conf, retriever.getServiceNamespace(), script, httpClient);
+        this.packer = new PubhubPacker(conf, retriever.getServiceNamespace(), characterizer, httpClient);
     }
 
     /**

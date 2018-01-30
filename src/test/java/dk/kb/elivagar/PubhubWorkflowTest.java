@@ -112,7 +112,7 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
 
         int numberOfBooks = 10;
         for(int i = 0; i < numberOfBooks; i++) {
-            File testFile = new File(conf.getEbookFileDir(), UUID.randomUUID().toString() + PubhubPacker.XML_SUFFIX);
+            File testFile = new File(conf.getEbookFileDir(), UUID.randomUUID().toString() + Constants.PUBHUB_METADATA_SUFFIX);
             TestFileUtils.createFile(testFile, UUID.randomUUID().toString());
         }
 

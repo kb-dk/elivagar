@@ -1,4 +1,4 @@
-package dk.kb.elivagar.script;
+package dk.kb.elivagar.characterization;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,10 +13,11 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import dk.kb.elivagar.characterization.FitsCharacterizer;
 import dk.kb.elivagar.testutils.TestFileUtils;
 import dk.kb.elivagar.utils.StreamUtils;
 
-public class CharacterizationScriptWrapperTest extends ExtendedTestCase {
+public class FitsCharacterizerTest extends ExtendedTestCase {
 
     File origScript;
     File exampleScript;
@@ -45,7 +46,7 @@ public class CharacterizationScriptWrapperTest extends ExtendedTestCase {
         Assert.assertFalse(outputFile.exists());
         
         try {
-            CharacterizationScriptWrapper csw = new CharacterizationScriptWrapper(origScript);
+            FitsCharacterizer csw = new FitsCharacterizer(origScript);
             csw.execute(exampleScript, outputFile);
         } catch(IllegalStateException e) {
             throw new SkipException("Failed to run characterization, skipping test.", e);
@@ -64,7 +65,7 @@ public class CharacterizationScriptWrapperTest extends ExtendedTestCase {
         Assert.assertFalse(outputFile.exists());
         
         try {
-            CharacterizationScriptWrapper csw = new CharacterizationScriptWrapper(origScript);
+            FitsCharacterizer csw = new FitsCharacterizer(origScript);
             csw.execute(exampleScript, outputFile);
         } catch(IllegalStateException e) {
             throw new SkipException("Failed to run characterization, skipping test.", e);
@@ -84,7 +85,7 @@ public class CharacterizationScriptWrapperTest extends ExtendedTestCase {
         Assert.assertFalse(outputFile.exists());
         
         try {
-            CharacterizationScriptWrapper csw = new CharacterizationScriptWrapper(origScript);
+            FitsCharacterizer csw = new FitsCharacterizer(origScript);
             csw.execute(inputFile, outputFile);
         } catch(IllegalStateException e) {
             throw new SkipException("Failed to run characterization, skipping test.", e);

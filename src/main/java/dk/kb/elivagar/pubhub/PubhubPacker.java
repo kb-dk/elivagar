@@ -17,12 +17,13 @@ import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.HttpClient;
+import dk.kb.elivagar.characterization.CharacterizationHandler;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.pubhub.validator.AudioSuffixValidator;
 import dk.kb.elivagar.pubhub.validator.EbookSuffixValidator;
-import dk.kb.elivagar.script.CharacterizationScriptWrapper;
 import dk.kb.elivagar.utils.FileUtils;
 import dk.kb.elivagar.utils.StringUtils;
 import dk.pubhub.service.Book;
@@ -39,11 +40,6 @@ public class PubhubPacker {
     /** The logger.*/
     private static final Logger log = LoggerFactory.getLogger(PubhubPacker.class);
 
-    /** The suffix of XML files.*/
-    public static final String XML_SUFFIX = ".xml";
-    /** The suffix for the fits characterization metadata output files.*/
-    public static final String FITS_SUFFIX = ".fits.xml";
-
     /** The Configuration with the base directories for the files to be packed.*/
     protected final Configuration conf;
     /** The namespace of marshalled xml.*/
@@ -52,8 +48,8 @@ public class PubhubPacker {
     protected final HttpClient httpClient;
     /** Map between marshallers and their the classes they marshall.*/
     protected final Map<String, Marshaller> marshallers;
-    /** The script for characterizing the book files. May be null, if no script exists.*/
-    protected CharacterizationScriptWrapper characterizationScript;
+    /** The characterizer. */
+    protected final CharacterizationHandler characterizer;
 
     /** The suffix validator for audio files.*/
     protected final AudioSuffixValidator audioSuffixValidator;
@@ -64,19 +60,20 @@ public class PubhubPacker {
      * Constructor.
      * @param conf The Configuration with the base directories for the files to be packed.
      * @param serviceNamespace The namespace for the service.
-     * @param script The script for characterizing the book files. May be null, for no characterization.
+     * @param characterizer The characterizer for characterizing the files.
      * @param httpClient The http client.
      */
-    public PubhubPacker(Configuration conf, String serviceNamespace, CharacterizationScriptWrapper script, 
+    public PubhubPacker(Configuration conf, String serviceNamespace, CharacterizationHandler characterizer, 
             HttpClient httpClient) {
         ArgumentCheck.checkNotNull(conf, "Configuration conf");
+        ArgumentCheck.checkNotNull(characterizer, "Characterizer characterizer");
         ArgumentCheck.checkNotNullOrEmpty(serviceNamespace, "String serviceNamespace");
         ArgumentCheck.checkNotNull(httpClient, "HttpClient httpClient");
         this.conf = conf;
         this.namespace = serviceNamespace;
         this.marshallers = new HashMap<String, Marshaller>();
         this.httpClient = httpClient;
-        this.characterizationScript = script;
+        this.characterizer = characterizer;
         this.audioSuffixValidator = new AudioSuffixValidator(conf);
         this.ebookSuffixValidator = new EbookSuffixValidator(conf);
     }
@@ -115,7 +112,7 @@ public class PubhubPacker {
 
         JAXBElement<Book> rootElement = null;
         Marshaller marshaller = getMarshallerForClass(book.getClass());
-        File bookFile = new File(bookDir, book.getBookId() +  XML_SUFFIX);
+        File bookFile = new File(bookDir, book.getBookId() +  Constants.PUBHUB_METADATA_SUFFIX);
         rootElement = new JAXBElement<Book>(new QName(namespace, Book.class.getSimpleName()), 
                 Book.class, book);
         marshaller.marshal(rootElement, bookFile);
@@ -156,14 +153,12 @@ public class PubhubPacker {
         log.info("Packaging book file for book-id: " + id);
         File bookDir = getBookDir(id, BookTypeEnum.EBOG);
         File symbolicBookFile = new File(bookDir, bookFile.getName());
-        File characterizationOutputFile = new File(bookDir, bookFile.getName() + FITS_SUFFIX);
         if(symbolicBookFile.isFile()) {
             log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
-            runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
         } else {
             Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
-            runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
         }
+        characterizer.characterize(bookFile);
     }
 
     /**
@@ -192,36 +187,12 @@ public class PubhubPacker {
         log.info("Packaging book file for book-id: " + id);
         File bookDir = getBookDir(id, BookTypeEnum.LYDBOG);
         File symbolicBookFile = new File(bookDir, bookFile.getName().toLowerCase());
-        File characterizationOutputFile = new File(bookDir, bookFile.getName().toLowerCase() + FITS_SUFFIX);
         if(symbolicBookFile.isFile()) {
             log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
-            runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
         } else {
             Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
-            runCharacterizationIfNeeded(bookFile, characterizationOutputFile);
         }
-    }
-    
-    /**
-     * Runs the characterization if the prerequisites for characterization are met.
-     * The prerequisites are, that a characterization scripts was defined in the configuration, 
-     * that either the file has not yet been characterized, 
-     * or that the file is newer that the output characterization file. 
-     * @param inputFile The file to have characterized.
-     * @param outputFile The file where the output of the characterization should be placed.
-     */
-    protected void runCharacterizationIfNeeded(File inputFile, File outputFile) {
-        if(characterizationScript != null) {
-            if(!outputFile.exists() || 
-                    (outputFile.lastModified() < inputFile.lastModified())) {
-                // 2 args; 1 for input file path and 1 for output file path.
-                characterizationScript.execute(inputFile, outputFile);                    
-            } else {
-                log.trace("Characterization output file is newer that the file to characterize.");
-            }
-        } else {
-            log.trace("Characterization is turned off.");
-        }
+        characterizer.characterize(bookFile);
     }
 
     /**

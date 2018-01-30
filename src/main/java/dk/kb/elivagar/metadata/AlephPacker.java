@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.exception.ArgumentCheck;
 
@@ -35,23 +36,22 @@ public class AlephPacker {
     private static final Logger log = LoggerFactory.getLogger(AlephPacker.class);
 
     /** The XPATH for extracting the Identifier from the pubhub Book xml file.*/
-    protected static final String XPATH_FIND_IDENTIFIER = "/Book/Identifier/text()";
+    protected static final String XPATH_FIND_IDENTIFIER = "/*:Book/*:Identifier/text()";
     /** The XPATH for extracting the IdentifierType from the pubhub Book xml file.*/
-    protected static final String XPATH_FIND_IDENTIFIER_TYPE = "/Book/IdentifierType/text()";
+    protected static final String XPATH_FIND_IDENTIFIER_TYPE = "/*:Book/*:IdentifierType/text()";
     
-    /** The suffix for the MARC21 files.*/
-    protected static final String SUFFIX_MARC_FILES = ".marc.xml";
-    /** The suffix for the Aleph DanMarc2 files.*/
-    protected static final String SUFFIX_ALEPH_FILES = ".aleph.xml";
-    /** The suffix for the MODS files.*/
-    protected static final String SUFFIX_MODS_FILES = ".mods.xml";
-
     /** The configuration.*/
     protected final Configuration conf;
     /** The metadata retriever for the Aleph metadata.*/
     protected final AlephMetadataRetriever metadataRetriever;
     /** The metadata transformer, for transforming the Aleph metadata first into MARC21 and then into MODS.*/
     protected final MetadataTransformer transformer;
+
+    /** The document builder factory.*/
+    protected final DocumentBuilderFactory factory;
+    /** The XPath factory.*/
+    protected final XPathFactory xPathfactory;
+
     
     /**
      * Constructor.
@@ -66,6 +66,8 @@ public class AlephPacker {
         this.conf = conf;
         this.metadataRetriever = alephRetriever;
         this.transformer = transformer;
+        this.factory = DocumentBuilderFactory.newInstance();
+        this.xPathfactory = XPathFactory.newInstance();
     }
     
     /**
@@ -108,7 +110,7 @@ public class AlephPacker {
      */
     protected void packageMetadataForBook(File dir) {
         try {
-            File modsMetadata = new File(dir, dir.getName() + SUFFIX_MODS_FILES);
+            File modsMetadata = new File(dir, dir.getName() + Constants.MODS_METADATA_SUFFIX);
             if(modsMetadata.exists()) {
                 log.trace("Already retrieved MODS file.");
                 return;
@@ -128,7 +130,7 @@ public class AlephPacker {
 
             alephMetadata.deleteOnExit();
             marcMetadata.deleteOnExit();
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.warn("Failed to handle the book directory '" + dir.getAbsolutePath() + "'", e);
         }
     }
@@ -150,10 +152,8 @@ public class AlephPacker {
             return null;            
         }
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(pubhubMetadataFile);
-            XPathFactory xPathfactory = XPathFactory.newInstance();
             XPath xpath = xPathfactory.newXPath();
             XPathExpression identifierXpath = xpath.compile(XPATH_FIND_IDENTIFIER);
             XPathExpression identifierTypeXpath = xpath.compile(XPATH_FIND_IDENTIFIER_TYPE);
@@ -177,7 +177,7 @@ public class AlephPacker {
      * @throws IOException If it somehow fails to retrieve or write the output file.
      */
     protected File getAlephMetadata(String isbn) throws IOException {
-        File res = new File(conf.getAlephConfiguration().getTempDir(), isbn + SUFFIX_ALEPH_FILES);
+        File res = new File(conf.getAlephConfiguration().getTempDir(), isbn + Constants.ALEPH_METADATA_SUFFIX);
         try (OutputStream out = new FileOutputStream(res)) {
             metadataRetriever.retrieveMetadataForISBN(isbn, out);
             out.flush();
@@ -193,7 +193,7 @@ public class AlephPacker {
      * @throws IOException If it somehow fails to make the transformation.
      */
     protected File transformAlephMetadataToMarc(File alephMetadata, String isbn) throws IOException {
-        File res = new File(conf.getAlephConfiguration().getTempDir(), isbn + SUFFIX_MARC_FILES);
+        File res = new File(conf.getAlephConfiguration().getTempDir(), isbn + Constants.MARC_METADATA_SUFFIX);
         try (InputStream in = new FileInputStream(alephMetadata);
                 OutputStream out = new FileOutputStream(res)) {
             transformer.transformMetadata(in, out, MetadataTransformer.TransformationType.ALEPH_TO_MARC21);

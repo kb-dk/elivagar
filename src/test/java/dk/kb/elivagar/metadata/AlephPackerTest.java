@@ -27,6 +27,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.HttpClient;
 import dk.kb.elivagar.config.AlephConfiguration;
 import dk.kb.elivagar.config.Configuration;
@@ -93,7 +94,7 @@ public class AlephPackerTest extends ExtendedTestCase {
         
         String id = UUID.randomUUID().toString();
         File dir = TestFileUtils.createEmptyDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + id);
-        File modsFile = new File(dir, dir.getName() + AlephPacker.SUFFIX_MODS_FILES);
+        File modsFile = new File(dir, dir.getName() + Constants.MODS_METADATA_SUFFIX);
         TestFileUtils.createFile(modsFile, UUID.randomUUID().toString());
         
         packer.traverseBooksInFolder(dir);
@@ -132,7 +133,7 @@ public class AlephPackerTest extends ExtendedTestCase {
         
         TestFileUtils.copyFile(new File("src/test/resources/metadata/pubhub_metadata.xml"), new File(dir, dir.getName() + ".xml"));
         
-        File modsFile = new File(dir, dir.getName() + AlephPacker.SUFFIX_MODS_FILES);
+        File modsFile = new File(dir, dir.getName() + Constants.MODS_METADATA_SUFFIX);
         Assert.assertFalse(modsFile.exists());
         
         packer.packageMetadataForBook(dir);
@@ -158,7 +159,7 @@ public class AlephPackerTest extends ExtendedTestCase {
         String id = UUID.randomUUID().toString();
         File dir = TestFileUtils.createEmptyDirectory(new File(TestFileUtils.getTempDir(), id).getAbsolutePath());
         
-        File modsFile = new File(dir, dir.getName() + AlephPacker.SUFFIX_MODS_FILES);
+        File modsFile = new File(dir, dir.getName() + Constants.MODS_METADATA_SUFFIX);
         TestFileUtils.createFile(modsFile, UUID.randomUUID().toString());
         Assert.assertTrue(modsFile.exists());
         
@@ -206,7 +207,7 @@ public class AlephPackerTest extends ExtendedTestCase {
             }
         }).when(retriever).retrieveMetadataForISBN(eq(expectedIsbn), any(OutputStream.class));
         
-        File modsFile = new File(dir, dir.getName() + AlephPacker.SUFFIX_MODS_FILES);
+        File modsFile = new File(dir, dir.getName() + Constants.MODS_METADATA_SUFFIX);
         Assert.assertFalse(modsFile.exists());
         
         packer.packageMetadataForBook(dir);
@@ -314,7 +315,7 @@ public class AlephPackerTest extends ExtendedTestCase {
         
         Assert.assertEquals(marcOutput.getParentFile().getAbsolutePath(), configuration.getAlephConfiguration().getTempDir().getAbsolutePath());
         Assert.assertTrue(marcOutput.getName().startsWith(isbn));
-        Assert.assertTrue(marcOutput.getName().endsWith(AlephPacker.SUFFIX_ALEPH_FILES));
+        Assert.assertTrue(marcOutput.getName().endsWith(Constants.ALEPH_METADATA_SUFFIX));
         
         verify(retriever).retrieveMetadataForISBN(eq(isbn), any(OutputStream.class));
         verifyNoMoreInteractions(retriever);
@@ -337,7 +338,7 @@ public class AlephPackerTest extends ExtendedTestCase {
         
         Assert.assertEquals(marcOutput.getParentFile().getAbsolutePath(), configuration.getAlephConfiguration().getTempDir().getAbsolutePath());
         Assert.assertTrue(marcOutput.getName().startsWith(isbn));
-        Assert.assertTrue(marcOutput.getName().endsWith(AlephPacker.SUFFIX_MARC_FILES));
+        Assert.assertTrue(marcOutput.getName().endsWith(Constants.MARC_METADATA_SUFFIX));
         
         verifyZeroInteractions(retriever);
         

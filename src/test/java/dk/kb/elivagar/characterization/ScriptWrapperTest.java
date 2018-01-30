@@ -1,4 +1,4 @@
-package dk.kb.elivagar.script;
+package dk.kb.elivagar.characterization;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,8 +11,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import dk.kb.elivagar.characterization.ScriptWrapper;
 import dk.kb.elivagar.exception.ArgumentCheck;
-import dk.kb.elivagar.script.ScriptWrapper;
 import dk.kb.elivagar.utils.FileUtils;
 import dk.kb.elivagar.utils.StreamUtils;
 

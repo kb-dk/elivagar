@@ -5,6 +5,7 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.pubhub.validator.FileSuffixValidator;
 
@@ -78,7 +79,7 @@ public class PubhubStatistics {
             boolean hasFile = false;
             for(File f : files) {
                 String filename = f.getName();
-                if(filename.equalsIgnoreCase(dir.getName() + PubhubPacker.XML_SUFFIX)) {
+                if(filename.equalsIgnoreCase(dir.getName() + Constants.PUBHUB_METADATA_SUFFIX)) {
                     hasMetadata = true;
                 } else if(validator.hasValidSuffix(f)) {
                     hasFile = true;
