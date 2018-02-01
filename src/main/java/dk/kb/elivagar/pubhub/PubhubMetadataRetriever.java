@@ -62,7 +62,7 @@ public class PubhubMetadataRetriever {
     
     /**
      * Retrieves all the metadata for the books which have been modified after a given date.
-     * @param earliestDate The date limit for the modified books. If null, then all books newer than epoc is returned.
+     * @param earliestDate The date limit for the modified books. If null, then all books newer than epoch is returned.
      * @return The list of modified book metadata.
      */
     public ModifiedBookList downloadBookMetadataAfterModifyDate(Date earliestDate) {

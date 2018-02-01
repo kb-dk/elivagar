@@ -164,7 +164,7 @@ public class AlephPacker {
             }
             return (String) identifierXpath.evaluate(doc, XPathConstants.STRING);
         } catch (Exception e) {
-            log.info("Could not extract the ISBN number from the file '" + pubhubMetadataFile + "'. Returning a null", 
+            log.warn("Could not extract the ISBN number from the file '" + pubhubMetadataFile + "'. Returning a null", 
                     e);
             return null;
         }

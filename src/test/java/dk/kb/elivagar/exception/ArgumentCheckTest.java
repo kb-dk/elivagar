@@ -7,7 +7,9 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.UUID;
 
 import org.jaccept.structure.ExtendedTestCase;
@@ -73,9 +75,23 @@ public class ArgumentCheckTest extends ExtendedTestCase {
     }
     
     @Test
-    public void testNullOrEmptyByteArrayEmptySuccess() {
+    public void testNullOrEmptyByteArraySuccess() {
         addDescription("Test the byte array test on an non-empty byte array");
         ArgumentCheck.checkNotNullOrEmpty("GNU".getBytes(), "TEST");
+    }
+    
+    @Test(expectedExceptions = ArgumentCheck.class)
+    public void testNullOrEmptyMapEmptyFailure() {
+        addDescription("Test that the map test failes on an empty map");
+        ArgumentCheck.checkNotNullOrEmpty(new HashMap(), "TEST");
+    }
+    
+    @Test
+    public void testNullOrEmptyMapSuccess() {
+        addDescription("Test the map test on an non-empty map");
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("TEST", "TEST");
+        ArgumentCheck.checkNotNullOrEmpty(map, "TEST");
     }
     
     @Test(expectedExceptions = ArgumentCheck.class)
@@ -221,4 +237,32 @@ public class ArgumentCheckTest extends ExtendedTestCase {
         assertTrue(f.isFile());
         ArgumentCheck.checkExistsNormalFile(f, "TEST");
     }
+    
+    @Test
+    public void testCheckThatMapContainsKeySuccess() {
+        addDescription("Test the checkThatMapContainsKey method on a map that contains the key");
+        String keyName = "TEST";
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(keyName, UUID.randomUUID().toString());
+        ArgumentCheck.checkThatMapContainsKey(map, keyName, "TEST");
+    }
+    
+    @Test(expectedExceptions = ArgumentCheck.class)
+    public void testCheckThatMapContainsKeyFailureNoKey() {
+        addDescription("Test the checkThatMapContainsKey method on a map that does not contains the given key");
+        String keyName = "TEST";
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(keyName, UUID.randomUUID().toString());
+        ArgumentCheck.checkThatMapContainsKey(map, UUID.randomUUID().toString(), "TEST");
+    }
+    
+    @Test(expectedExceptions = ArgumentCheck.class)
+    public void testCheckThatMapContainsKeyFailureNullValue() {
+        addDescription("Test the checkThatMapContainsKey method on a map that contains a null for the given key");
+        String keyName = "TEST";
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(keyName, null);
+        ArgumentCheck.checkThatMapContainsKey(map, keyName, "TEST");
+    }
+    
 }

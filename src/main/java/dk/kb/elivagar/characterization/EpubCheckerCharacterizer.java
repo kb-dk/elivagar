@@ -21,19 +21,19 @@ import dk.kb.elivagar.exception.ArgumentCheck;
 /**
  * The characterization tool for performing the EpubChecker characterization.
  */
-public class EpubCharacterizer {
+public class EpubCheckerCharacterizer {
     /** The logger.*/
-    private static final Logger log = LoggerFactory.getLogger(EpubCharacterizer.class);
+    private static final Logger log = LoggerFactory.getLogger(EpubCheckerCharacterizer.class);
 
     /**
      * Constructor. 
      */
-    public EpubCharacterizer() {}
+    public EpubCheckerCharacterizer() {}
     
     /**
      * Checks whether or not the given file has the required file extension.
      * @param inputFile The file to have its suffix validated.
-     * @return Whether or not the file is have a epub suffix.
+     * @return Whether or not the file has a epub suffix.
      */
     protected boolean hasRequiredExtension(File inputFile) {
         return inputFile.getName().endsWith(Constants.EPUB_FILE_SUFFIX);

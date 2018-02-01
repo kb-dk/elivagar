@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.characterization.FitsCharacterizer;
 import dk.kb.elivagar.characterization.CharacterizationHandler;
-import dk.kb.elivagar.characterization.EpubCharacterizer;
+import dk.kb.elivagar.characterization.EpubCheckerCharacterizer;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
@@ -59,7 +59,7 @@ public class PubhubWorkflow {
         if(conf.getCharacterizationScriptFile() != null) {
             fitsCharacterizer = new FitsCharacterizer(conf.getCharacterizationScriptFile()); 
         }
-        EpubCharacterizer epubCharacterizer = new EpubCharacterizer();
+        EpubCheckerCharacterizer epubCharacterizer = new EpubCheckerCharacterizer();
         this.characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
         this.httpClient = new HttpClient();
         this.packer = new PubhubPacker(conf, retriever.getServiceNamespace(), characterizer, httpClient);

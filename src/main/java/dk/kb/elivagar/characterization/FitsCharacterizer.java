@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import dk.kb.elivagar.exception.ArgumentCheck;
 
 /**
- * Wrapper for the script for performing the characterization of the book files from PubHub.
+ * Wrapper for the script for performing the FITS characterization of the book files from PubHub.
  * Basically wraps the execution to require the specific number of arguments (2; input and output file).
  */
 public class FitsCharacterizer extends ScriptWrapper {
@@ -29,7 +29,7 @@ public class FitsCharacterizer extends ScriptWrapper {
      * @param inputFile The input file, which will be characterized.
      * @param outputFile The output file, where the characterization results is placed.
      */
-    public void execute(File inputFile, File outputFile) {
+    public void performCharacterization(File inputFile, File outputFile) {
         ArgumentCheck.checkExistsNormalFile(inputFile, "File inputFile");
         ArgumentCheck.checkNotNull(outputFile, "File outputFile");
         if(inputFile.getAbsolutePath().contains(" ") || outputFile.getAbsolutePath().contains(" ")) {

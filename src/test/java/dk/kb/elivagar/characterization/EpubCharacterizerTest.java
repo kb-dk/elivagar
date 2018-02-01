@@ -28,7 +28,7 @@ public class EpubCharacterizerTest extends ExtendedTestCase {
     public void testEpub() throws IOException {
         File f = TestFileUtils.copyFileToTemp(new File("src/test/resources/book-files/epub30-spec.epub"));
         
-        EpubCharacterizer epubCharacterizer = new EpubCharacterizer();
+        EpubCheckerCharacterizer epubCharacterizer = new EpubCheckerCharacterizer();
         
         Assert.assertTrue(epubCharacterizer.hasRequiredExtension(f));
         

@@ -203,7 +203,7 @@ public class ArgumentCheck extends RuntimeException {
      * Validates that the map contains a given key.
      * @param map The map to validate.
      * @param key The key which must be present and have a value in it.
-     * @param name The name of the argument to validate.
+     * @param name The name of the map being validated.
      */
     @SuppressWarnings("rawtypes")
     public static void checkThatMapContainsKey(Map map, String key, String name) {
@@ -212,7 +212,7 @@ public class ArgumentCheck extends RuntimeException {
             throw new ArgumentCheck("The map '" + name + "' must include the key '" + key + "'");
         }
         if(map.get(key) == null) {
-            throw new ArgumentCheck("The map '" + name + "' must a value for the key '" + key + "'");
+            throw new ArgumentCheck("The map '" + name + "' must have a value for the key '" + key + "'");
         }
     }
 }

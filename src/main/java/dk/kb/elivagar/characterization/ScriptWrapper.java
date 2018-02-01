@@ -21,7 +21,7 @@ public class ScriptWrapper {
     
     /**
      * Constructor.
-     * @param scriptFile The script for to be called.
+     * @param scriptFile The script to be called.
      */
     public ScriptWrapper(File scriptFile) {
         ArgumentCheck.checkExistsNormalFile(scriptFile, "File scriptFile");

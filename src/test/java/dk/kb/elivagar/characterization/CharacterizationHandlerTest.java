@@ -42,7 +42,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
     public void testRunFitsIfNeededWhenNoScript() throws IOException {
         addDescription("Test the runFitsIfNeeded method, when no script is given");
         FitsCharacterizer fitsCharacterizer = null;
-        EpubCharacterizer epubCharacterizer = mock(EpubCharacterizer.class);
+        EpubCheckerCharacterizer epubCharacterizer = mock(EpubCheckerCharacterizer.class);
         CharacterizationHandler characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
 
         File dir = FileUtils.createDirectory(new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString()).getAbsolutePath());
@@ -61,7 +61,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
     public void testRunFitsIfNeededWhenNoOutputFile() throws IOException {
         addDescription("Test the runFitsIfNeeded method, when the output file does not exist");
         FitsCharacterizer fitsCharacterizer = mock(FitsCharacterizer.class);
-        EpubCharacterizer epubCharacterizer = mock(EpubCharacterizer.class);
+        EpubCheckerCharacterizer epubCharacterizer = mock(EpubCheckerCharacterizer.class);
         CharacterizationHandler characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
 
         File dir = FileUtils.createDirectory(new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString()).getAbsolutePath());
@@ -72,7 +72,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
 
         characterizer.runFitsIfNeeded(inputFile);
         
-        verify(fitsCharacterizer).execute(eq(inputFile), eq(outputFile));
+        verify(fitsCharacterizer).performCharacterization(eq(inputFile), eq(outputFile));
         verifyNoMoreInteractions(fitsCharacterizer);
         verifyZeroInteractions(epubCharacterizer);
     }
@@ -81,7 +81,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
     public void testRunFitsIfNeededWhenOutputFileIsOlderThanInputFile() throws Exception {
         addDescription("Test the runFitsIfNeeded method, when the output file is older than the input file.");
         FitsCharacterizer fitsCharacterizer = mock(FitsCharacterizer.class);
-        EpubCharacterizer epubCharacterizer = mock(EpubCharacterizer.class);
+        EpubCheckerCharacterizer epubCharacterizer = mock(EpubCheckerCharacterizer.class);
         CharacterizationHandler characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
 
         File dir = FileUtils.createDirectory(new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString()).getAbsolutePath());
@@ -96,7 +96,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
         characterizer.runFitsIfNeeded(inputFile);
         
         Assert.assertTrue(outputFile.exists());
-        verify(fitsCharacterizer).execute(eq(inputFile), eq(outputFile));
+        verify(fitsCharacterizer).performCharacterization(eq(inputFile), eq(outputFile));
         verifyNoMoreInteractions(fitsCharacterizer);
         verifyZeroInteractions(epubCharacterizer);
     }
@@ -105,7 +105,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
     public void testRunFitsIfNeededWhenOutputFileIsNewerThanInputFile() throws Exception {
         addDescription("Test the runFitsIfNeeded method, when the output file is newer than the input file.");
         FitsCharacterizer fitsCharacterizer = mock(FitsCharacterizer.class);
-        EpubCharacterizer epubCharacterizer = mock(EpubCharacterizer.class);
+        EpubCheckerCharacterizer epubCharacterizer = mock(EpubCheckerCharacterizer.class);
         CharacterizationHandler characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
 
         File dir = FileUtils.createDirectory(new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString()).getAbsolutePath());
@@ -129,12 +129,12 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
     public void testRunEpubCheckIfNeededWhenBadExtension() throws IOException {
         addDescription("Test the runEpubCheckIfNeeded method, when no script is given");
         FitsCharacterizer fitsCharacterizer = mock(FitsCharacterizer.class);
-        EpubCharacterizer epubCharacterizer = mock(EpubCharacterizer.class);
+        EpubCheckerCharacterizer epubCharacterizer = mock(EpubCheckerCharacterizer.class);
         CharacterizationHandler characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
 
         File dir = FileUtils.createDirectory(new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString()).getAbsolutePath());
         File inputFile = new File(dir, UUID.randomUUID().toString());
-        File outputFile = new File(dir, inputFile.getName() + Constants.EPUB_METADATA_SUFFIX);
+        File outputFile = new File(dir, inputFile.getName() + Constants.EPUBCHECK_METADATA_SUFFIX);
 
         when(epubCharacterizer.hasRequiredExtension(eq(inputFile))).thenReturn(false);
 
@@ -152,12 +152,12 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
     public void testRunEpubCheckIfNeededWhenNoOutputFile() throws IOException {
         addDescription("Test the runEpubCheckIfNeeded method, when the output file does not exist");
         FitsCharacterizer fitsCharacterizer = mock(FitsCharacterizer.class);
-        EpubCharacterizer epubCharacterizer = mock(EpubCharacterizer.class);
+        EpubCheckerCharacterizer epubCharacterizer = mock(EpubCheckerCharacterizer.class);
         CharacterizationHandler characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
 
         File dir = FileUtils.createDirectory(new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString()).getAbsolutePath());
         File inputFile = new File(dir, UUID.randomUUID().toString() + Constants.EPUB_FILE_SUFFIX);
-        File outputFile = new File(dir, inputFile.getName() + Constants.EPUB_METADATA_SUFFIX);
+        File outputFile = new File(dir, inputFile.getName() + Constants.EPUBCHECK_METADATA_SUFFIX);
 
         when(epubCharacterizer.hasRequiredExtension(eq(inputFile))).thenReturn(true);
         
@@ -175,12 +175,12 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
     public void testRunEpubCheckIfNeededWhenOutputFileIsOlderThanInputFile() throws Exception {
         addDescription("Test the runEpubCheckIfNeeded method, when the output file is older than the input file.");
         FitsCharacterizer fitsCharacterizer = mock(FitsCharacterizer.class);
-        EpubCharacterizer epubCharacterizer = mock(EpubCharacterizer.class);
+        EpubCheckerCharacterizer epubCharacterizer = mock(EpubCheckerCharacterizer.class);
         CharacterizationHandler characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
 
         File dir = FileUtils.createDirectory(new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString()).getAbsolutePath());
         File inputFile = new File(dir, UUID.randomUUID().toString() + Constants.EPUB_FILE_SUFFIX);
-        File outputFile = new File(dir, inputFile.getName() + Constants.EPUB_METADATA_SUFFIX);
+        File outputFile = new File(dir, inputFile.getName() + Constants.EPUBCHECK_METADATA_SUFFIX);
         TestFileUtils.createFile(inputFile, UUID.randomUUID().toString());
         TestFileUtils.createFile(outputFile, UUID.randomUUID().toString());
 
@@ -203,12 +203,12 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
     public void testRunEpubCheckIfNeededWhenOutputFileIsNewerThanInputFile() throws Exception {
         addDescription("Test the runEpubCheckIfNeeded method, when the output file is newer than the input file.");
         FitsCharacterizer fitsCharacterizer = mock(FitsCharacterizer.class);
-        EpubCharacterizer epubCharacterizer = mock(EpubCharacterizer.class);
+        EpubCheckerCharacterizer epubCharacterizer = mock(EpubCheckerCharacterizer.class);
         CharacterizationHandler characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
 
         File dir = FileUtils.createDirectory(new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString()).getAbsolutePath());
         File inputFile = new File(dir, UUID.randomUUID().toString() + Constants.EPUB_FILE_SUFFIX);
-        File outputFile = new File(dir, inputFile.getName() + Constants.EPUB_METADATA_SUFFIX);
+        File outputFile = new File(dir, inputFile.getName() + Constants.EPUBCHECK_METADATA_SUFFIX);
         TestFileUtils.createFile(inputFile, UUID.randomUUID().toString());
         TestFileUtils.createFile(outputFile, UUID.randomUUID().toString());
 
@@ -229,12 +229,12 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
     public void testRunEpubCheckIfNeededWhenItThrowsAnError() throws Exception {
         addDescription("Test the runEpubCheckIfNeeded method, when the output file is newer than the input file.");
         FitsCharacterizer fitsCharacterizer = mock(FitsCharacterizer.class);
-        EpubCharacterizer epubCharacterizer = mock(EpubCharacterizer.class);
+        EpubCheckerCharacterizer epubCharacterizer = mock(EpubCheckerCharacterizer.class);
         CharacterizationHandler characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
 
         File dir = FileUtils.createDirectory(new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString()).getAbsolutePath());
         File inputFile = new File(dir, UUID.randomUUID().toString() + Constants.EPUB_FILE_SUFFIX);
-        File outputFile = new File(dir, inputFile.getName() + Constants.EPUB_METADATA_SUFFIX);
+        File outputFile = new File(dir, inputFile.getName() + Constants.EPUBCHECK_METADATA_SUFFIX);
         TestFileUtils.createFile(inputFile, UUID.randomUUID().toString());
         TestFileUtils.createFile(outputFile, UUID.randomUUID().toString());
         

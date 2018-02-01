@@ -46,8 +46,8 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
         Assert.assertEquals(conf.getEbookFileDir().list().length, count);
     }
 
-//    @Test(enabled = true)
-    @Test(enabled = false)
+    @Test(enabled = true)
+//    @Test(enabled = false)
     public void testElivagarRetrievingModifiedBooks() throws Exception {
         int count = 10;
         Date oneYearAgo = new Date(System.currentTimeMillis()-MILLIS_PER_YEAR);

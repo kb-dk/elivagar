@@ -11,8 +11,8 @@ public class Constants {
     public static final String PUBHUB_METADATA_SUFFIX = ".pubhub" + XML_SUFFIX;
     /** The suffix for the fits characterization metadata output files.*/
     public static final String FITS_METADATA_SUFFIX = ".fits" + XML_SUFFIX;
-    /** The suffix for the epub-check characterization metadata output files.*/
-    public static final String EPUB_METADATA_SUFFIX = ".epubcheck" + XML_SUFFIX;
+    /** The suffix for the epubcheck characterization metadata output files.*/
+    public static final String EPUBCHECK_METADATA_SUFFIX = ".epubcheck" + XML_SUFFIX;
 
     /** The suffix for the temporary MARC21 files.*/
     public static final String MARC_METADATA_SUFFIX = ".marc" + XML_SUFFIX;

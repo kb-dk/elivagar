@@ -47,7 +47,7 @@ public class FitsCharacterizerTest extends ExtendedTestCase {
         
         try {
             FitsCharacterizer csw = new FitsCharacterizer(origScript);
-            csw.execute(exampleScript, outputFile);
+            csw.performCharacterization(exampleScript, outputFile);
         } catch(IllegalStateException e) {
             throw new SkipException("Failed to run characterization, skipping test.", e);
         }
@@ -66,7 +66,7 @@ public class FitsCharacterizerTest extends ExtendedTestCase {
         
         try {
             FitsCharacterizer csw = new FitsCharacterizer(origScript);
-            csw.execute(exampleScript, outputFile);
+            csw.performCharacterization(exampleScript, outputFile);
         } catch(IllegalStateException e) {
             throw new SkipException("Failed to run characterization, skipping test.", e);
         }
@@ -86,7 +86,7 @@ public class FitsCharacterizerTest extends ExtendedTestCase {
         
         try {
             FitsCharacterizer csw = new FitsCharacterizer(origScript);
-            csw.execute(inputFile, outputFile);
+            csw.performCharacterization(inputFile, outputFile);
         } catch(IllegalStateException e) {
             throw new SkipException("Failed to run characterization, skipping test.", e);
         }

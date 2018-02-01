@@ -1,7 +1,6 @@
 package dk.kb.elivagar.characterization;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +8,8 @@ import org.slf4j.LoggerFactory;
 import dk.kb.elivagar.Constants;
 
 /**
- * The characterizer for performing the different kinds of characterization.
+ * The characterization handler for performing different kinds of characterization.
+ * Currently supports both FITS and EpubCheck characterization.
  */
 public class CharacterizationHandler {
     /** The logger.*/
@@ -18,14 +18,14 @@ public class CharacterizationHandler {
     /** The FITS characterization. May be null, if no script exists.*/
     protected FitsCharacterizer fitsCharacterizer;
     /** The epub characterization. */
-    protected final EpubCharacterizer epubCharacterizer;
+    protected final EpubCheckerCharacterizer epubCharacterizer;
     
     /**
      * Constructor.
      * @param fitsScript The script for characterizing the book files. May be null, for no characterization.
      * @param epubCharacterizer The characterizer for epubs.
      */
-    public CharacterizationHandler(FitsCharacterizer fitsScript, EpubCharacterizer epubCharacterizer) {
+    public CharacterizationHandler(FitsCharacterizer fitsScript, EpubCheckerCharacterizer epubCharacterizer) {
         this.fitsCharacterizer = fitsScript;
         this.epubCharacterizer = epubCharacterizer;
     }
@@ -41,22 +41,22 @@ public class CharacterizationHandler {
     }
     
     /**
-     * Check and perform the epub check chacracterization if it is needed.
+     * Check and do the epubcheck chacracterization if it is needed.
      * @param inputFile The file to characterize, if it is needed.
      */
     protected void runEpubCheckIfNeeded(File inputFile) {
         if(!epubCharacterizer.hasRequiredExtension(inputFile)) {
-            log.debug("Not an epub file, thus not running epub-check characterization.");
+            log.debug("Not an epub file, thus not running epubcheck characterization.");
             return;
         }
         
         File outputFile = new File(inputFile.getParentFile(), inputFile.getName().toLowerCase() 
-                + Constants.EPUB_METADATA_SUFFIX);
+                + Constants.EPUBCHECK_METADATA_SUFFIX);
         
-        if(shouldPerformCharacterization(outputFile, inputFile)) {
+        if(shouldCharacterize(outputFile, inputFile)) {
             try {
                 epubCharacterizer.characterize(inputFile, outputFile);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.warn("Failure when trying to characterize the epub file: " + inputFile.getAbsolutePath(), e);
             }
         } else {
@@ -73,29 +73,32 @@ public class CharacterizationHandler {
      * @param outputFile The file where the output of the characterization should be placed.
      */
     protected void runFitsIfNeeded(File inputFile) {
-        if(fitsCharacterizer != null) {
-            File characterizationOutputFile = new File(inputFile.getParentFile(), inputFile.getName().toLowerCase() 
-                    + Constants.FITS_METADATA_SUFFIX);
-            if(shouldPerformCharacterization(characterizationOutputFile, inputFile)) {
-                // 2 args; 1 for input file path and 1 for output file path.
-                fitsCharacterizer.execute(inputFile, characterizationOutputFile);                    
-            } else {
-                log.trace("FITS output file is newer that the file to characterize. Not characterizing again.");
+        if(fitsCharacterizer == null) {
+            log.debug("FITS is turned off.");
+            return;
+        }
+        File characterizationOutputFile = new File(inputFile.getParentFile(), inputFile.getName().toLowerCase() 
+                + Constants.FITS_METADATA_SUFFIX);
+        if(shouldCharacterize(characterizationOutputFile, inputFile)) {
+            try { 
+                fitsCharacterizer.performCharacterization(inputFile, characterizationOutputFile);
+            } catch (Exception e) {
+                log.warn("Failure when trying to do the FITS characterization for the file: "
+                        + inputFile.getAbsolutePath(), e);
             }
         } else {
-            log.trace("FITS is turned off.");
+            log.trace("FITS output file is newer that the file to characterize. Not characterizing again.");
         }
     }
     
     /**
      * Checks whether the given type of characterization should be performed.
-     * If the output file does not exist, or if it is older than the input file, 
-     * then a the characterization should be performed.
+     * If the output file does not exist, or if it is older than the input file, then a characterization is needed.
      * @param outputFile The output file.
      * @param inputFile The input file.
-     * @return Whether a new characterization should be performed.
+     * @return Whether a new characterization is needed.
      */
-    protected boolean shouldPerformCharacterization(File outputFile, File inputFile) {
+    protected boolean shouldCharacterize(File outputFile, File inputFile) {
         return !outputFile.exists() || outputFile.lastModified() < inputFile.lastModified();
     }
 }
