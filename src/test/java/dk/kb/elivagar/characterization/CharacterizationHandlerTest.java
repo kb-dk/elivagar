@@ -51,7 +51,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
 
         Assert.assertFalse(outputFile.exists());
 
-        characterizer.runFitsIfNeeded(inputFile);
+        characterizer.runFitsIfNeeded(inputFile, dir);
         
         Assert.assertFalse(outputFile.exists());
         verifyZeroInteractions(epubCharacterizer);
@@ -70,7 +70,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
 
         Assert.assertFalse(outputFile.exists());
 
-        characterizer.runFitsIfNeeded(inputFile);
+        characterizer.runFitsIfNeeded(inputFile, dir);
         
         verify(fitsCharacterizer).performCharacterization(eq(inputFile), eq(outputFile));
         verifyNoMoreInteractions(fitsCharacterizer);
@@ -93,7 +93,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
         outputFile.setLastModified(0);
         Assert.assertTrue(outputFile.exists());
 
-        characterizer.runFitsIfNeeded(inputFile);
+        characterizer.runFitsIfNeeded(inputFile, dir);
         
         Assert.assertTrue(outputFile.exists());
         verify(fitsCharacterizer).performCharacterization(eq(inputFile), eq(outputFile));
@@ -117,7 +117,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
         inputFile.setLastModified(0);
         Assert.assertTrue(outputFile.exists());
 
-        characterizer.runFitsIfNeeded(inputFile);
+        characterizer.runFitsIfNeeded(inputFile, dir);
         
         Assert.assertTrue(outputFile.exists());
         verifyZeroInteractions(fitsCharacterizer);
@@ -140,7 +140,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
 
         Assert.assertFalse(outputFile.exists());
 
-        characterizer.runEpubCheckIfNeeded(inputFile);
+        characterizer.runEpubCheckIfNeeded(inputFile, dir);
         
         Assert.assertFalse(outputFile.exists());
         verify(epubCharacterizer).hasRequiredExtension(eq(inputFile));
@@ -163,7 +163,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
         
         Assert.assertFalse(outputFile.exists());
 
-        characterizer.runEpubCheckIfNeeded(inputFile);
+        characterizer.runEpubCheckIfNeeded(inputFile, dir);
         
         verify(epubCharacterizer).hasRequiredExtension(eq(inputFile));
         verify(epubCharacterizer).characterize(eq(inputFile), eq(outputFile));
@@ -189,7 +189,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
         outputFile.setLastModified(0);
         Assert.assertTrue(outputFile.exists());
 
-        characterizer.runEpubCheckIfNeeded(inputFile);
+        characterizer.runEpubCheckIfNeeded(inputFile, dir);
         
         Assert.assertTrue(outputFile.exists());
         
@@ -217,7 +217,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
         inputFile.setLastModified(0);
         Assert.assertTrue(outputFile.exists());
 
-        characterizer.runEpubCheckIfNeeded(inputFile);
+        characterizer.runEpubCheckIfNeeded(inputFile, dir);
         
         Assert.assertTrue(outputFile.exists());
         verify(epubCharacterizer).hasRequiredExtension(eq(inputFile));
@@ -251,7 +251,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
         outputFile.setLastModified(0);
         Assert.assertTrue(outputFile.exists());
 
-        characterizer.runEpubCheckIfNeeded(inputFile);
+        characterizer.runEpubCheckIfNeeded(inputFile, dir);
         
         Assert.assertTrue(outputFile.exists());
         verify(epubCharacterizer).hasRequiredExtension(eq(inputFile));

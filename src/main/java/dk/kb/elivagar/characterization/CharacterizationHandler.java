@@ -33,24 +33,26 @@ public class CharacterizationHandler {
     /**
      * Perform all the different kinds of characterization, if they are needed.
      * @param inputFile The file to characterize.
+     * @param outputDir The directory, where the characterization output file should be placed.
      */
-    public void characterize(File inputFile) {
+    public void characterize(File inputFile, File outputDir) {
         log.debug("Characterizing the file '" + inputFile.getAbsolutePath() + "'.");
-        runFitsIfNeeded(inputFile);
-        runEpubCheckIfNeeded(inputFile);
+        runFitsIfNeeded(inputFile, outputDir);
+        runEpubCheckIfNeeded(inputFile, outputDir);
     }
     
     /**
      * Check and do the epubcheck chacracterization if it is needed.
      * @param inputFile The file to characterize, if it is needed.
+     * @param outputDir The directory, where the characterization output file should be placed.
      */
-    protected void runEpubCheckIfNeeded(File inputFile) {
+    protected void runEpubCheckIfNeeded(File inputFile, File outputDir) {
         if(!epubCharacterizer.hasRequiredExtension(inputFile)) {
             log.debug("Not an epub file, thus not running epubcheck characterization.");
             return;
         }
         
-        File outputFile = new File(inputFile.getParentFile(), inputFile.getName().toLowerCase() 
+        File outputFile = new File(outputDir, inputFile.getName().toLowerCase() 
                 + Constants.EPUBCHECK_METADATA_SUFFIX);
         
         if(shouldCharacterize(outputFile, inputFile)) {
@@ -70,14 +72,14 @@ public class CharacterizationHandler {
      * that either the file has not yet been characterized, 
      * or that the file is newer that the output characterization file. 
      * @param inputFile The file to have characterized.
-     * @param outputFile The file where the output of the characterization should be placed.
+     * @param outputDir The directory, where the characterization output file should be placed.
      */
-    protected void runFitsIfNeeded(File inputFile) {
+    protected void runFitsIfNeeded(File inputFile, File outputDir) {
         if(fitsCharacterizer == null) {
             log.debug("FITS is turned off.");
             return;
         }
-        File characterizationOutputFile = new File(inputFile.getParentFile(), inputFile.getName().toLowerCase() 
+        File characterizationOutputFile = new File(outputDir, inputFile.getName().toLowerCase() 
                 + Constants.FITS_METADATA_SUFFIX);
         if(shouldCharacterize(characterizationOutputFile, inputFile)) {
             try { 

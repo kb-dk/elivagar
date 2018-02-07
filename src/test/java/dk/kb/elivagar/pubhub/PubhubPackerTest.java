@@ -202,7 +202,7 @@ public class PubhubPackerTest extends ExtendedTestCase {
         
         verifyZeroInteractions(httpClient);
         
-        verify(characterizer).characterize(any(File.class));
+        verify(characterizer).characterize(any(File.class), any(File.class));
         verifyNoMoreInteractions(characterizer);
     }
 
@@ -252,7 +252,7 @@ public class PubhubPackerTest extends ExtendedTestCase {
         
         verifyZeroInteractions(httpClient);
         
-        verify(characterizer).characterize(any(File.class));
+        verify(characterizer).characterize(any(File.class), any(File.class));
         verifyNoMoreInteractions(characterizer);
     }
     
@@ -277,7 +277,7 @@ public class PubhubPackerTest extends ExtendedTestCase {
         
         verifyZeroInteractions(httpClient);
         
-        verify(characterizer).characterize(any(File.class));
+        verify(characterizer).characterize(any(File.class), any(File.class));
         verifyNoMoreInteractions(characterizer);
     }
 
@@ -326,7 +326,7 @@ public class PubhubPackerTest extends ExtendedTestCase {
         
         verifyZeroInteractions(httpClient);
         
-        verify(characterizer).characterize(any(File.class));
+        verify(characterizer).characterize(any(File.class), any(File.class));
         verifyNoMoreInteractions(characterizer);
     }
     

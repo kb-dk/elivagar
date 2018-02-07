@@ -7,19 +7,19 @@ import java.util.UUID;
 
 import org.jaccept.structure.ExtendedTestCase;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import dk.kb.elivagar.config.Configuration;
-import dk.kb.elivagar.pubhub.PubhubPacker;
 import dk.kb.elivagar.testutils.TestConfigurations;
 import dk.kb.elivagar.testutils.TestFileUtils;
 
 public class PubhubWorkflowTest extends ExtendedTestCase {
 
     public static final String PDF_SUFFIX = ".pdf";
-    public static final String EPUB_SUFFIX = ".epub";
+    public static final String EPUB_SUFFIX = Constants.EPUB_FILE_SUFFIX;
     
     Long MILLIS_PER_YEAR = 31556908800L; // from wiki
 
@@ -36,6 +36,11 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
     public void setupMethod() throws Exception {
         TestFileUtils.setup();        
     }
+    
+    @AfterClass
+    public void tearDown() {
+        TestFileUtils.tearDown();
+    }
 
     @Test(enabled = false)
     public void testElivagarRetrievingBooks() throws Exception {
@@ -46,8 +51,8 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
         Assert.assertEquals(conf.getEbookFileDir().list().length, count);
     }
 
-    @Test(enabled = true)
-//    @Test(enabled = false)
+//    @Test(enabled = true)
+    @Test(enabled = false)
     public void testElivagarRetrievingModifiedBooks() throws Exception {
         int count = 10;
         Date oneYearAgo = new Date(System.currentTimeMillis()-MILLIS_PER_YEAR);
@@ -96,9 +101,8 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
         Assert.assertTrue(conf.getEbookFileDir().isDirectory());
         Assert.assertTrue(conf.getEbookOutputDir().isDirectory());
         for(File bookDir : conf.getEbookOutputDir().listFiles()) {
-            for(File bookFile : bookDir.listFiles()) {
-                Assert.assertTrue(Files.isSymbolicLink(bookFile.toPath()));
-            }
+            File symlinkFile = new File(bookDir, bookDir.getName() + EPUB_SUFFIX);
+            Assert.assertTrue(Files.isSymbolicLink(symlinkFile.toPath()));
         }
 
         Assert.assertEquals(calculateNumberOfEbooksAndAudioBooks(), numberOfBooks);

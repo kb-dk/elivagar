@@ -48,8 +48,8 @@ public class PubhubPacker {
     protected final HttpClient httpClient;
     /** Map between marshallers and their the classes they marshall.*/
     protected final Map<String, Marshaller> marshallers;
-    /** The characterizer. */
-    protected final CharacterizationHandler characterizer;
+    /** The characterization handler. */
+    protected final CharacterizationHandler characterizationHandler;
 
     /** The suffix validator for audio files.*/
     protected final AudioSuffixValidator audioSuffixValidator;
@@ -73,7 +73,7 @@ public class PubhubPacker {
         this.namespace = serviceNamespace;
         this.marshallers = new HashMap<String, Marshaller>();
         this.httpClient = httpClient;
-        this.characterizer = characterizer;
+        this.characterizationHandler = characterizer;
         this.audioSuffixValidator = new AudioSuffixValidator(conf);
         this.ebookSuffixValidator = new EbookSuffixValidator(conf);
     }
@@ -158,7 +158,7 @@ public class PubhubPacker {
         } else {
             Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
         }
-        characterizer.characterize(bookFile);
+        characterizationHandler.characterize(bookFile, bookDir);
     }
 
     /**
@@ -192,7 +192,7 @@ public class PubhubPacker {
         } else {
             Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
         }
-        characterizer.characterize(bookFile);
+        characterizationHandler.characterize(bookFile, bookDir);
     }
 
     /**
