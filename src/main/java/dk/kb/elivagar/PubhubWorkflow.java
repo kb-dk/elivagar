@@ -3,6 +3,7 @@ package dk.kb.elivagar;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,17 +12,14 @@ import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import dk.kb.elivagar.characterization.FitsCharacterizer;
 import dk.kb.elivagar.characterization.CharacterizationHandler;
 import dk.kb.elivagar.characterization.EpubCheckerCharacterizer;
+import dk.kb.elivagar.characterization.FitsCharacterizer;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
 import dk.kb.elivagar.pubhub.PubhubPacker;
-import dk.kb.elivagar.pubhub.PubhubStatistics;
-import dk.kb.elivagar.pubhub.validator.AudioSuffixValidator;
-import dk.kb.elivagar.pubhub.validator.EbookSuffixValidator;
-import dk.kb.elivagar.pubhub.validator.FileSuffixValidator;
+import dk.kb.elivagar.statistics.ElivagarStatistics;
 import dk.pubhub.service.Book;
 
 /**
@@ -178,39 +176,92 @@ public class PubhubWorkflow {
     /**
      * Makes and prints the statistics for the both the ebook directory and the audio directory.
      * @param printer The print stream where the output is written.
+     * @param date The earliest date for marking a file or directory as 'new'.
+     * Used to identify the new object found in the current run of the workflow.
      */
-    public void makeStatistics(PrintStream printer) {
+    public void makeStatistics(PrintStream printer, long date) {
         ArgumentCheck.checkNotNull(printer, "PrintStream printer");
         
+        ElivagarStatistics statistics = new ElivagarStatistics(conf);
         if(conf.getEbookOutputDir().list() != null) {
-            makeStatisticsForDirectory(printer, conf.getEbookOutputDir(), new EbookSuffixValidator(conf));
+            statistics.traverseBaseDir(conf.getEbookOutputDir(), date);
         } else {
             printer.println("No ebooks to make statistics upon.");
         }
         if(conf.getAudioOutputDir().list() != null) {
-            makeStatisticsForDirectory(printer, conf.getAudioOutputDir(), new AudioSuffixValidator(conf));
+            statistics.traverseBaseDir(conf.getAudioOutputDir(), date);
         } else {
             printer.println("No ebooks to make statistics upon.");
         }
+        printStatistics(printer, statistics);
     }
 
     /**
      * Calculates the statistics on the books in the given directory.
      * @param printer The print stream where the output is written.
-     * @param dir The directory to calculate the statistics upon.
+     * @param statistics The Elivagar statistics to be printed.
      */
-    protected void makeStatisticsForDirectory(PrintStream printer, File dir, FileSuffixValidator validator) {
-        PubhubStatistics statistics = new PubhubStatistics(dir, validator);
-        printer.println("Calculating the statistics for directory: " + dir.getAbsolutePath());
-        statistics.calculateStatistics();
-        printer.println("Number of book directories traversed: " + statistics.getTotalCount());
-        printer.println("Number of book directories with both book file and metadata file: '" 
-                + statistics.getBothDataCount() + "'");
-        printer.println("Number of book directories with only book file: '" 
-                + statistics.getOnlyBookFileCount() + "'");
-        printer.println("Number of book directories with only metadata file: '" 
-                + statistics.getOnlyMetadataCount() + "'");
-        printer.println("Number of book directories with neither book file nor metadata file: '" 
-                + statistics.getNeitherDataCount() + "'");
-    }    
+    protected void printStatistics(PrintStream printer, ElivagarStatistics statistics) {
+        printer.println("The number of book directories traversed: " + statistics.getTotalCount());
+        printer.println(" - Whereas the number of new directories: " + statistics.getNewDirCount());
+        
+        printer.println("Number of Ebooks: " + statistics.getMapOfFileSuffices().getMultiKeyCount(
+                conf.getEbookFormats()));
+        for(String ebookFormat : conf.getEbookFormats()) {
+            printer.println(" - Ebooks in format '" + ebookFormat + "': " 
+                    + statistics.getMapOfFileSuffices().getValue(ebookFormat));
+        }
+        
+        printer.println("Number of new Ebooks: " + statistics.getMapOfNewFileSuffices().getMultiKeyCount( 
+                conf.getEbookFormats()));
+        for(String ebookFormat : conf.getEbookFormats()) {
+            printer.println(" - new Ebooks in format '" + ebookFormat + "': " 
+                    + statistics.getMapOfNewFileSuffices().getValue(ebookFormat));
+        }
+
+        printer.println("Number of Audio books: " + statistics.getMapOfFileSuffices().getMultiKeyCount( 
+                conf.getAudioFormats()));
+        for(String audioFormat : conf.getAudioFormats()) {
+            printer.println(" - Audio books in format '" + audioFormat + "': " 
+                    + statistics.getMapOfFileSuffices().getValue(audioFormat));
+        }
+        
+        printer.println("Number of new Audio books: " + statistics.getMapOfNewFileSuffices().getMultiKeyCount( 
+                conf.getAudioFormats()));
+        for(String audioFormat : conf.getAudioFormats()) {
+            printer.println(" - new Audio books in format '" + audioFormat + "': " 
+                    + statistics.getMapOfNewFileSuffices().getValue(audioFormat));
+        }
+
+        printer.println("The number of pubhub metadata records: " 
+                + statistics.getMapOfFileSuffices().getValue(Constants.PUBHUB_METADATA_SUFFIX));
+        printer.println(" - whereas the number of new pubhub metadata records: " 
+                + statistics.getMapOfNewFileSuffices().getValue(Constants.PUBHUB_METADATA_SUFFIX));
+        
+        printer.println("The number of MODS metadata records transformed from Aleph: " 
+                + statistics.getMapOfFileSuffices().getValue(Constants.MODS_METADATA_SUFFIX));
+        printer.println(" - whereas the number of new MODS metadata records transformed from Aleph: " 
+                + statistics.getMapOfNewFileSuffices().getValue(Constants.MODS_METADATA_SUFFIX));
+
+        printer.println("The number of FITS characterization metadata records: " 
+                + statistics.getMapOfFileSuffices().getValue(Constants.FITS_METADATA_SUFFIX));
+        printer.println(" - whereas the number of new FITS characterization metadata records: " 
+                + statistics.getMapOfNewFileSuffices().getValue(Constants.FITS_METADATA_SUFFIX));
+
+        printer.println("The number of EpubCheck characterization metadata records: " 
+                + statistics.getMapOfFileSuffices().getValue(Constants.EPUBCHECK_METADATA_SUFFIX));
+        printer.println(" - whereas the number of new EpubCheck characterization metadata records: " 
+                + statistics.getMapOfNewFileSuffices().getValue(Constants.EPUBCHECK_METADATA_SUFFIX));
+        
+        List<String> suffices = new ArrayList<String>();
+        suffices.addAll(conf.getAudioFormats());
+        suffices.addAll(conf.getEbookFormats());
+        suffices.add(Constants.PUBHUB_METADATA_SUFFIX);
+        suffices.add(Constants.MODS_METADATA_SUFFIX);
+        suffices.add(Constants.FITS_METADATA_SUFFIX);
+        suffices.add(Constants.EPUB_FILE_SUFFIX);
+        
+        printer.println("The number of files encountered, which does is not amongst the other counts:"
+                + statistics.getMapOfFileSuffices().getCountExcludingKeys(suffices));
+    }
 }

@@ -79,6 +79,7 @@ public class Elivagar {
         }
 
         try {
+            long beginDate = System.currentTimeMillis();
             Configuration conf = Configuration.createFromYAMLFile(confFile);
             PubhubWorkflow pubhubWorkflow = new PubhubWorkflow(conf);
             
@@ -97,7 +98,7 @@ public class Elivagar {
             }
             pubhubWorkflow.packFilesForBooks();
             alephWorkflow.packAlephMetadataForBooks();
-            pubhubWorkflow.makeStatistics(System.out);
+            pubhubWorkflow.makeStatistics(System.out, beginDate);
         } catch (Exception e) {
             log.error("Failure to run the workflow. \nThe waters of Elivagar must have frozen over!", e);
             System.exit(1);
