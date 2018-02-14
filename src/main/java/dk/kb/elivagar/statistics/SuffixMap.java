@@ -25,12 +25,19 @@ public class SuffixMap {
      * Otherwise the suffix is added with count 1.
      * @param suffix The suffix to add.
      */
-    protected void addSuffix(String suffix) {
+    public void addSuffix(String suffix) {
         int count = 1;
         if(suffixCount.containsKey(suffix)) {
             count = suffixCount.get(suffix) + 1;
         }
         suffixCount.put(suffix, count);
+    }
+    
+    /**
+     * @return Whether or not the map is empty.
+     */
+    public boolean isEmpty() {
+        return suffixCount.isEmpty();
     }
     
     /**
@@ -68,9 +75,9 @@ public class SuffixMap {
      */
     public int getCountExcludingKeys(Collection<String> keys) {
         int res = 0;
-        for(String key : suffixCount.keySet()) {
-            if(!keys.contains(key)) {
-                res += suffixCount.get(key);
+        for(Map.Entry<String, Integer> keyValue : suffixCount.entrySet()) {
+            if(!keys.contains(keyValue.getKey())) {
+                res += keyValue.getValue();
             }
         }
         return res;

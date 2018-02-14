@@ -13,8 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.characterization.CharacterizationHandler;
-import dk.kb.elivagar.characterization.EpubCheckerCharacterizer;
-import dk.kb.elivagar.characterization.FitsCharacterizer;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
@@ -39,28 +37,26 @@ public class PubhubWorkflow {
     protected final PubhubMetadataRetriever retriever;
     /** The packer of the Pubhub data.*/
     protected final PubhubPacker packer;
-    /** The HTTP client.*/
-    protected final HttpClient httpClient;
     /** The characterizer for performing the different kinds of characterization.*/
     protected final CharacterizationHandler characterizer;
     
     /**
      * Constructor. 
      * @param conf The elivagar configuration. 
+     * @param retriever The retriever of metadata from PubHub
+     * @param characterizer The characterization handler.
+     * @param packer The PubhubPacker.
      */
-    public PubhubWorkflow(Configuration conf) {
+    public PubhubWorkflow(Configuration conf, PubhubMetadataRetriever retriever, 
+            CharacterizationHandler characterizer, PubhubPacker packer) {
         ArgumentCheck.checkNotNull(conf, "Configuration conf");
+        ArgumentCheck.checkNotNull(retriever, "PubhubMetadataRetriever retriever");
+        ArgumentCheck.checkNotNull(characterizer, "CharacterizationHandler characterizer");
 
         this.conf = conf;
-        this.retriever = new PubhubMetadataRetriever(conf.getLicenseKey());
-        FitsCharacterizer fitsCharacterizer = null;
-        if(conf.getCharacterizationScriptFile() != null) {
-            fitsCharacterizer = new FitsCharacterizer(conf.getCharacterizationScriptFile()); 
-        }
-        EpubCheckerCharacterizer epubCharacterizer = new EpubCheckerCharacterizer();
-        this.characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
-        this.httpClient = new HttpClient();
-        this.packer = new PubhubPacker(conf, retriever.getServiceNamespace(), characterizer, httpClient);
+        this.retriever = retriever;
+        this.characterizer = characterizer;
+        this.packer = packer;
     }
 
     /**
@@ -111,7 +107,7 @@ public class PubhubWorkflow {
     protected void packFilesForEbooks() {
         File[] eBooks = conf.getEbookFileDir().listFiles();
         if(eBooks == null) {
-            log.info("No book files to package.");
+            log.info("No ebook files to package.");
             return;
         } else {
             for(File fileForBook : eBooks) {
@@ -182,7 +178,7 @@ public class PubhubWorkflow {
     public void makeStatistics(PrintStream printer, long date) {
         ArgumentCheck.checkNotNull(printer, "PrintStream printer");
         
-        ElivagarStatistics statistics = new ElivagarStatistics(conf);
+        ElivagarStatistics statistics = new ElivagarStatistics();
         if(conf.getEbookOutputDir().list() != null) {
             statistics.traverseBaseDir(conf.getEbookOutputDir(), date);
         } else {

@@ -6,10 +6,15 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dk.kb.elivagar.characterization.CharacterizationHandler;
+import dk.kb.elivagar.characterization.EpubCheckerCharacterizer;
+import dk.kb.elivagar.characterization.FitsCharacterizer;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.metadata.AlephMetadataRetriever;
 import dk.kb.elivagar.metadata.AlephPacker;
 import dk.kb.elivagar.metadata.MetadataTransformer;
+import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
+import dk.kb.elivagar.pubhub.PubhubPacker;
 
 /**
  * Class for instantiating the Elivagar workflow.
@@ -37,7 +42,10 @@ import dk.kb.elivagar.metadata.MetadataTransformer;
 public class Elivagar {
     /** The logger.*/
     private static final Logger log = LoggerFactory.getLogger(Elivagar.class);
-
+    
+    /** One minute in milliseconds.*/
+    protected static final long ONE_MINUTE_IN_MILLIS = 60000l;
+    
     /**
      * Main method.
      * Requires at least the one argument for the configuration.
@@ -79,9 +87,19 @@ public class Elivagar {
         }
 
         try {
-            long beginDate = System.currentTimeMillis();
+            long beginDate = System.currentTimeMillis() - ONE_MINUTE_IN_MILLIS;
             Configuration conf = Configuration.createFromYAMLFile(confFile);
-            PubhubWorkflow pubhubWorkflow = new PubhubWorkflow(conf);
+            PubhubMetadataRetriever retriever = new PubhubMetadataRetriever(conf.getLicenseKey());
+            FitsCharacterizer fitsCharacterizer = null;
+            if(conf.getCharacterizationScriptFile() != null) {
+                fitsCharacterizer = new FitsCharacterizer(conf.getCharacterizationScriptFile()); 
+            }
+            EpubCheckerCharacterizer epubCharacterizer = new EpubCheckerCharacterizer();
+            CharacterizationHandler characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
+            HttpClient httpClient = new HttpClient();
+            PubhubPacker packer = new PubhubPacker(conf, retriever.getServiceNamespace(), characterizer, httpClient);
+
+            PubhubWorkflow pubhubWorkflow = new PubhubWorkflow(conf, retriever, characterizer, packer);
             
             MetadataTransformer transformer = new MetadataTransformer(conf.getXsltFileDir());
             AlephMetadataRetriever alephRetriever = new AlephMetadataRetriever(conf.getAlephConfiguration(), 

@@ -5,8 +5,6 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import dk.kb.elivagar.config.Configuration;
-
 /**
  * Method for calculating the statistics for the books retrieved from pubhub. 
  */
@@ -27,9 +25,8 @@ public class ElivagarStatistics {
 
     /**
      * Constructor.
-     * @param baseDir The base directory, where each retrieved book has its own subdirectory.
      */
-    public ElivagarStatistics(Configuration conf) {
+    public ElivagarStatistics() {
         totalCount = 0l;
         newDirCount = 0l;
         numberOfOtherCount = 0l;
