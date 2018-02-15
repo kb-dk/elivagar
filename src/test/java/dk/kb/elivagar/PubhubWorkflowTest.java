@@ -311,6 +311,31 @@ public class PubhubWorkflowTest extends ExtendedTestCase {
         verify(packer).packFileForAudio(eq(testFile));
         verifyNoMoreInteractions(packer);
     }
+
+    @Test
+    public void testPackFilesForAudioBookWithDirAndOddNamedFile() throws Exception {
+        addDescription("Test the packFilesForAudioBooks method, when the directory contains a subdirectory and an oddly named file.");
+        PubhubMetadataRetriever retriever = mock(PubhubMetadataRetriever.class);
+        CharacterizationHandler characterizer = mock(CharacterizationHandler.class);
+        PubhubPacker packer = mock(PubhubPacker.class);
+        PubhubWorkflow elivagarWorkflow = new PubhubWorkflow(conf, retriever, characterizer, packer);
+
+        TestFileUtils.createEmptyDirectory(conf.getAudioFileDir().getAbsolutePath());
+        
+        String id = UUID.randomUUID().toString();
+        File audioDir = FileUtils.createDirectory(conf.getAudioFileDir() + "/" + id);
+        File audioFileDir = FileUtils.createDirectory(audioDir.getAbsolutePath() + "/" + PubhubWorkflow.AUDIO_SUB_DIR_PATH);
+        File testDir = FileUtils.createDirectory(audioFileDir.getAbsolutePath() + "/" + id);
+        File testFile = new File(audioFileDir, UUID.randomUUID().toString());
+        TestFileUtils.createFile(testFile, UUID.randomUUID().toString());
+        
+        elivagarWorkflow.packFilesForAudioBooks();
+        
+        verifyZeroInteractions(retriever);
+        verifyZeroInteractions(characterizer);
+        
+        verifyZeroInteractions(packer);
+    }
     
     @Test
     public void testStatisticsWhenBooksDirsHaveBeenReplacedWithFiles() throws IOException {

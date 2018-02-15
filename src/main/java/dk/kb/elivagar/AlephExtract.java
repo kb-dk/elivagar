@@ -47,7 +47,12 @@ public class AlephExtract {
             AlephMetadataRetriever metadataRetriever = new AlephMetadataRetriever(conf.getAlephConfiguration(), 
                     httpClient);
             for(int i = 1; i < args.length; i++) {
-                retrieveMetadataForIsbn(conf, transformer, metadataRetriever, args[i]);
+                String isbn = args[i];
+                try {
+                    retrieveMetadataForIsbn(conf, transformer, metadataRetriever, isbn);
+                } catch (IOException e) {
+                    log.warn("Issue occured when retrieving the metadata for ISBN: '" + isbn + "'", e);
+                }
             }
         } catch (Exception e ) {
             throw new IllegalStateException("Failure to retrieve Aleph metadata and transforming it to MODS.", e);
@@ -62,28 +67,24 @@ public class AlephExtract {
      * @param isbn The ISBN number of the record to retrieve the metadata for.
      */
     protected static void retrieveMetadataForIsbn(Configuration conf, MetadataTransformer transformer, 
-            AlephMetadataRetriever retriever, String isbn) {
+            AlephMetadataRetriever retriever, String isbn) throws IOException {
         log.info("Retrieving the metadata for ISBN: '" + isbn + "'");
-        try {
-            File alephMetadataFile = new File(conf.getAlephConfiguration().getTempDir(), isbn + ".aleph.xml");
-            try (OutputStream out = new FileOutputStream(alephMetadataFile)) {
-                retriever.retrieveMetadataForISBN(isbn, out);
-            }
-            
-            File marcMetadataFile = new File(conf.getAlephConfiguration().getTempDir(), isbn + ".marc.xml");
-            try (InputStream in = new FileInputStream(alephMetadataFile); 
-                    OutputStream out = new FileOutputStream(marcMetadataFile)) {
-                transformer.transformMetadata(in, out, MetadataTransformer.TransformationType.ALEPH_TO_MARC21);
-            }
-
-            File modsMetadataFile = new File(conf.getAlephConfiguration().getTempDir(), isbn + ".mods.xml");
-            try (InputStream in = new FileInputStream(marcMetadataFile); 
-                    OutputStream out = new FileOutputStream(modsMetadataFile)) {
-                transformer.transformMetadata(in, out, MetadataTransformer.TransformationType.MARC21_TO_MODS);
-            }
-            log.info("Metadata for ISBN '" + isbn + "' can be found at: " + conf.getAlephConfiguration().getTempDir());
-        } catch (IOException e) {
-            log.warn("Issue occured when retrieving the metadata for ISBN: '" + isbn + "'", e);
+        File alephMetadataFile = new File(conf.getAlephConfiguration().getTempDir(), isbn + ".aleph.xml");
+        try (OutputStream out = new FileOutputStream(alephMetadataFile)) {
+            retriever.retrieveMetadataForISBN(isbn, out);
         }
+
+        File marcMetadataFile = new File(conf.getAlephConfiguration().getTempDir(), isbn + ".marc.xml");
+        try (InputStream in = new FileInputStream(alephMetadataFile); 
+                OutputStream out = new FileOutputStream(marcMetadataFile)) {
+            transformer.transformMetadata(in, out, MetadataTransformer.TransformationType.ALEPH_TO_MARC21);
+        }
+
+        File modsMetadataFile = new File(conf.getAlephConfiguration().getTempDir(), isbn + ".mods.xml");
+        try (InputStream in = new FileInputStream(marcMetadataFile); 
+                OutputStream out = new FileOutputStream(modsMetadataFile)) {
+            transformer.transformMetadata(in, out, MetadataTransformer.TransformationType.MARC21_TO_MODS);
+        }
+        log.info("Metadata for ISBN '" + isbn + "' can be found at: " + conf.getAlephConfiguration().getTempDir());
     }
 }

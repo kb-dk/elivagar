@@ -2,7 +2,6 @@ package dk.kb.elivagar;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.Permission;
 import java.util.UUID;
 
 import org.jaccept.structure.ExtendedTestCase;
@@ -10,6 +9,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import dk.kb.elivagar.testutils.PreventSystemExit;
 import dk.kb.elivagar.testutils.TestFileUtils;
 
 public class ElivagarTest extends ExtendedTestCase {
@@ -29,91 +29,75 @@ public class ElivagarTest extends ExtendedTestCase {
         Assert.assertNotNull(e);
     }
 
-    @Test(expectedExceptions = ExitTrappedException.class)
+    @Test(expectedExceptions = PreventSystemExit.ExitTrappedException.class)
     public void testFailureWhenNoArgs() {
-        forbidSystemExitCall() ;
+        PreventSystemExit.forbidSystemExitCall() ;
         try {
             Elivagar.main(new String[0]);
         } finally {
-            enableSystemExitCall() ;
+            PreventSystemExit.enableSystemExitCall() ;
         }
     }
     
-    @Test(expectedExceptions = ExitTrappedException.class)
+    @Test(expectedExceptions = PreventSystemExit.ExitTrappedException.class)
     public void testFailureWhenBadConfPath() {
         String path = UUID.randomUUID().toString();
-        forbidSystemExitCall() ;
+        PreventSystemExit.forbidSystemExitCall() ;
         try {
             Elivagar.main(path);
         } finally {
-            enableSystemExitCall() ;
+            PreventSystemExit.enableSystemExitCall() ;
         }
     }
     
-    @Test(expectedExceptions = ExitTrappedException.class)
+    @Test(expectedExceptions = PreventSystemExit.ExitTrappedException.class)
     public void testFailureWithBadConfiguration() {
-        forbidSystemExitCall() ;
+        PreventSystemExit.forbidSystemExitCall() ;
         try {
             Elivagar.main(testConfFile.getAbsolutePath());
         } finally {
-            enableSystemExitCall() ;
+            PreventSystemExit.enableSystemExitCall() ;
         }
     }
 
-    @Test(expectedExceptions = ExitTrappedException.class)
+    @Test(expectedExceptions = PreventSystemExit.ExitTrappedException.class)
     public void testFailureWithBadConfigurationAndModifyDate() {
-        forbidSystemExitCall() ;
+        PreventSystemExit.forbidSystemExitCall() ;
         try {
             Elivagar.main(testConfFile.getAbsolutePath(), "1");
         } finally {
-            enableSystemExitCall() ;
+            PreventSystemExit.enableSystemExitCall() ;
         }
     }
 
     @Test
     public void testSuccessWithNoDownloads() {
-        forbidSystemExitCall() ;
+        PreventSystemExit.forbidSystemExitCall() ;
         try {
             Elivagar.main(testConfFile.getAbsolutePath(), "0");
         } finally {
-            enableSystemExitCall() ;
+            PreventSystemExit.enableSystemExitCall() ;
         }
     }
 
     @Test
     public void testSuccessWithNoDownloadsNoMax() {
-        forbidSystemExitCall() ;
+        PreventSystemExit.forbidSystemExitCall() ;
         try {
             Elivagar.main(testConfFile.getAbsolutePath(), "0", "-1");
         } finally {
-            enableSystemExitCall() ;
+            PreventSystemExit.enableSystemExitCall() ;
         }
     }
     
     @Test
     public void testSuccessWithNoDownloadsAndAMaximum() {
-        forbidSystemExitCall() ;
+        PreventSystemExit.forbidSystemExitCall() ;
         try {
             Elivagar.main(testConfFile.getAbsolutePath(), "0", "1");
         } finally {
-            enableSystemExitCall() ;
+            PreventSystemExit.enableSystemExitCall() ;
         }
     }
-    
-    private static class ExitTrappedException extends SecurityException { }
-    private static void forbidSystemExitCall() {
-        final SecurityManager securityManager = new SecurityManager() {
-            public void checkPermission( Permission permission ) {
-                if( permission.getName().startsWith("exitVM") ) {
-                    throw new ExitTrappedException() ;
-                }
-            }
-        } ;
-        System.setSecurityManager( securityManager ) ;
-        System.out.println("Exit disabled");
-    }
 
-    private static void enableSystemExitCall() {
-        System.setSecurityManager( null ) ;
-    }
 }
