@@ -44,8 +44,8 @@ public class ElivagarStatisticsTest extends ExtendedTestCase {
         Assert.assertEquals(statistics.totalCount, statistics.getTotalCount());
         Assert.assertEquals(statistics.newDirCount, statistics.getNewDirCount());
         Assert.assertEquals(statistics.numberOfOtherCount, statistics.getNonStandardNamedCount());
-        Assert.assertEquals(statistics.numberOfFiles, statistics.getMapOfFileSuffices());
-        Assert.assertEquals(statistics.numberOfNewFiles, statistics.getMapOfNewFileSuffices());
+        Assert.assertEquals(statistics.numberOfFiles, statistics.getMapOfFileSuffixes());
+        Assert.assertEquals(statistics.numberOfNewFiles, statistics.getMapOfNewFileSuffixes());
     }
     
     @Test
@@ -106,8 +106,8 @@ public class ElivagarStatisticsTest extends ExtendedTestCase {
         
         Assert.assertEquals(statistics.totalCount, 1);
         Assert.assertEquals(statistics.getNonStandardNamedCount(), 0);
-        Assert.assertEquals(statistics.getMapOfFileSuffices().getValue(suffix), 1);
-        Assert.assertEquals(statistics.getMapOfNewFileSuffices().getValue(suffix), 1);
+        Assert.assertEquals(statistics.getMapOfFileSuffixes().getValue(suffix), 1);
+        Assert.assertEquals(statistics.getMapOfNewFileSuffixes().getValue(suffix), 1);
     }
 
     @Test
@@ -126,8 +126,8 @@ public class ElivagarStatisticsTest extends ExtendedTestCase {
         
         Assert.assertEquals(statistics.totalCount, 1);
         Assert.assertEquals(statistics.getNonStandardNamedCount(), 0);
-        Assert.assertEquals(statistics.getMapOfFileSuffices().getValue(suffix), 1);
-        Assert.assertEquals(statistics.getMapOfNewFileSuffices().getValue(suffix), 0);
+        Assert.assertEquals(statistics.getMapOfFileSuffixes().getValue(suffix), 1);
+        Assert.assertEquals(statistics.getMapOfNewFileSuffixes().getValue(suffix), 0);
     }
 
     @Test
@@ -146,8 +146,8 @@ public class ElivagarStatisticsTest extends ExtendedTestCase {
         
         Assert.assertEquals(statistics.totalCount, 1);
         Assert.assertEquals(statistics.getNonStandardNamedCount(), 1);
-        Assert.assertEquals(statistics.getMapOfFileSuffices().getValue(suffix), 0);
-        Assert.assertEquals(statistics.getMapOfNewFileSuffices().getValue(suffix), 0);
+        Assert.assertEquals(statistics.getMapOfFileSuffixes().getValue(suffix), 0);
+        Assert.assertEquals(statistics.getMapOfNewFileSuffixes().getValue(suffix), 0);
     }
 
     @Test

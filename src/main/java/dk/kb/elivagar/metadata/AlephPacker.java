@@ -145,7 +145,7 @@ public class AlephPacker {
      * @return The ISBN number, or null if no ISBN could be found.
      */
     protected String getIsbn(File dir) {
-        File pubhubMetadataFile = new File(dir, dir.getName() + ".xml");
+        File pubhubMetadataFile = new File(dir, dir.getName() + Constants.PUBHUB_METADATA_SUFFIX);
         if(!pubhubMetadataFile.isFile()) {
             log.warn("No pubhub metadata file for '" + dir.getName() + "', thus cannot extract ISBN. "
                     + "Returning a null.");

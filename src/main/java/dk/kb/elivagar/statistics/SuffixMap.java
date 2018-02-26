@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Container format for the results of a suffix count. Maps between the suffices and the times they have been encountered.
+ * Container format for the results of a suffix count. Maps between the suffixes and the times they have been encountered.
  */
 public class SuffixMap {
-    /** The map between suffices and the number of times they have been encountered.*/
+    /** The map between suffixes and the number of times they have been encountered.*/
     protected Map<String, Integer> suffixCount;
     
     /**
@@ -18,7 +18,6 @@ public class SuffixMap {
         suffixCount = new HashMap<String, Integer>();
     }
     
-
     /**
      * Adds a suffix to the count.
      * If the suffix already exists as a key in the SuffixMap, then the value is incremented.
@@ -69,7 +68,7 @@ public class SuffixMap {
     }
     
     /**
-     * Retrieves the count of all the other suffices, than the ones given keys.
+     * Retrieves the count of all the other suffixes, than the ones given keys.
      * @param keys The keys to ignore when calculating all the remaining keys.
      * @return The combined count of the suffices, which are not amongst the keys.
      */

@@ -44,7 +44,7 @@ public class Elivagar {
     private static final Logger log = LoggerFactory.getLogger(Elivagar.class);
     
     /** One minute in milliseconds.*/
-    protected static final long ONE_MINUTE_IN_MILLIS = 60000l;
+    protected static final long ONE_MINUTE_IN_MILLIS = 60000L;
     
     /**
      * Main method.

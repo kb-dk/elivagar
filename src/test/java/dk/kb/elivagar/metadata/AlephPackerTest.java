@@ -131,7 +131,7 @@ public class AlephPackerTest extends ExtendedTestCase {
         String id = UUID.randomUUID().toString();
         File dir = TestFileUtils.createEmptyDirectory(new File(TestFileUtils.getTempDir(), id).getAbsolutePath());
         
-        TestFileUtils.copyFile(new File("src/test/resources/metadata/pubhub_metadata.xml"), new File(dir, dir.getName() + ".xml"));
+        TestFileUtils.copyFile(new File("src/test/resources/metadata/pubhub_metadata.xml"), new File(dir, dir.getName() + Constants.PUBHUB_METADATA_SUFFIX));
         
         File modsFile = new File(dir, dir.getName() + Constants.MODS_METADATA_SUFFIX);
         Assert.assertFalse(modsFile.exists());
@@ -198,7 +198,7 @@ public class AlephPackerTest extends ExtendedTestCase {
         String id = UUID.randomUUID().toString();
         File dir = TestFileUtils.createEmptyDirectory(new File(TestFileUtils.getTempDir(), id).getAbsolutePath());
         
-        TestFileUtils.copyFile(new File("src/test/resources/metadata/pubhub_metadata.xml"), new File(dir, dir.getName() + ".xml"));
+        TestFileUtils.copyFile(new File("src/test/resources/metadata/pubhub_metadata.xml"), new File(dir, dir.getName() + Constants.PUBHUB_METADATA_SUFFIX));
 
         doAnswer(new Answer<Void>() {
             @Override
@@ -232,7 +232,7 @@ public class AlephPackerTest extends ExtendedTestCase {
         String id = UUID.randomUUID().toString();
         File dir = TestFileUtils.createEmptyDirectory(new File(TestFileUtils.getTempDir(), id).getAbsolutePath());
         
-        TestFileUtils.copyFile(new File("src/test/resources/metadata/pubhub_metadata.xml"), new File(dir, dir.getName() + ".xml"));
+        TestFileUtils.copyFile(new File("src/test/resources/metadata/pubhub_metadata.xml"), new File(dir, dir.getName() + Constants.PUBHUB_METADATA_SUFFIX));
         
         String isbn = packer.getIsbn(dir);
         
@@ -253,7 +253,7 @@ public class AlephPackerTest extends ExtendedTestCase {
         String id = UUID.randomUUID().toString();
         File dir = TestFileUtils.createEmptyDirectory(new File(TestFileUtils.getTempDir(), id).getAbsolutePath());
         
-        TestFileUtils.copyFile(new File("src/test/resources/metadata/pubhub_metadata_bad_type.xml"), new File(dir, dir.getName() + ".xml"));
+        TestFileUtils.copyFile(new File("src/test/resources/metadata/pubhub_metadata_bad_type.xml"), new File(dir, dir.getName() + Constants.PUBHUB_METADATA_SUFFIX));
         
         String isbn = packer.getIsbn(dir);
         

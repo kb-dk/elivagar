@@ -3,7 +3,6 @@ package dk.kb.elivagar;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -187,77 +186,8 @@ public class PubhubWorkflow {
         if(conf.getAudioOutputDir().list() != null) {
             statistics.traverseBaseDir(conf.getAudioOutputDir(), date);
         } else {
-            printer.println("No ebooks to make statistics upon.");
+            printer.println("No audio books to make statistics upon.");
         }
-        printStatistics(printer, statistics);
-    }
-
-    /**
-     * Calculates the statistics on the books in the given directory.
-     * @param printer The print stream where the output is written.
-     * @param statistics The Elivagar statistics to be printed.
-     */
-    protected void printStatistics(PrintStream printer, ElivagarStatistics statistics) {
-        printer.println("The number of book directories traversed: " + statistics.getTotalCount());
-        printer.println(" - Whereas the number of new directories: " + statistics.getNewDirCount());
-        
-        printer.println("Number of Ebooks: " + statistics.getMapOfFileSuffices().getMultiKeyCount(
-                conf.getEbookFormats()));
-        for(String ebookFormat : conf.getEbookFormats()) {
-            printer.println(" - Ebooks in format '" + ebookFormat + "': " 
-                    + statistics.getMapOfFileSuffices().getValue(ebookFormat));
-        }
-        
-        printer.println("Number of new Ebooks: " + statistics.getMapOfNewFileSuffices().getMultiKeyCount( 
-                conf.getEbookFormats()));
-        for(String ebookFormat : conf.getEbookFormats()) {
-            printer.println(" - new Ebooks in format '" + ebookFormat + "': " 
-                    + statistics.getMapOfNewFileSuffices().getValue(ebookFormat));
-        }
-
-        printer.println("Number of Audio books: " + statistics.getMapOfFileSuffices().getMultiKeyCount( 
-                conf.getAudioFormats()));
-        for(String audioFormat : conf.getAudioFormats()) {
-            printer.println(" - Audio books in format '" + audioFormat + "': " 
-                    + statistics.getMapOfFileSuffices().getValue(audioFormat));
-        }
-        
-        printer.println("Number of new Audio books: " + statistics.getMapOfNewFileSuffices().getMultiKeyCount( 
-                conf.getAudioFormats()));
-        for(String audioFormat : conf.getAudioFormats()) {
-            printer.println(" - new Audio books in format '" + audioFormat + "': " 
-                    + statistics.getMapOfNewFileSuffices().getValue(audioFormat));
-        }
-
-        printer.println("The number of pubhub metadata records: " 
-                + statistics.getMapOfFileSuffices().getValue(Constants.PUBHUB_METADATA_SUFFIX));
-        printer.println(" - whereas the number of new pubhub metadata records: " 
-                + statistics.getMapOfNewFileSuffices().getValue(Constants.PUBHUB_METADATA_SUFFIX));
-        
-        printer.println("The number of MODS metadata records transformed from Aleph: " 
-                + statistics.getMapOfFileSuffices().getValue(Constants.MODS_METADATA_SUFFIX));
-        printer.println(" - whereas the number of new MODS metadata records transformed from Aleph: " 
-                + statistics.getMapOfNewFileSuffices().getValue(Constants.MODS_METADATA_SUFFIX));
-
-        printer.println("The number of FITS characterization metadata records: " 
-                + statistics.getMapOfFileSuffices().getValue(Constants.FITS_METADATA_SUFFIX));
-        printer.println(" - whereas the number of new FITS characterization metadata records: " 
-                + statistics.getMapOfNewFileSuffices().getValue(Constants.FITS_METADATA_SUFFIX));
-
-        printer.println("The number of EpubCheck characterization metadata records: " 
-                + statistics.getMapOfFileSuffices().getValue(Constants.EPUBCHECK_METADATA_SUFFIX));
-        printer.println(" - whereas the number of new EpubCheck characterization metadata records: " 
-                + statistics.getMapOfNewFileSuffices().getValue(Constants.EPUBCHECK_METADATA_SUFFIX));
-        
-        List<String> suffices = new ArrayList<String>();
-        suffices.addAll(conf.getAudioFormats());
-        suffices.addAll(conf.getEbookFormats());
-        suffices.add(Constants.PUBHUB_METADATA_SUFFIX);
-        suffices.add(Constants.MODS_METADATA_SUFFIX);
-        suffices.add(Constants.FITS_METADATA_SUFFIX);
-        suffices.add(Constants.EPUB_FILE_SUFFIX);
-        
-        printer.println("The number of files encountered, which does is not amongst the other counts:"
-                + statistics.getMapOfFileSuffices().getCountExcludingKeys(suffices));
+        statistics.printStatistics(printer, conf);
     }
 }
