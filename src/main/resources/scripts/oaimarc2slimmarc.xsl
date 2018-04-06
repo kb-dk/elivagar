@@ -81,6 +81,17 @@
     </xsl:element>
   </xsl:template>
 
+  <xsl:template name="original_language">
+    <xsl:for-each select="//varfield[@id='041']">
+      <xsl:if test="subfield[@label = 'c']">
+	<xsl:element name="marc:subfield">
+	  <xsl:attribute name="code">e</xsl:attribute>
+	  <xsl:value-of select="subfield[@label = 'c']"/>
+	</xsl:element>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+
   <xsl:template match="varfield[@id='041']">
     <xsl:element name="marc:datafield">
       <xsl:choose>
@@ -94,9 +105,9 @@
 	</xsl:otherwise>
       </xsl:choose>
       <xsl:attribute name="tag">041</xsl:attribute>
+<!--	subfield[@label = 'c']| -->
       <xsl:for-each select="subfield[@label = 'a']|
 	subfield[@label = 'b']|
-	subfield[@label = 'c']|
 	subfield[@label = 'd']|
 	subfield[@label = 'e']|
 	subfield[@label = 'p']|
@@ -190,6 +201,7 @@
 	  <xsl:attribute name="code">t</xsl:attribute>
 	  <xsl:apply-templates select="subfield[@label='a']" />
 	</xsl:element>
+	<xsl:call-template name="original_language"/>
       </xsl:element>
     </xsl:if>
   </xsl:template>
@@ -589,7 +601,8 @@
 	    <xsl:value-of select="substring-after(.,'&gt;&gt;')"/>
 	  </the-rest>
 	</xsl:variable>
-	<xsl:apply-templates select="exsl:node-set($therest)/the-rest"/>
+	<xsl:apply-templates select="$therest/the-rest"/>
+	<!--xsl:apply-templates select="exsl:node-set($therest)/the-rest"/ -->
       </xsl:when>
 
       <xsl:when test="contains(substring-before(substring-after(.,'&lt;&lt;'),'&gt;&gt;'),'=')">
@@ -600,7 +613,8 @@
 	    <xsl:value-of select="substring-after(.,'&gt;&gt;')"/>
 	  </the-rest>
 	</xsl:variable>
-	<xsl:apply-templates select="exsl:node-set($therest)/the-rest"/>
+	<!--xsl:apply-templates select="exsl:node-set($therest)/the-rest"/ -->
+	<xsl:apply-templates select="$therest/the-rest"/>
       </xsl:when>
       <xsl:otherwise>
 	<xsl:value-of select="."/>

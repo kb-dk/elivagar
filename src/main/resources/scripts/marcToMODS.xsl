@@ -2094,7 +2094,7 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
     </xsl:for-each>
 
     <xsl:for-each select="marc:datafield[@tag=765]">
-      <relatedItem type="originalVersion">
+      <relatedItem type="original">
 	<xsl:call-template name="relatedItem76X-78X"/>
       </relatedItem>
     </xsl:for-each>

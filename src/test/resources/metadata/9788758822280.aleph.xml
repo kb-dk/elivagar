@@ -1,0 +1,134 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<present>
+<record>
+<record_header>
+<set_entry>000000001</set_entry>
+</record_header>
+<doc_number>003468579</doc_number>
+<metadata>
+<oai_marc>
+<fixfield id="FMT">BK</fixfield>
+<fixfield id="LDR">01211name-22003490--450-</fixfield>
+<varfield id="001" i1="0" i2="0">
+<subfield label="a">x952073626</subfield>
+<subfield label="f">a</subfield>
+</varfield>
+<varfield id="004" i1="0" i2="0">
+<subfield label="r">n</subfield>
+<subfield label="a">e</subfield>
+</varfield>
+<varfield id="008" i1="0" i2="0">
+<subfield label="t">m</subfield>
+<subfield label="u">f</subfield>
+<subfield label="a">2015</subfield>
+<subfield label="b">dk</subfield>
+<subfield label="d">x</subfield>
+<subfield label="j">f</subfield>
+<subfield label="l">dan</subfield>
+<subfield label="n">b</subfield>
+<subfield label="o">s</subfield>
+<subfield label="v">0</subfield>
+<subfield label="w">1</subfield>
+</varfield>
+<varfield id="009" i1="0" i2="0">
+<subfield label="a">a</subfield>
+<subfield label="g">xe</subfield>
+</varfield>
+<varfield id="021" i1="0" i2="0">
+<subfield label="e">9788758822280</subfield>
+</varfield>
+<varfield id="032" i1="0" i2="0">
+<subfield label="a">DBF201603</subfield>
+<subfield label="x">BKM201603</subfield>
+<subfield label="x">ERA201603</subfield>
+<subfield label="x">ERE201603</subfield>
+</varfield>
+<varfield id="042" i1="0" i2="0">
+<subfield label="a">06</subfield>
+<subfield label="b">Ml 5,5 + Lo 0,6</subfield>
+</varfield>
+<varfield id="096" i1="0" i2="0">
+<subfield label="a"></subfield>
+</varfield>
+<varfield id="100" i1="0" i2="0">
+<subfield label="a">Fleischer</subfield>
+<subfield label="h">Rune</subfield>
+<subfield label="4">aut</subfield>
+<subfield label="4">ill</subfield>
+</varfield>
+<varfield id="245" i1="0" i2="0">
+<subfield label="a">Otto i solen</subfield>
+</varfield>
+<varfield id="250" i1="0" i2="0">
+<subfield label="a">1. e-bogsudgave</subfield>
+</varfield>
+<varfield id="260" i1="0" i2="0">
+<subfield label="b">Så til hest</subfield>
+<subfield label="g">[sælges på internettet]</subfield>
+<subfield label="c">2015</subfield>
+</varfield>
+<varfield id="440" i1="0" i2="0">
+<subfield label="a">Otto</subfield>
+<subfield label="v">&lt;&lt;#11=11&gt;&gt;</subfield>
+</varfield>
+<varfield id="504" i1="0" i2="0">
+<subfield label="a">Otto er gået i parken for at sole sig. Han har glemt solcreme. Men han har tyggegummi med. Så han laver en stor boble. Den bruger han som solcreme. Nu vil Otto hjælpe de andre i parken mod solen</subfield>
+</varfield>
+<varfield id="512" i1="0" i2="0">
+<subfield label="a">Downloades i EPUB-format</subfield>
+</varfield>
+<varfield id="520" i1="0" i2="0">
+<subfield label="a">Originaludgave: 2015</subfield>
+</varfield>
+<varfield id="595" i1="0" i2="0">
+<subfield label="a">e-pligt</subfield>
+</varfield>
+<varfield id="631" i1="0" i2="0">
+<subfield label="a">sjove bøger</subfield>
+</varfield>
+<varfield id="631" i1="0" i2="0">
+<subfield label="a">hjælpsomhed</subfield>
+</varfield>
+<varfield id="631" i1="0" i2="0">
+<subfield label="a">misforståelser</subfield>
+</varfield>
+<varfield id="631" i1="0" i2="0">
+<subfield label="a">let at læse</subfield>
+</varfield>
+<varfield id="631" i1="0" i2="0">
+<subfield label="a">for begynderlæsere</subfield>
+</varfield>
+<varfield id="631" i1="0" i2="0">
+<subfield label="a">for 7 år</subfield>
+</varfield>
+<varfield id="631" i1="0" i2="0">
+<subfield label="a">for 8 år</subfield>
+</varfield>
+<varfield id="652" i1="0" i2="0">
+<subfield label="n">86</subfield>
+<subfield label="z">096</subfield>
+</varfield>
+<varfield id="652" i1="0" i2="0">
+<subfield label="o">sk</subfield>
+</varfield>
+<varfield id="856" i1="0" i2="0">
+<subfield label="z">Adgang til lån hos eReolen.dk</subfield>
+<subfield label="u">https://ereolen.dk/ting/object/870970-basis:52073626</subfield>
+</varfield>
+<fixfield id="BAS">bcx</fixfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">dig1603imp</subfield>
+<subfield label="b"></subfield>
+<subfield label="c">20170508</subfield>
+<subfield label="l">KGL02</subfield>
+<subfield label="h">1059</subfield>
+</varfield>
+<varfield id="UID" i1=" " i2=" ">
+<subfield label="a">x952073626bcx</subfield>
+</varfield>
+</oai_marc>
+</metadata>
+</record>
+<session-id>BNI7NATHN89IGE3XBLCQJIJ7KLQA9DNSISDEI3LE94G13L5169</session-id>
+</present>
+ 
