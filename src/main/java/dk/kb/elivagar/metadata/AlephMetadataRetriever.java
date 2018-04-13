@@ -138,7 +138,7 @@ public class AlephMetadataRetriever {
                 throw new IllegalStateException("No search result entries found from Aleph.");
             }
             if(numberOfEntries > 1) {
-                log.debug("Found more than 1 entry. Retrieving only the first.");
+                log.warn("Found more than 1 entry. Retrieving only the first.");
             }
             return setNumberXpath.evaluate(doc);
         } catch (Exception e) {

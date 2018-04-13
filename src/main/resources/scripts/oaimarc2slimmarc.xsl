@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<xsl:transform version="1.0"
+<xsl:transform version="2.0"
 	       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	       xmlns:marc="http://www.loc.gov/MARC21/slim"
 	       xmlns:xlink="http://www.w3.org/1999/xlink"
+	       xmlns:saxon="http://saxon.sf.net/"
 	       xmlns:exsl="http://exslt.org/common"
 	       extension-element-prefixes="exsl">
 
@@ -479,7 +480,7 @@
   </xsl:template>
 
   <xsl:template match="varfield[@id='631']">
-    <xsl:if test="contains('abfgst',subfield/@label)">
+    <xsl:if test="contains('abfgst',subfield[1]/@label)">
     <xsl:element name="marc:datafield">
       <xsl:attribute name="ind1"><xsl:text> </xsl:text></xsl:attribute>
       <xsl:attribute name="ind2"><xsl:text> </xsl:text></xsl:attribute>
@@ -596,25 +597,32 @@
 			not(contains(substring-before(.,'&gt;&gt;'),'='))">
 	<xsl:value-of
 	    select="substring-after(substring-before(.,'&gt;&gt;'),'&lt;&lt;')"/>
-	<xsl:variable name="therest">
-	  <the-rest>
-	    <xsl:value-of select="substring-after(.,'&gt;&gt;')"/>
-	  </the-rest>
-	</xsl:variable>
-	<xsl:apply-templates select="$therest/the-rest"/>
-	<!--xsl:apply-templates select="exsl:node-set($therest)/the-rest"/ -->
+	<xsl:variable name="therest"><xsl:element name="the-rest"><xsl:value-of select="substring-after(.,'&gt;&gt;')"/></xsl:element></xsl:variable>
+	<xsl:choose>
+	  <xsl:when test="contains(system-property('xsl:vendor'),'Saxonica')" >
+	    <xsl:apply-templates select="$therest/the-rest"/>
+	  </xsl:when>
+	  <xsl:otherwise>
+	    <!-- xsl:apply-templates select="exsl:node-set($therest)/the-rest"/ -->
+	  </xsl:otherwise>
+	</xsl:choose>
       </xsl:when>
 
       <xsl:when test="contains(substring-before(substring-after(.,'&lt;&lt;'),'&gt;&gt;'),'=')">
 	<xsl:value-of select="substring-before(.,'&lt;&lt;')"/>
 	<xsl:value-of select="substring-before(substring-after(.,'&lt;&lt;'),'=')"/>
-	<xsl:variable name="therest">
-	  <the-rest>
-	    <xsl:value-of select="substring-after(.,'&gt;&gt;')"/>
-	  </the-rest>
+	<xsl:variable name="therest"><the-rest><xsl:value-of select="substring-after(.,'&gt;&gt;')"/></the-rest>
 	</xsl:variable>
-	<!--xsl:apply-templates select="exsl:node-set($therest)/the-rest"/ -->
-	<xsl:apply-templates select="$therest/the-rest"/>
+
+	<xsl:choose>
+	  <xsl:when test="contains(system-property('xsl:vendor'),'Saxonica')" >
+	    <xsl:apply-templates select="$therest"/>
+	  </xsl:when>
+	  <xsl:otherwise>
+	    <!-- xsl:apply-templates select="exsl:node-set($therest)/the-rest"/ -->
+	  </xsl:otherwise>
+	</xsl:choose>
+
       </xsl:when>
       <xsl:otherwise>
 	<xsl:value-of select="."/>

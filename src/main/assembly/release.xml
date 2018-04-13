@@ -12,7 +12,7 @@
 		<fileSet>
 			<directory>${project.basedir}/src/main/resources/bin</directory>
 			<lineEnding>lf</lineEnding>
-			<outputDirectory>/bin/</outputDirectory>
+			<outputDirectory>bin/</outputDirectory>
 			<fileMode>0755</fileMode>
 			<filtered>true</filtered>
 		</fileSet>
@@ -23,7 +23,7 @@
 				<include>*.xml</include>
 			</includes>
 			<lineEnding>lf</lineEnding>
-			<outputDirectory>/conf/</outputDirectory>
+			<outputDirectory>conf/</outputDirectory>
 			<fileMode>0755</fileMode>
 			<filtered>true</filtered>
 		</fileSet>
@@ -40,13 +40,13 @@
 			<includes>
 				<include>*.txt</include>
 			</includes>
-			<outputDirectory>/licenses/</outputDirectory>
+			<outputDirectory>licenses/</outputDirectory>
 		</fileSet>
 	</fileSets>
 	<!-- Copy all project dependencies to lib/ -->
 	<dependencySets>
 		<dependencySet>
-			<outputDirectory>/lib</outputDirectory>
+			<outputDirectory>lib</outputDirectory>
 		</dependencySet>
 	</dependencySets>
 </assembly>

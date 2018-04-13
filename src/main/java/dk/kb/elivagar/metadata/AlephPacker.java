@@ -130,7 +130,7 @@ public class AlephPacker {
 
             alephMetadata.deleteOnExit();
             marcMetadata.deleteOnExit();
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.warn("Failed to handle the book directory '" + dir.getAbsolutePath() + "'", e);
         }
     }
