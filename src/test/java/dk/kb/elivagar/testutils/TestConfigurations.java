@@ -72,6 +72,7 @@ public class TestConfigurations {
             File baseBookFileDir = TestFileUtils.createEmptyDirectory(baseDir.getAbsolutePath() + "/books_files");
             File baseAudioMetadataDir = TestFileUtils.createEmptyDirectory(baseDir.getAbsolutePath() + "/audio_metadata");
             File baseAudioFileDir = TestFileUtils.createEmptyDirectory(baseDir.getAbsolutePath() + "/audio_files");
+            File statisticsDir = TestFileUtils.createEmptyDirectory(baseDir.getAbsolutePath() + "/statistic");
 
             Map<String, Object> confMap = new HashMap<String, Object>();
             confMap.put(Configuration.CONF_EBOOK_OUTPUT_DIR, baseBookMetadataDir.getAbsolutePath());
@@ -82,7 +83,8 @@ public class TestConfigurations {
             confMap.put(Configuration.CONF_AUDIO_FORMATS, Arrays.asList("mp3"));
             confMap.put(Configuration.CONF_EBOOK_FORMATS, Arrays.asList("pdf", "epub"));
             confMap.put(Configuration.CONF_XSLT_DIR, TestFileUtils.getTempDir().getAbsolutePath());
-
+            confMap.put(Configuration.CONF_STATISTIC_DIR, statisticsDir.getAbsolutePath());
+            
             confMap.put(Configuration.CONF_ALEPH_ROOT, getAlephMap());
 
             return new Configuration(confMap);

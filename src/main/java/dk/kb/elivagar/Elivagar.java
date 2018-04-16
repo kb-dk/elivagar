@@ -1,7 +1,12 @@
 package dk.kb.elivagar;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Date;
+
+import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +20,7 @@ import dk.kb.elivagar.metadata.AlephPacker;
 import dk.kb.elivagar.metadata.MetadataTransformer;
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
 import dk.kb.elivagar.pubhub.PubhubPacker;
+import dk.kb.elivagar.utils.CalendarUtils;
 
 /**
  * Class for instantiating the Elivagar workflow.
@@ -116,7 +122,13 @@ public class Elivagar {
             }
             pubhubWorkflow.packFilesForBooks();
             alephWorkflow.packAlephMetadataForBooks();
-            pubhubWorkflow.makeStatistics(System.out, beginDate);
+            
+            File statisticsFile = new File(conf.getStatisticsDir(), 
+                    CalendarUtils.getDateAsString(new Date()) + ".txt");
+            try (PrintStream ps = new PrintStream(statisticsFile)) {
+                pubhubWorkflow.makeStatistics(ps, beginDate);                
+            }
+            log.info("Finished! Written statistics at " + statisticsFile.getAbsolutePath());
         } catch (Exception e) {
             log.error("Failure to run the workflow. \nThe waters of Elivagar must have frozen over!", e);
             System.exit(1);

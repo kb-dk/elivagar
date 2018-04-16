@@ -28,6 +28,7 @@ import dk.kb.elivagar.utils.YamlUtils;
  *     <li>license_key: DO_NOT_PUT_LICENSE_IN_GITHUB_FILE</li>
  *     <li>characterization_script: bin/run_fits.sh (optional)</li>
  *     <li>xslt_dir: scripts</li>
+ *     <li>statistic_dir: /path/to/statistics/dir/</li>
  *     <li>ebook_formats:</li>
  *     <ul>
  *       <li>- pdf</li>
@@ -70,6 +71,8 @@ public class Configuration {
     public static final String CONF_EBOOK_FORMATS = "ebook_formats";
     /** The configuration name for the list of formats for the audio books.*/
     public static final String CONF_AUDIO_FORMATS = "audio_formats";
+    /** The directory where the output statistics will be placed.*/
+    public static final String CONF_STATISTIC_DIR = "statistic_dir";
     
     /** The configuration Aleph element.*/
     public static final String CONF_ALEPH_ROOT = "aleph";
@@ -94,6 +97,8 @@ public class Configuration {
     protected File scriptFile;
     /** The directory containing the XSLT files for transforming the metadata.*/
     protected final File xsltFileDir;
+    /** The directory for the output statistics files.*/
+    protected final File statisticsDir;
     
     /** The list of formats for the ebooks.*/
     protected List<String> ebookFormats;
@@ -121,6 +126,7 @@ public class Configuration {
         ArgumentCheck.checkThatMapContainsKey(confMap, CONF_AUDIO_FILE_DIR, "confMap");
         ArgumentCheck.checkThatMapContainsKey(confMap, CONF_XSLT_DIR, "confMap");
         ArgumentCheck.checkThatMapContainsKey(confMap, CONF_ALEPH_ROOT, "confMap");
+        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_STATISTIC_DIR, "confMap");
         
         ebookOutputDir = FileUtils.createDirectory((String) confMap.get(CONF_EBOOK_OUTPUT_DIR));
         abookOutputDir = FileUtils.createDirectory((String) confMap.get(CONF_AUDIO_OUTPUT_DIR));
@@ -131,6 +137,8 @@ public class Configuration {
             scriptFile = new File((String) confMap.get(CONF_CHARACTERIZATION_SCRIPT));
         }
         xsltFileDir = FileUtils.createDirectory((String) confMap.get(CONF_XSLT_DIR));
+        statisticsDir = FileUtils.createDirectory((String) confMap.get(CONF_STATISTIC_DIR));
+        
         
         ebookFormats = (List<String>) confMap.get(CONF_EBOOK_FORMATS);
         audioFormats = (List<String>) confMap.get(CONF_AUDIO_FORMATS);
@@ -194,6 +202,11 @@ public class Configuration {
     /** @return The directory with the XSLT files.*/
     public File getXsltFileDir() {
         return xsltFileDir;
+    }
+    
+    /** @return The directory for the output statistics.*/
+    public File getStatisticsDir() {
+        return statisticsDir;
     }
     
     /** @return The list of formats for the ebooks.*/

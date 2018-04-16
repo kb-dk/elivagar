@@ -144,29 +144,33 @@ public class ElivagarStatistics {
         printer.println("Number of Ebooks: " + getMapOfFileSuffixes().getMultiKeyCount(
                 conf.getEbookFormats()));
         for(String ebookFormat : conf.getEbookFormats()) {
-            printer.println(" - Ebooks in format '" + ebookFormat + "': " 
-                    + getMapOfFileSuffixes().getValue(ebookFormat));
+            String suffix = "." + ebookFormat;
+            printer.println(" - Ebooks in format '" + suffix + "': " 
+                    + getMapOfFileSuffixes().getValue(suffix));
         }
         
         printer.println("Number of new Ebooks: " + getMapOfNewFileSuffixes().getMultiKeyCount( 
                 conf.getEbookFormats()));
         for(String ebookFormat : conf.getEbookFormats()) {
-            printer.println(" - new Ebooks in format '" + ebookFormat + "': " 
-                    + getMapOfNewFileSuffixes().getValue(ebookFormat));
+            String suffix = "." + ebookFormat;
+            printer.println(" - new Ebooks in format '" + suffix + "': " 
+                    + getMapOfNewFileSuffixes().getValue(suffix));
         }
 
         printer.println("Number of Audio books: " + getMapOfFileSuffixes().getMultiKeyCount( 
                 conf.getAudioFormats()));
         for(String audioFormat : conf.getAudioFormats()) {
-            printer.println(" - Audio books in format '" + audioFormat + "': " 
-                    + getMapOfFileSuffixes().getValue(audioFormat));
+            String suffix = "." + audioFormat;
+            printer.println(" - Audio books in format '" + suffix + "': " 
+                    + getMapOfFileSuffixes().getValue(suffix));
         }
         
         printer.println("Number of new Audio books: " + getMapOfNewFileSuffixes().getMultiKeyCount( 
                 conf.getAudioFormats()));
         for(String audioFormat : conf.getAudioFormats()) {
-            printer.println(" - new Audio books in format '" + audioFormat + "': " 
-                    + getMapOfNewFileSuffixes().getValue(audioFormat));
+            String suffix = "." + audioFormat;
+            printer.println(" - new Audio books in format '" + suffix + "': " 
+                    + getMapOfNewFileSuffixes().getValue(suffix));
         }
 
         printer.println("The number of pubhub metadata records: " 
@@ -191,7 +195,13 @@ public class ElivagarStatistics {
         
         List<String> suffices = new ArrayList<String>();
         suffices.addAll(conf.getAudioFormats());
+        for(String suffix : conf.getAudioFormats()) {
+            suffices.add("." + suffix);
+        }
         suffices.addAll(conf.getEbookFormats());
+        for(String suffix : conf.getEbookFormats()) {
+            suffices.add("." + suffix);
+        }
         suffices.add(Constants.PUBHUB_METADATA_SUFFIX);
         suffices.add(Constants.MODS_METADATA_SUFFIX);
         suffices.add(Constants.FITS_METADATA_SUFFIX);
@@ -199,6 +209,8 @@ public class ElivagarStatistics {
         
         printer.println("The number of files encountered, which does is not amongst the other counts:"
                 + getMapOfFileSuffixes().getCountExcludingKeys(suffices));
-
+        
+        printer.println(" - Where the following suffices have not been acounted for: "
+                + getMapOfFileSuffixes().getMissingKeys(suffices));
     }
 }

@@ -1,7 +1,9 @@
 package dk.kb.elivagar.statistics;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -80,5 +82,21 @@ public class SuffixMap {
             }
         }
         return res;
+    }
+    
+    /**
+     * Retrieves all the keys, which have not been accounted for.
+     * Thus all the found keys, which are not part of the given key-set.
+     * @param expectedKeys The keys which are expected to be found.
+     * @return The missing keys.
+     */
+    public Collection<String> getMissingKeys(Collection<String> expectedKeys) {
+        List<String> res = new ArrayList<String>();
+        for(String key : suffixCount.keySet()) {
+            if(!expectedKeys.contains(key)) {
+                res.add(key);
+            }
+        }
+        return  res;
     }
 }

@@ -1,5 +1,7 @@
 package dk.kb.elivagar.utils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -16,6 +18,9 @@ public class CalendarUtils {
     /** The logger.*/
     private static final Logger log = LoggerFactory.getLogger(CalendarUtils.class);
 
+    /** Our default date format.*/
+    public static final String DEFAULT_DATE_FORMAT = "YYYYMMdd-hhmmss";
+    
     /**
      * Turns a date into a XMLGregorianCalendar.
      * @param date The date. If the argument is null, then epoch is returned.
@@ -34,5 +39,15 @@ public class CalendarUtils {
         } catch (Exception e) {
             throw new IllegalStateException("Could not convert the date '" + date + "' into the xml format.", e);
         }
+    }
+    
+    /**
+     * Returns the date in text format (
+     * @param date The date to convert into a string.
+     * @return The text version of the date.
+     */
+    public static String getDateAsString(Date date) {
+        DateFormat format = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+        return format.format(date);
     }
 }

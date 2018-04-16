@@ -117,7 +117,7 @@ public class AlephPacker {
             }
             String isbn = getIsbn(dir);
             if(isbn == null) {
-                log.debug("Could not retrieve a ISBN from '" + dir.getAbsolutePath() + "'.");
+                log.debug("Could not retrieve a ISBN or GTIN from '" + dir.getAbsolutePath() + "'.");
                 return;
             }
             
@@ -158,8 +158,8 @@ public class AlephPacker {
             XPathExpression identifierXpath = xpath.compile(XPATH_FIND_IDENTIFIER);
             XPathExpression identifierTypeXpath = xpath.compile(XPATH_FIND_IDENTIFIER_TYPE);
             String idType = (String) identifierTypeXpath.evaluate(doc, XPathConstants.STRING);
-            if(!idType.startsWith("ISBN")) {
-                log.info("Not an ISBN type of identifier. Found: '" + idType + "'. Returning a null.");
+            if(!idType.startsWith("ISBN") && !idType.startsWith("GTIN13")) {
+                log.info("Not an ISBN or GTIN13 type of identifier. Found: '" + idType + "'. Returning a null.");
                 return null;
             }
             return (String) identifierXpath.evaluate(doc, XPathConstants.STRING);

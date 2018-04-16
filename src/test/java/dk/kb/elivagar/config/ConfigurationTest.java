@@ -36,6 +36,8 @@ public class ConfigurationTest extends ExtendedTestCase {
         Assert.assertNotNull(conf.getEbookFormats());
         Assert.assertNotNull(conf.getEbookOutputDir());
         Assert.assertNotNull(conf.getLicenseKey());
+        Assert.assertNotNull(conf.getStatisticsDir());
+        
         Assert.assertTrue(conf.getAudioOutputDir().isDirectory());
         Assert.assertTrue(conf.getEbookOutputDir().isDirectory());
         Assert.assertFalse(conf.getAudioFormats().isEmpty());
@@ -44,5 +46,6 @@ public class ConfigurationTest extends ExtendedTestCase {
         Assert.assertNotNull(conf.getAlephConfiguration().getServerUrl());
         Assert.assertNotNull(conf.getAlephConfiguration().getBase());
         Assert.assertTrue(conf.getAlephConfiguration().getTempDir().isDirectory());
+        Assert.assertTrue(conf.getStatisticsDir().isDirectory());
     }
 }

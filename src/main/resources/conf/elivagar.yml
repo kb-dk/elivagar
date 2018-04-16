@@ -5,6 +5,7 @@ elivagar:
   audio_orig_dir: /path/to/audio/files/
   license_key: LICENSE_KEY
   xslt_dir: scripts
+  statistic_dir: tempDir/statistic
   ebook_formats:
     - pdf
     - epub

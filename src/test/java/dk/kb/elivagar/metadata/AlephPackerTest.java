@@ -243,6 +243,28 @@ public class AlephPackerTest extends ExtendedTestCase {
     }
     
     @Test
+    public void testGetIsbnGtinSuccess() throws Exception {
+        addDescription("Test the getIsbn method, in the success case when it finds a GTIN number.");
+        AlephMetadataRetriever retriever = mock(AlephMetadataRetriever.class);
+        MetadataTransformer transformer = mock(MetadataTransformer.class);
+        
+        String expectedIsbn = "9788711436981";
+        AlephPacker packer = new AlephPacker(configuration, retriever, transformer);
+        
+        String id = UUID.randomUUID().toString();
+        File dir = TestFileUtils.createEmptyDirectory(new File(TestFileUtils.getTempDir(), id).getAbsolutePath());
+        
+        TestFileUtils.copyFile(new File("src/test/resources/metadata/pubhub_metadata_gtin.xml"), new File(dir, dir.getName() + Constants.PUBHUB_METADATA_SUFFIX));
+        
+        String isbn = packer.getIsbn(dir);
+        
+        Assert.assertEquals(isbn, expectedIsbn);
+        
+        verifyZeroInteractions(retriever);
+        verifyZeroInteractions(transformer);
+    }
+    
+    @Test
     public void testGetIsbnBadIdentifierType() throws Exception {
         addDescription("Test the getIsbn method, when the identifier number is not an ISBN.");
         AlephMetadataRetriever retriever = mock(AlephMetadataRetriever.class);
