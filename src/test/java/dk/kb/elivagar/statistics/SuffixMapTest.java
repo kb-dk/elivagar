@@ -111,4 +111,53 @@ public class SuffixMapTest extends ExtendedTestCase {
         int sumWithoutSuffix2OrSuffix3 = suffixMap.getCountExcludingKeys(Arrays.asList(suffix2, suffix3));
         Assert.assertEquals(sumWithoutSuffix2OrSuffix3, count1);
     }
+    
+    @Test
+    public void testGetValuesEndingWithKey() {
+        addDescription("Test the getCountExcludingKeys method");
+        SuffixMap suffixMap = new SuffixMap();
+        
+        String suffixSuffix = UUID.randomUUID().toString();
+        String suffixPrefix = UUID.randomUUID().toString();
+        String suffix = suffixPrefix + "." + suffixSuffix;
+        
+        suffixMap.addSuffix(suffix);
+        
+        Assert.assertEquals(suffixMap.suffixCount.size(), 1);
+        Assert.assertEquals(suffixMap.getValuesEndingWithKey(suffix), 1);
+        Assert.assertEquals(suffixMap.getValuesEndingWithKey(suffixSuffix), 1);
+        Assert.assertFalse(suffixSuffix.equalsIgnoreCase(suffixPrefix));
+        Assert.assertEquals(suffixMap.getValuesEndingWithKey(suffixPrefix), 0);
+    }
+    
+    @Test
+    public void testGetMultiKeyCountWithDot() {
+        addDescription("Test the getMultiKeyCountWithDot method");
+        SuffixMap suffixMap = new SuffixMap();
+        
+        String suffixSuffix = UUID.randomUUID().toString();
+        String suffix = "." + suffixSuffix;
+        
+        suffixMap.addSuffix(suffix);
+        
+        Assert.assertEquals(suffixMap.suffixCount.size(), 1);
+        Assert.assertEquals(suffixMap.getMultiKeyCount(Arrays.asList(suffixSuffix)), 1);
+        Assert.assertEquals(suffixMap.getMultiKeyCount(Arrays.asList(suffix)), 1);
+    }
+    
+    @Test
+    public void testGetMissingKeys() {
+        addDescription("Test the getMultiKeyCountWithDot method");
+        SuffixMap suffixMap = new SuffixMap();
+        
+        String suffixSuffix = UUID.randomUUID().toString();
+        String suffix = "." + suffixSuffix;
+        
+        suffixMap.addSuffix(suffix);
+
+        Assert.assertEquals(suffixMap.suffixCount.size(), 1);
+        Assert.assertEquals(suffixMap.getMissingKeys(Arrays.asList(UUID.randomUUID().toString())).size(), 1);
+        Assert.assertEquals(suffixMap.getMissingKeys(Arrays.asList(suffix)).size(), 0);
+        
+    }
 }

@@ -39,6 +39,27 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
     }
     
     @Test
+    public void testCharacterizeWhenOddFileFormat() throws IOException {
+        addDescription("Test the characterize method, when the file has an odd file format.");
+        FitsCharacterizer fitsCharacterizer = null;
+        EpubCheckerCharacterizer epubCharacterizer = mock(EpubCheckerCharacterizer.class);
+        CharacterizationHandler characterizer = new CharacterizationHandler(fitsCharacterizer, epubCharacterizer);
+        
+        File dir = TestFileUtils.createEmptyDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + UUID.randomUUID().toString());
+        File f = new File(dir, UUID.randomUUID().toString() + ".suffix");
+        TestFileUtils.createFile(f, UUID.randomUUID().toString());
+        
+        Assert.assertEquals(dir.list().length, 1);
+        
+        characterizer.characterize(f, dir);
+        
+        Assert.assertEquals(dir.list().length, 1);
+        
+        verify(epubCharacterizer).hasRequiredExtension(eq(f));
+        verifyNoMoreInteractions(epubCharacterizer);
+    }
+    
+    @Test
     public void testRunFitsIfNeededWhenNoScript() throws IOException {
         addDescription("Test the runFitsIfNeeded method, when no script is given");
         FitsCharacterizer fitsCharacterizer = null;

@@ -55,6 +55,21 @@ public class SuffixMap {
     }
     
     /**
+     * Retrieving the summed count of all suffices ending with the given key.
+     * @param key The suffix ending for the counts to be summed.
+     * @return The total count of entries ending with the given key.
+     */
+    public int getValuesEndingWithKey(String key) {
+        int res = 0;
+        for(String suffix : suffixCount.keySet()) {
+            if(suffix.endsWith(key)) {
+                res += suffixCount.get(suffix);
+            }
+        }
+        return res;
+    }
+    
+    /**
      * Retrieves the combined count of the values of all the keys.
      * @param keys The keys whose values will be summed.
      * @return The combined sum of the value for all the given keys.
@@ -64,6 +79,8 @@ public class SuffixMap {
         for(String key : keys) {
             if(suffixCount.containsKey(key)) {
                 res += suffixCount.get(key);
+            } else if(suffixCount.containsKey("." + key)) {
+                res += suffixCount.get("." + key);
             }
         }
         return res;

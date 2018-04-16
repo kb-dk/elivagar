@@ -184,23 +184,27 @@ public class ElivagarStatistics {
                 + getMapOfNewFileSuffixes().getValue(Constants.MODS_METADATA_SUFFIX));
 
         printer.println("The number of FITS characterization metadata records: " 
-                + getMapOfFileSuffixes().getValue(Constants.FITS_METADATA_SUFFIX));
+                + getMapOfFileSuffixes().getValuesEndingWithKey(Constants.FITS_METADATA_SUFFIX));
         printer.println(" - whereas the number of new FITS characterization metadata records: " 
-                + getMapOfNewFileSuffixes().getValue(Constants.FITS_METADATA_SUFFIX));
+                + getMapOfNewFileSuffixes().getValuesEndingWithKey(Constants.FITS_METADATA_SUFFIX));
 
         printer.println("The number of EpubCheck characterization metadata records: " 
-                + getMapOfFileSuffixes().getValue(Constants.EPUBCHECK_METADATA_SUFFIX));
+                + getMapOfFileSuffixes().getValuesEndingWithKey(Constants.EPUBCHECK_METADATA_SUFFIX));
         printer.println(" - whereas the number of new EpubCheck characterization metadata records: " 
-                + getMapOfNewFileSuffixes().getValue(Constants.EPUBCHECK_METADATA_SUFFIX));
+                + getMapOfNewFileSuffixes().getValuesEndingWithKey(Constants.EPUBCHECK_METADATA_SUFFIX));
         
         List<String> suffices = new ArrayList<String>();
         suffices.addAll(conf.getAudioFormats());
         for(String suffix : conf.getAudioFormats()) {
             suffices.add("." + suffix);
+            suffices.add("." + suffix + Constants.FITS_METADATA_SUFFIX);
+            suffices.add("." + suffix + Constants.EPUBCHECK_METADATA_SUFFIX);
         }
         suffices.addAll(conf.getEbookFormats());
         for(String suffix : conf.getEbookFormats()) {
             suffices.add("." + suffix);
+            suffices.add("." + suffix + Constants.FITS_METADATA_SUFFIX);
+            suffices.add("." + suffix + Constants.EPUBCHECK_METADATA_SUFFIX);
         }
         suffices.add(Constants.PUBHUB_METADATA_SUFFIX);
         suffices.add(Constants.MODS_METADATA_SUFFIX);
