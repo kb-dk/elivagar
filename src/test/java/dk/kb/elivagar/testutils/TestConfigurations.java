@@ -58,6 +58,19 @@ public class TestConfigurations {
 
         return res;
     }
+    
+    protected static Map<String, Object> getTransferMap() throws Exception {
+        
+        Map<String, Object> res = new HashMap<String, Object>();
+        res.put(Configuration.CONF_TRANSFER_BASE_CONTENT_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/content");
+        res.put(Configuration.CONF_TRANSFER_BASE_METADATA_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/metadata");
+        res.put(Configuration.CONF_TRANSFER_RETAIN_CREATE_DATE, new Integer(3600000));
+        res.put(Configuration.CONF_TRANSFER_RETAIN_MODIFY_DATE, new Integer(60000));
+        res.put(Configuration.CONF_TRANSFER_RETAIN_PUBLICATION_DATE, new Integer(0));
+        res.put(Configuration.CONF_TRANSFER_REQUIRED_FORMATS, Arrays.asList("fits.xml", "mods.xml"));
+
+        return res;
+    }
 
     public static Configuration getConfigurationForTest(){
         File passwordFile = new File(licenseFilePath);
@@ -86,6 +99,7 @@ public class TestConfigurations {
             confMap.put(Configuration.CONF_STATISTIC_DIR, statisticsDir.getAbsolutePath());
             
             confMap.put(Configuration.CONF_ALEPH_ROOT, getAlephMap());
+            confMap.put(Configuration.CONF_TRANSFER_ROOT, getTransferMap());
 
             return new Configuration(confMap);
         } catch (Exception e) {

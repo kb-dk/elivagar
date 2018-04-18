@@ -4,6 +4,7 @@ elivagar:
   ebook_orig_dir: /path/to/book/files/
   audio_orig_dir: /path/to/audio/files/
   license_key: LICENSE_KEY
+  characterization_script: src/main/resources/bin/run_fits.sh
   xslt_dir: scripts
   statistic_dir: tempDir/statistic
   ebook_formats:

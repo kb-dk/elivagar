@@ -42,10 +42,24 @@ public class ConfigurationTest extends ExtendedTestCase {
         Assert.assertTrue(conf.getEbookOutputDir().isDirectory());
         Assert.assertFalse(conf.getAudioFormats().isEmpty());
         Assert.assertFalse(conf.getEbookFormats().isEmpty());
+        Assert.assertTrue(conf.getStatisticsDir().isDirectory());
+        
+        addStep("Test the aleph configuration", "");
         Assert.assertNotNull(conf.getAlephConfiguration());
         Assert.assertNotNull(conf.getAlephConfiguration().getServerUrl());
         Assert.assertNotNull(conf.getAlephConfiguration().getBase());
+        Assert.assertNotNull(conf.getAlephConfiguration().getTempDir());
         Assert.assertTrue(conf.getAlephConfiguration().getTempDir().isDirectory());
-        Assert.assertTrue(conf.getStatisticsDir().isDirectory());
+        
+        addStep("Test the transfer configuraiton", "");
+        Assert.assertNotNull(conf.getTransferConfiguration());
+        Assert.assertNotNull(conf.getTransferConfiguration().getBaseContentDir());
+        Assert.assertNotNull(conf.getTransferConfiguration().getBaseMetadataDir());
+        Assert.assertNotNull(conf.getTransferConfiguration().getRetainCreateDate());
+        Assert.assertNotNull(conf.getTransferConfiguration().getRetainModifyDate());
+        Assert.assertNotNull(conf.getTransferConfiguration().getRetainPublicationDate());
+        Assert.assertNotNull(conf.getTransferConfiguration().getRequiredFormats());
+        Assert.assertTrue(conf.getTransferConfiguration().getBaseContentDir().isDirectory());
+        Assert.assertTrue(conf.getTransferConfiguration().getBaseMetadataDir().isDirectory());
     }
 }
