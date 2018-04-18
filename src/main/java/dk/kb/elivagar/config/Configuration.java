@@ -44,6 +44,19 @@ import dk.kb.elivagar.utils.YamlUtils;
  *       <li>aleph_base: $ALEPH_BASE</li>
  *       <li>temp_dir: $TEMP_DIR</li>
  *     </ul>
+ *     <li>transfer:</li>
+ *     <ul>
+ *       <li>base_content_path: /transfer/path/root/content/</li>
+ *       <li>base_metadata_path: /transfer/path/root/metadata/</li>
+ *       <li>retain_create_date: -1 // TIME IN MILLIS</li>
+ *       <li>retain_modify_date: -1 // TIME IN MILLIS</li>
+ *       <li>retain_pub_date: -1 </li>
+ *       <li>required_formats:</li>
+ *       <ul>
+ *         <li>- fits.xml</li>
+ *         <li>- mods.xml</li>
+ *       </ul>
+ *     </ul>
  *   </ul>
  * </ul>
  */
@@ -83,6 +96,21 @@ public class Configuration {
     /** The configuration name for the directory for temporary storing aleph resources.*/
     public static final String CONF_ALEPH_TEMP_DIR = "temp_dir";
     
+    /** The configuration transfer element.*/
+    public static final String CONF_TRANSFER_ROOT = "transfer";
+    /** The base path for content and technical metadata.*/
+    public static final String CONF_TRANSFER_BASE_CONTENT_PATH = "base_content_path";
+    /** The base path for the metadata (except technical metadata).*/
+    public static final String CONF_TRANSFER_BASE_METADATA_PATH = "base_metadata_path";
+    /** The retain interval for the create date, in millis.*/
+    public static final String CONF_TRANSFER_RETAIN_CREATE_DATE = "retain_create_date";
+    /** The retain interval for the modify data, in millis.*/
+    public static final String CONF_TRANSFER_RETAIN_MODIFY_DATE = "retain_modify_date";
+    /** The retain interval for the publicatoin date, in millis.*/
+    public static final String CONF_TRANSFER_RETAIN_PUBLICATION_DATE = "retain_pub_date";
+    /** The list of required formats for initiating the transfer.*/
+    public static final String CONF_TRANSFER_REQUIRED_FORMATS = "required_formats";
+    
     /** The output directory for the ebooks.*/
     protected final File ebookOutputDir;
     /** The output directory for the audio-books.*/
@@ -108,6 +136,9 @@ public class Configuration {
     /** The Aleph configuration.*/
     protected final AlephConfiguration alephConfiguration;
     
+    /** The transfer configuration.*/
+    protected final TransferConfiguration transferConfiguration;
+    
     /**
      * Constructor.
      * @param confMap The YAML map for the configuration.
@@ -125,8 +156,9 @@ public class Configuration {
         ArgumentCheck.checkThatMapContainsKey(confMap, CONF_EBOOK_FILE_DIR, "confMap");
         ArgumentCheck.checkThatMapContainsKey(confMap, CONF_AUDIO_FILE_DIR, "confMap");
         ArgumentCheck.checkThatMapContainsKey(confMap, CONF_XSLT_DIR, "confMap");
-        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_ALEPH_ROOT, "confMap");
         ArgumentCheck.checkThatMapContainsKey(confMap, CONF_STATISTIC_DIR, "confMap");
+        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_ALEPH_ROOT, "confMap");
+        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_TRANSFER_ROOT, "confMap");
         
         ebookOutputDir = FileUtils.createDirectory((String) confMap.get(CONF_EBOOK_OUTPUT_DIR));
         abookOutputDir = FileUtils.createDirectory((String) confMap.get(CONF_AUDIO_OUTPUT_DIR));
@@ -139,11 +171,11 @@ public class Configuration {
         xsltFileDir = FileUtils.createDirectory((String) confMap.get(CONF_XSLT_DIR));
         statisticsDir = FileUtils.createDirectory((String) confMap.get(CONF_STATISTIC_DIR));
         
-        
         ebookFormats = (List<String>) confMap.get(CONF_EBOOK_FORMATS);
         audioFormats = (List<String>) confMap.get(CONF_AUDIO_FORMATS);
         
         this.alephConfiguration = getAlephConfiguration((Map<String, Object>) confMap.get(CONF_ALEPH_ROOT));
+        this.transferConfiguration = getTransferConfiguration((Map<String, Object>) confMap.get(CONF_TRANSFER_ROOT));
     }
     
     /**
@@ -164,9 +196,43 @@ public class Configuration {
         return new AlephConfiguration(url, base, tempDir);
     }
     
+    /**
+     * Instantiates the TransferConfiguration from the given map.
+     * @param transferMap The map with the Transfer elements.
+     * @return The transfer configuration.
+     * @throws IOException If the directories cannot be instantiated.
+     */
+    @SuppressWarnings("unchecked")
+    protected TransferConfiguration getTransferConfiguration(Map<String, Object> transferMap) throws IOException {
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_BASE_CONTENT_PATH, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_BASE_METADATA_PATH, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_RETAIN_CREATE_DATE, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_RETAIN_MODIFY_DATE, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_RETAIN_PUBLICATION_DATE, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_REQUIRED_FORMATS, "transferMap");
+        
+        String baseContentPath = (String) transferMap.get(CONF_TRANSFER_BASE_CONTENT_PATH);
+        File baseContentDir = FileUtils.createDirectory(baseContentPath);
+
+        String baseMetadataPath = (String) transferMap.get(CONF_TRANSFER_BASE_METADATA_PATH);
+        File baseMetadataDir = FileUtils.createDirectory(baseMetadataPath);
+
+        Long retainCreateDate = ((Integer) transferMap.get(CONF_TRANSFER_RETAIN_CREATE_DATE)).longValue();
+        Long retainModifyDate = ((Integer) transferMap.get(CONF_TRANSFER_RETAIN_MODIFY_DATE)).longValue();
+        Long retainPublicationDate = ((Integer) transferMap.get(CONF_TRANSFER_RETAIN_PUBLICATION_DATE)).longValue();
+        List<String> requiredFormats = (List<String>) transferMap.get(CONF_TRANSFER_REQUIRED_FORMATS);
+        return new TransferConfiguration(baseContentDir, baseMetadataDir, retainCreateDate, retainModifyDate, 
+                retainPublicationDate, requiredFormats);
+    }
+    
     /** @return The aleph configuration. */
     public AlephConfiguration getAlephConfiguration() {
         return alephConfiguration;
+    }
+    
+    /** @return The transfer configuration. */
+    public TransferConfiguration getTransferConfiguration() {
+        return transferConfiguration;
     }
     
     /** @return The output directory for the ebook directories. */
