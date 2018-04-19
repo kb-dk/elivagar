@@ -11,10 +11,12 @@ import dk.kb.elivagar.exception.ArgumentCheck;
  * Configuration for the transfer of data from Elivagar to Preservica pre-ingest area.
  */
 public class TransferConfiguration {
+    /** The base directory for the ingest.*/
+    protected final File ingestDir;
     /** The base directory for the content files and the technical metadata.*/
-    protected final File baseContentDir;
+    protected final File updateContentDir;
     /** The base directory for the metadata (except technical metadata).*/
-    protected final File baseMetadataDir;
+    protected final File updateMetadataDir;
     /** The retain interval for the create date, in millis.*/
     protected final Long retainCreateDate;
     /** The retain interval for the modify data, in millis.*/
@@ -26,38 +28,46 @@ public class TransferConfiguration {
     
     /**
      * Constructor.
-     * @param baseContentDir The base directory for the content files and the technical metadata.
-     * @param baseMetadataDir The base directory for the metadata (except technical metadata).
+     * @param ingestDir The directory for the ingest.
+     * @param updateContentDir The base directory for the content files and the technical metadata.
+     * @param updateMetadataDir The base directory for the metadata (except technical metadata).
      * @param retainCreateDate The retain interval for the create date, in millis.
      * @param retainModifyDate The retain interval for the modify data, in millis.
      * @param retainPublicationDate The retain interval for the publication date, in millis.
      * @param requiredFormats The list of required formats for initiating the transfer.
      */
-    public TransferConfiguration(File baseContentDir, File baseMetadataDir, Long retainCreateDate, 
+    public TransferConfiguration(File ingestDir, File updateContentDir, File updateMetadataDir, Long retainCreateDate, 
             Long retainModifyDate, Long retainPublicationDate, Collection<String> requiredFormats) {
-        ArgumentCheck.checkExistsDirectory(baseContentDir, "File baseContentDir");
-        ArgumentCheck.checkExistsDirectory(baseMetadataDir, "File baseMetadataDir");
+        ArgumentCheck.checkExistsDirectory(ingestDir, "File ingestDir");
+        ArgumentCheck.checkExistsDirectory(updateContentDir, "File baseContentDir");
+        ArgumentCheck.checkExistsDirectory(updateMetadataDir, "File baseMetadataDir");
         ArgumentCheck.checkNotNull(retainCreateDate, "Long retainCreateDate");
         ArgumentCheck.checkNotNull(retainModifyDate, "Long retainModifyDate");
         ArgumentCheck.checkNotNull(retainPublicationDate, "Long retainPublicationDate");
         ArgumentCheck.checkNotNullOrEmpty(requiredFormats, "Collection<String> requiredFormats");
         
-        this.baseContentDir = baseContentDir;
-        this.baseMetadataDir = baseMetadataDir;
+        this.ingestDir = ingestDir;
+        this.updateContentDir = updateContentDir;
+        this.updateMetadataDir = updateMetadataDir;
         this.retainCreateDate = retainCreateDate;
         this.retainModifyDate = retainModifyDate;
         this.retainPublicationDate = retainPublicationDate;
         this.requiredFormats = new ArrayList<String>(requiredFormats);
     }
     
+    /** @return The base directory for the ingest.*/
+    public File getIngestDir() {
+        return ingestDir;
+    }
+
     /** @return The base directory for the content files and the technical metadata.*/
-    public File getBaseContentDir() {
-        return baseContentDir;
+    public File getUpdateContentDir() {
+        return updateContentDir;
     }
     
     /** @return The base directory for the metadata (except technical metadata).*/
-    public File getBaseMetadataDir() {
-        return baseMetadataDir;
+    public File getUpdateMetadataDir() {
+        return updateMetadataDir;
     }
     
     /** @return The retain interval for the create date, in millis.*/

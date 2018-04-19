@@ -1,6 +1,7 @@
 package dk.kb.elivagar.utils;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -10,6 +11,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import dk.kb.elivagar.exception.ArgumentCheck;
 
 /**
  * Utility class for dealing with dates and calendars. Especially converting to and from the date XML date format.
@@ -42,12 +45,29 @@ public class CalendarUtils {
     }
     
     /**
-     * Returns the date in text format (
+     * Transforms a Date object into text.
      * @param date The date to convert into a string.
      * @return The text version of the date.
      */
     public static String getDateAsString(Date date) {
+        ArgumentCheck.checkNotNull(date, "Date date");
+        
         DateFormat format = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
         return format.format(date);
+    }
+    
+    /**
+     * Transforms a text date into a date object.
+     * @param date The date in text.
+     * @param format The format for the date in the text.
+     * @return The date.
+     * @throws ParseException If it cannot transform the date.
+     */
+    public static Date getDateFromString(String date, String format) throws ParseException {
+        ArgumentCheck.checkNotNull(date, "String date");
+        ArgumentCheck.checkNotNull(format, "String format");
+        
+        DateFormat dateFormat = new SimpleDateFormat(format);
+        return dateFormat.parse(date);        
     }
 }

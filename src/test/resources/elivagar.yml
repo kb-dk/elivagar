@@ -17,8 +17,9 @@ elivagar:
     aleph_base: $ALEPH_BASE
     temp_dir: tempDir/aleph
   transfer:
-    base_content_path: tempDir/transfer/content/
-    base_metadata_path: tempDir/transfer/metadata/
+    ingest_path: tempDir/transfer/ingest
+    update_content_path: tempDir/transfer/content/
+    update_metadata_path: tempDir/transfer/metadata/
     retain_create_date: -1
     retain_modify_date: -1
     retain_pub_date: -1

@@ -41,4 +41,41 @@ public class FileUtils {
             throw new IllegalStateException("Could not delete the file '" + f.getAbsolutePath() + "'");
         }
     }
+    
+    /**
+     * Copies from one directory to another.
+     * @param from The from directory.
+     * @param to The to directory.
+     * @throws IOException If it fails to copy.
+     */
+    public static void copyDirectory(File from, File to) throws IOException {
+        ArgumentCheck.checkExistsDirectory(from, "File from");
+        if(to.exists()) {
+            ArgumentCheck.checkExistsDirectory(to, "File to");
+        } else {
+            createDirectory(to.getAbsolutePath());
+        }
+        
+        for(File f : from.listFiles()) {
+            copyFileFollowSymbolicLinks(f, new File(to, f.getName()));
+        }
+    }
+
+    /**
+     * Copies a file or the content of its symbolic link to a given destination.
+     * @param fromFile The from file.
+     * @param toFile The to file.
+     * @throws IOException If it fails to handle the copy or symbolic links.
+     */
+    public static void copyFileFollowSymbolicLinks(File fromFile, File toFile) throws IOException {
+        ArgumentCheck.checkExistsNormalFile(fromFile, "File from");
+        Path toPath = toFile.toPath();
+        Path fromPath;
+        if(Files.isSymbolicLink(fromFile.toPath())) {
+            fromPath = Files.readSymbolicLink(fromFile.toPath());
+        } else {
+            fromPath = fromFile.toPath();
+        }
+        Files.copy(fromPath, toPath);        
+    }
 }

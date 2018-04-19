@@ -53,13 +53,13 @@ public class ConfigurationTest extends ExtendedTestCase {
         
         addStep("Test the transfer configuraiton", "");
         Assert.assertNotNull(conf.getTransferConfiguration());
-        Assert.assertNotNull(conf.getTransferConfiguration().getBaseContentDir());
-        Assert.assertNotNull(conf.getTransferConfiguration().getBaseMetadataDir());
+        Assert.assertNotNull(conf.getTransferConfiguration().getUpdateContentDir());
+        Assert.assertNotNull(conf.getTransferConfiguration().getUpdateMetadataDir());
         Assert.assertNotNull(conf.getTransferConfiguration().getRetainCreateDate());
         Assert.assertNotNull(conf.getTransferConfiguration().getRetainModifyDate());
         Assert.assertNotNull(conf.getTransferConfiguration().getRetainPublicationDate());
         Assert.assertNotNull(conf.getTransferConfiguration().getRequiredFormats());
-        Assert.assertTrue(conf.getTransferConfiguration().getBaseContentDir().isDirectory());
-        Assert.assertTrue(conf.getTransferConfiguration().getBaseMetadataDir().isDirectory());
+        Assert.assertTrue(conf.getTransferConfiguration().getUpdateContentDir().isDirectory());
+        Assert.assertTrue(conf.getTransferConfiguration().getUpdateMetadataDir().isDirectory());
     }
 }

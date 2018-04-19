@@ -62,8 +62,9 @@ public class TestConfigurations {
     protected static Map<String, Object> getTransferMap() throws Exception {
         
         Map<String, Object> res = new HashMap<String, Object>();
-        res.put(Configuration.CONF_TRANSFER_BASE_CONTENT_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/content");
-        res.put(Configuration.CONF_TRANSFER_BASE_METADATA_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/metadata");
+        res.put(Configuration.CONF_TRANSFER_INGEST_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/ingest");
+        res.put(Configuration.CONF_TRANSFER_UPDATE_CONTENT_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/content");
+        res.put(Configuration.CONF_TRANSFER_UPDATE_METADATA_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/metadata");
         res.put(Configuration.CONF_TRANSFER_RETAIN_CREATE_DATE, new Integer(3600000));
         res.put(Configuration.CONF_TRANSFER_RETAIN_MODIFY_DATE, new Integer(60000));
         res.put(Configuration.CONF_TRANSFER_RETAIN_PUBLICATION_DATE, new Integer(0));

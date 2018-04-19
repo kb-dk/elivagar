@@ -46,8 +46,9 @@ import dk.kb.elivagar.utils.YamlUtils;
  *     </ul>
  *     <li>transfer:</li>
  *     <ul>
- *       <li>base_content_path: /transfer/path/root/content/</li>
- *       <li>base_metadata_path: /transfer/path/root/metadata/</li>
+ *       <li>ingest_path: /transfer/path/root/ingest/</li>
+ *       <li>update_content_path: /transfer/path/root/content/</li>
+ *       <li>update_metadata_path: /transfer/path/root/metadata/</li>
  *       <li>retain_create_date: -1 // TIME IN MILLIS</li>
  *       <li>retain_modify_date: -1 // TIME IN MILLIS</li>
  *       <li>retain_pub_date: -1 </li>
@@ -98,10 +99,12 @@ public class Configuration {
     
     /** The configuration transfer element.*/
     public static final String CONF_TRANSFER_ROOT = "transfer";
-    /** The base path for content and technical metadata.*/
-    public static final String CONF_TRANSFER_BASE_CONTENT_PATH = "base_content_path";
-    /** The base path for the metadata (except technical metadata).*/
-    public static final String CONF_TRANSFER_BASE_METADATA_PATH = "base_metadata_path";
+    /** The base path for the ingest dir.*/
+    public static final String CONF_TRANSFER_INGEST_PATH = "ingest_path";
+    /** The base path for update dir for content and technical metadata.*/
+    public static final String CONF_TRANSFER_UPDATE_CONTENT_PATH = "update_content_path";
+    /** The base path for update dir for metadata (except technical metadata).*/
+    public static final String CONF_TRANSFER_UPDATE_METADATA_PATH = "update_metadata_path";
     /** The retain interval for the create date, in millis.*/
     public static final String CONF_TRANSFER_RETAIN_CREATE_DATE = "retain_create_date";
     /** The retain interval for the modify data, in millis.*/
@@ -204,25 +207,29 @@ public class Configuration {
      */
     @SuppressWarnings("unchecked")
     protected TransferConfiguration getTransferConfiguration(Map<String, Object> transferMap) throws IOException {
-        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_BASE_CONTENT_PATH, "transferMap");
-        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_BASE_METADATA_PATH, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_INGEST_PATH, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_UPDATE_CONTENT_PATH, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_UPDATE_METADATA_PATH, "transferMap");
         ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_RETAIN_CREATE_DATE, "transferMap");
         ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_RETAIN_MODIFY_DATE, "transferMap");
         ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_RETAIN_PUBLICATION_DATE, "transferMap");
         ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_REQUIRED_FORMATS, "transferMap");
-        
-        String baseContentPath = (String) transferMap.get(CONF_TRANSFER_BASE_CONTENT_PATH);
+
+        String baseIngestPath = (String) transferMap.get(CONF_TRANSFER_INGEST_PATH);
+        File baseIngestDir = FileUtils.createDirectory(baseIngestPath);
+
+        String baseContentPath = (String) transferMap.get(CONF_TRANSFER_UPDATE_CONTENT_PATH);
         File baseContentDir = FileUtils.createDirectory(baseContentPath);
 
-        String baseMetadataPath = (String) transferMap.get(CONF_TRANSFER_BASE_METADATA_PATH);
+        String baseMetadataPath = (String) transferMap.get(CONF_TRANSFER_UPDATE_METADATA_PATH);
         File baseMetadataDir = FileUtils.createDirectory(baseMetadataPath);
 
         Long retainCreateDate = ((Integer) transferMap.get(CONF_TRANSFER_RETAIN_CREATE_DATE)).longValue();
         Long retainModifyDate = ((Integer) transferMap.get(CONF_TRANSFER_RETAIN_MODIFY_DATE)).longValue();
         Long retainPublicationDate = ((Integer) transferMap.get(CONF_TRANSFER_RETAIN_PUBLICATION_DATE)).longValue();
         List<String> requiredFormats = (List<String>) transferMap.get(CONF_TRANSFER_REQUIRED_FORMATS);
-        return new TransferConfiguration(baseContentDir, baseMetadataDir, retainCreateDate, retainModifyDate, 
-                retainPublicationDate, requiredFormats);
+        return new TransferConfiguration(baseIngestDir, baseContentDir, baseMetadataDir, retainCreateDate, 
+                retainModifyDate, retainPublicationDate, requiredFormats);
     }
     
     /** @return The aleph configuration. */
