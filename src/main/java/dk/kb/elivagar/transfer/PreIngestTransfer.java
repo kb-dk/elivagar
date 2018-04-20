@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +29,14 @@ import dk.kb.elivagar.utils.FileUtils;
 /**
  * Class for dealing with the transfer of the packaged data to the pre-ingest area of the preservation repository.
  * 
+ * This does two things; transfer new uningsted books to the ingest-area, and transfer new files to their designated 
+ * update area.
+ * Several requirements have to be meet before performing the ingest transfer.
+ * And it will first try to update, when it has been ingested.
  * 
+ * When updating, the content files and technical metadata files will be copied to the designated update content 
+ * directory, whereas the other types of metadata will be copied to the designated update metadata directory.
+ * And update will only occur, if the last modified timestamp is newer than the latest update timestamp.
  */
 public class PreIngestTransfer {
     /** The logger.*/
@@ -40,11 +48,11 @@ public class PreIngestTransfer {
     protected static final String DATE_FORMAT_PUBLICATION_DATE = "DD-MM-YYYY";
     
     /** The list of suffixes of the metadata files, which should be updated at the metadata destination.*/
-    protected static final List<String> UPDATE_METADATA_SUFFIXES = Arrays.asList(Constants.PUBHUB_METADATA_SUFFIX,
-            Constants.MODS_METADATA_SUFFIX);
+    protected static final List<String> UPDATE_METADATA_SUFFIXES = Collections.unmodifiableList(Arrays.asList(
+            Constants.PUBHUB_METADATA_SUFFIX, Constants.MODS_METADATA_SUFFIX));
     /** The list of suffixes of technical metadata files which should be update along the content destination.*/
-    protected static final List<String> UPDATE_TECH_METADATA_SUFFIXES = Arrays.asList(
-            Constants.EPUBCHECK_METADATA_SUFFIX, Constants.FITS_METADATA_SUFFIX);
+    protected static final List<String> UPDATE_TECH_METADATA_SUFFIXES = Collections.unmodifiableList(Arrays.asList(
+            Constants.EPUBCHECK_METADATA_SUFFIX, Constants.FITS_METADATA_SUFFIX));
 
     /** The configuration.*/
     protected final Configuration conf;
@@ -87,7 +95,7 @@ public class PreIngestTransfer {
      */
     protected void transferBook(File dir) {
         try {
-            for(File bookDir : dir.listFiles()) {
+            for(File bookDir : FileUtils.getFilesInDirectory(dir)) {
                 String id = bookDir.getName();
                 if(!bookDir.isDirectory()) {
                     log.warn("Dir for book '" + id + "' is not a directory ('" + bookDir.getAbsolutePath() + "').");
@@ -178,8 +186,8 @@ public class PreIngestTransfer {
      * The content file of the book is old enough (creation date and modify date).
      * The publication date from Publizon must not be too new.
      * 
-     * @param bookDir The directory 
-     * @return
+     * @param bookDir The directory of the book.
+     * @return Whether or not the current book directory is ready for the transfer.
      */
     protected boolean readyForIngest(File bookDir) {
         // Check for required files.
@@ -234,7 +242,7 @@ public class PreIngestTransfer {
      * @return Whether or not a file with the given suffix is found in the book dir.
      */
     protected boolean hasRequiredFile(File bookDir, String suffix) {
-        for(File f : bookDir.listFiles()) {
+        for(File f : FileUtils.getFilesInDirectory(bookDir)) {
             if(f.getName().endsWith(suffix)) {
                 return true;
             }
@@ -357,13 +365,13 @@ public class PreIngestTransfer {
      * timestamp than a given limit.
      * @param bookDir The directory for the book.
      * @param suffixes The suffixes to find.
-     * @param lastModifiedLimit The 
+     * @param lastModifiedLimit The earliest last modified timestamp for the files to be considered new.
      * @return The list of new files with the given suffixes.
      */
     protected List<File> getNewFilesWithSuffix(File bookDir, List<String> suffixes, Date lastModifiedLimit) {
         List<File> res = new ArrayList<File>();
-        for(String suffix : suffixes) {
-            for(File f : bookDir.listFiles()) {
+        for(File f : FileUtils.getFilesInDirectory(bookDir)) {
+            for(String suffix : suffixes) {
                 if(f.getName().endsWith(suffix)) {
                     if(f.lastModified() > lastModifiedLimit.getTime()) {
                         res.add(f);

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
 
 import dk.kb.elivagar.exception.ArgumentCheck;
 
@@ -56,7 +58,7 @@ public class FileUtils {
             createDirectory(to.getAbsolutePath());
         }
         
-        for(File f : from.listFiles()) {
+        for(File f : getFilesInDirectory(from)) {
             copyFileFollowSymbolicLinks(f, new File(to, f.getName()));
         }
     }
@@ -76,6 +78,21 @@ public class FileUtils {
         } else {
             fromPath = fromFile.toPath();
         }
-        Files.copy(fromPath, toPath);        
+        Files.copy(fromPath, toPath);
+    }
+    
+    /**
+     * Retrieves the list of files from a directory, with the notorious null-pointer check.
+     * @param dir The directory to retrieve the files from.
+     * @return The collection of files in a directory.
+     */
+    public static Collection<File> getFilesInDirectory(File dir) {
+        ArgumentCheck.checkExistsDirectory(dir, "File dir");
+        if(dir.listFiles() == null) {
+            throw new IllegalStateException("Unable to obtain the list of files from directory "
+                    + dir.getAbsolutePath());
+        }
+        
+        return Arrays.asList(dir.listFiles());
     }
 }
