@@ -91,8 +91,23 @@ public class FileUtils {
         if(dir.listFiles() == null) {
             throw new IllegalStateException("Unable to obtain the list of files from directory "
                     + dir.getAbsolutePath());
+        } else {
+            return Arrays.asList(dir.listFiles());
         }
-        
-        return Arrays.asList(dir.listFiles());
+    }
+    
+    /**
+     * Retrieves the path for the given file or the path which a symbolic link points to.
+     * @param f The file to retrieve the path for.
+     * @return The path for the file or the path of the symbolic link.
+     * @throws IOException If it fails to ready the symbolic link.
+     */
+    public static Path getFileOrSymlinkPath(File f) throws IOException {
+        ArgumentCheck.checkExistsNormalFile(f, "File f");
+        if(Files.isSymbolicLink(f.toPath())) {
+            return Files.readSymbolicLink(f.toPath());
+        } else {
+            return f.toPath();
+        }
     }
 }

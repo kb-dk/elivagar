@@ -71,8 +71,8 @@ public class TransferRegistry {
             out.write(line.getBytes(StandardCharsets.UTF_8));
             out.flush();
         } catch(IOException e) {
-            log.error("Error when trying write the ingest date (" + ingestDate + ") for the book: " 
-                    + bookDir.getName(), e);
+            throw new IllegalStateException("Error when trying write the ingest date (" + ingestDate + ") "
+                    + "for the book: " + bookDir.getName(), e);
         }
     }
 
@@ -113,8 +113,8 @@ public class TransferRegistry {
             out.write(line.getBytes(StandardCharsets.UTF_8));
             out.flush();
         } catch(IOException e) {
-            log.error("Error when trying write the update date (" + updateDate + ") for the book: " 
-                    + bookDir.getName(), e);
+            throw new IllegalStateException("Error when trying write the update date (" + updateDate + ") "
+                    + "for the book: " + bookDir.getName(), e);
         }
     }
 

@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -67,7 +68,7 @@ public class CalendarUtils {
         ArgumentCheck.checkNotNull(date, "String date");
         ArgumentCheck.checkNotNull(format, "String format");
         
-        DateFormat dateFormat = new SimpleDateFormat(format);
-        return dateFormat.parse(date);        
+        DateFormat dateFormat = new SimpleDateFormat(format, Locale.getDefault());
+        return dateFormat.parse(date);
     }
 }

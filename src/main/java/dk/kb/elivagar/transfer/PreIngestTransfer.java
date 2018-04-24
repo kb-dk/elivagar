@@ -43,9 +43,9 @@ public class PreIngestTransfer {
     private static final Logger log = LoggerFactory.getLogger(PreIngestTransfer.class);
 
     /** The XPATH for finding the publication date in the pubhub metadata file.*/
-    protected static final String XPATH_PUBLICATION_DATE = "/Book/PublicationDate/text()";
+    protected static final String XPATH_PUBLICATION_DATE = "/*:Book/*:PublicationDate/text()";
     /** The date format for the publication date in the pubhub metadata file.*/
-    protected static final String DATE_FORMAT_PUBLICATION_DATE = "DD-MM-YYYY";
+    protected static final String DATE_FORMAT_PUBLICATION_DATE = "dd-MM-yyyy";
     
     /** The list of suffixes of the metadata files, which should be updated at the metadata destination.*/
     protected static final List<String> UPDATE_METADATA_SUFFIXES = Collections.unmodifiableList(Arrays.asList(
@@ -84,9 +84,9 @@ public class PreIngestTransfer {
         File audioDir = conf.getAudioOutputDir();
         if(audioDir == ebookDir) {
             log.info("Ebook and Audio books have the same directory.");
-            return;
+        } else {
+            transferBook(audioDir);
         }
-        transferBook(audioDir);
     }
 
     /**
@@ -99,7 +99,7 @@ public class PreIngestTransfer {
                 String id = bookDir.getName();
                 if(!bookDir.isDirectory()) {
                     log.warn("Dir for book '" + id + "' is not a directory ('" + bookDir.getAbsolutePath() + "').");
-                    return;
+                    continue;
                 }
 
                 TransferRegistry register = new TransferRegistry(bookDir);
@@ -157,7 +157,7 @@ public class PreIngestTransfer {
             File updateDir = getUpdateContentDir(bookDir);
             copyToUpdateDir(updateDir, contentFiles);
             updated = true;            
-        }        
+        }
         
         if(updated) {
             log.debug("Setting the new update date in the register for book '" + bookDir.getName() + "'");
@@ -188,8 +188,9 @@ public class PreIngestTransfer {
      * 
      * @param bookDir The directory of the book.
      * @return Whether or not the current book directory is ready for the transfer.
+     * @throws IOException If it fails to read the files, especially symlinks.
      */
-    protected boolean readyForIngest(File bookDir) {
+    protected boolean readyForIngest(File bookDir) throws IOException {
         // Check for required files.
         for(String suffix : conf.getTransferConfiguration().getRequiredFormats()) {
             if(!hasRequiredFile(bookDir, suffix)) {
@@ -199,21 +200,16 @@ public class PreIngestTransfer {
         }
 
         // check content file date
-        try {
-            List<Path> contentFiles = getContentFiles(bookDir);
-            for(Path f : contentFiles) {
-                if(!hasContentFileDate(f)) {
-                    log.debug("Content file is too new.");
-                    return false;
-                }
+        List<Path> contentFiles = getContentFiles(bookDir);
+        for(Path f : contentFiles) {
+            if(!hasContentFileDate(f)) {
+                log.debug("Content file is too new.");
+                return false;
             }
-        } catch (Exception e) {
-            log.warn("Issue occured while finding the content files of book " + bookDir.getName(), e);
-            return false;
         }
 
         // Check for the publication date.
-        if(conf.getTransferConfiguration().getRetainPublicationDate() > 0) {
+        if(conf.getTransferConfiguration().getRetainPublicationDate() >= 0) {
             File pubhubMetadataFile = new File(bookDir, bookDir.getName() + Constants.PUBHUB_METADATA_SUFFIX);
             if(!pubhubMetadataFile.isFile()) {
                 log.debug(bookDir.getName() + " has no pubhub metadata file.");
@@ -223,8 +219,8 @@ public class PreIngestTransfer {
             Date publicationDate = findPublicationDate(pubhubMetadataFile);
             Date earliestPublicationDate = new Date(System.currentTimeMillis() 
                     - conf.getTransferConfiguration().getRetainPublicationDate());
-
-            if(publicationDate.getTime() > earliestPublicationDate.getTime()) {
+            
+            if(publicationDate != null && publicationDate.getTime() < earliestPublicationDate.getTime()) {
                 log.debug(bookDir.getName() + " has a too new publication date.");
                 return false;
             }
@@ -295,26 +291,27 @@ public class PreIngestTransfer {
     protected boolean hasContentFileDate(Path path) throws IOException {
         BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
         
-        if(conf.getTransferConfiguration().getRetainCreateDate() > 0) {
+        if(conf.getTransferConfiguration().getRetainCreateDate() >= 0) {
             long earliestDate = System.currentTimeMillis() - conf.getTransferConfiguration().getRetainCreateDate();
             if(earliestDate < attributes.creationTime().toMillis()) {
                 return false;
             }
         }
-        if(conf.getTransferConfiguration().getRetainModifyDate() > 0) {
+        if(conf.getTransferConfiguration().getRetainModifyDate() >= 0) {
             long earliestDate = System.currentTimeMillis() - conf.getTransferConfiguration().getRetainModifyDate();
             if(earliestDate < attributes.lastModifiedTime().toMillis()) {
                 return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     /**
      * Retrieves the date for the publication date from the pubhub metadata file.
      * @param pubhubMetadata The pubhub metadata file.
-     * @return The publication date from the pubhub metadata file. 
+     * @return The publication date from the pubhub metadata file. Will return null if it cannot find the 
+     * publication date in the xml-file.
      */
     protected Date findPublicationDate(File pubhubMetadata) {
         try {
@@ -324,9 +321,15 @@ public class PreIngestTransfer {
             XPathExpression publicationDatePath = xpath.compile(XPATH_PUBLICATION_DATE);
 
             String date = publicationDatePath.evaluate(doc);
-            return CalendarUtils.getDateFromString(date, DATE_FORMAT_PUBLICATION_DATE);
+            if(date.isEmpty()) {
+                log.warn("Could not extract the publication date from file '" 
+                        + pubhubMetadata.getAbsolutePath() + "'. Returning a null.");
+                return null;
+            } else {
+                return CalendarUtils.getDateFromString(date, DATE_FORMAT_PUBLICATION_DATE);
+            }
         } catch (Exception e) {
-            throw new IllegalStateException("Could not find publication date in file '" 
+            throw new IllegalStateException("Could not aquire publication date in file '" 
                     + pubhubMetadata.getAbsolutePath() + "'", e);
         }
     }
@@ -345,7 +348,7 @@ public class PreIngestTransfer {
         for(String format : conf.getEbookFormats()) {
             File f = new File(bookDir, bookDir.getName() + "." + format);
             if(f.exists()) {
-                res.add(Files.readSymbolicLink(f.toPath()));
+                res.add(FileUtils.getFileOrSymlinkPath(f));
             }
         }
 
@@ -353,7 +356,7 @@ public class PreIngestTransfer {
         for(String format : conf.getAudioFormats()) {
             File f = new File(bookDir, bookDir.getName() + "." + format);
             if(f.exists()) {
-                res.add(Files.readSymbolicLink(f.toPath()));
+                res.add(FileUtils.getFileOrSymlinkPath(f));
             }
         }
 
