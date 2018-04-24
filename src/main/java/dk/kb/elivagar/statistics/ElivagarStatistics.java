@@ -25,7 +25,7 @@ public class ElivagarStatistics {
     protected long newDirCount;
     /** The number of non-standard named items found.*/
     protected long numberOfOtherCount;
-    /** The mapping between file suffices and the number of files with given suffix.*/
+    /** The mapping between file suffixes and the number of files with given suffix.*/
     protected SuffixMap numberOfFiles;
     /** The mapping between file suffixes and the number of new files with the given suffix.*/
     protected SuffixMap numberOfNewFiles;
@@ -63,9 +63,8 @@ public class ElivagarStatistics {
     
     /**
      * Calculates the statistics on a specific book directory.
-     * For each file in the directory, it increments the increments the number of times the suffix
-     * of the given file is encountered.
-     * It also count the number of new files and directories, and also the number of files, which does
+     * For each file in the directory, it increments the number of times the suffix of the given file is encountered.
+     * It also counts the number of new files and directories, and also the number of files, which does
      * not follow the naming scheme ('id'/'id'.suffix).
      * @param dir The directory to calculate the statistics upon.
      * @param date The date in millis since epoch.
@@ -138,6 +137,8 @@ public class ElivagarStatistics {
      * @param conf The configuration, with the different formats of ebooks and audio books.
      */
     public void printStatistics(PrintStream printer, Configuration conf) {
+        ArgumentCheck.checkNotNull(printer, "PrintStream printer");
+        ArgumentCheck.checkNotNull(conf, "Configuration conf");
         printer.println("The number of book directories traversed: " + getTotalCount());
         printer.println(" - Including new directories: " + getNewDirCount());
         
@@ -193,28 +194,27 @@ public class ElivagarStatistics {
         printer.println(" - whereas the number of new EpubCheck characterization metadata records: " 
                 + getMapOfNewFileSuffixes().getValuesEndingWithKey(Constants.EPUBCHECK_METADATA_SUFFIX));
         
-        List<String> suffices = new ArrayList<String>();
-        suffices.addAll(conf.getAudioFormats());
+        List<String> suffixes = new ArrayList<String>();
+        suffixes.addAll(conf.getAudioFormats());
         for(String suffix : conf.getAudioFormats()) {
-            suffices.add("." + suffix);
-            suffices.add("." + suffix + Constants.FITS_METADATA_SUFFIX);
-            suffices.add("." + suffix + Constants.EPUBCHECK_METADATA_SUFFIX);
+            suffixes.add("." + suffix);
+            suffixes.add("." + suffix + Constants.FITS_METADATA_SUFFIX);
         }
-        suffices.addAll(conf.getEbookFormats());
+        suffixes.addAll(conf.getEbookFormats());
         for(String suffix : conf.getEbookFormats()) {
-            suffices.add("." + suffix);
-            suffices.add("." + suffix + Constants.FITS_METADATA_SUFFIX);
-            suffices.add("." + suffix + Constants.EPUBCHECK_METADATA_SUFFIX);
+            suffixes.add("." + suffix);
+            suffixes.add("." + suffix + Constants.FITS_METADATA_SUFFIX);
+            suffixes.add("." + suffix + Constants.EPUBCHECK_METADATA_SUFFIX);
         }
-        suffices.add(Constants.PUBHUB_METADATA_SUFFIX);
-        suffices.add(Constants.MODS_METADATA_SUFFIX);
-        suffices.add(Constants.FITS_METADATA_SUFFIX);
-        suffices.add(Constants.EPUBCHECK_METADATA_SUFFIX);
+        suffixes.add(Constants.PUBHUB_METADATA_SUFFIX);
+        suffixes.add(Constants.MODS_METADATA_SUFFIX);
+        suffixes.add(Constants.FITS_METADATA_SUFFIX);
+        suffixes.add(Constants.EPUBCHECK_METADATA_SUFFIX);
         
-        printer.println("The number of files encountered, which does is not amongst the other counts:"
-                + getMapOfFileSuffixes().getCountExcludingKeys(suffices));
+        printer.println("The number of files encountered, which is not amongst the other counts:"
+                + getMapOfFileSuffixes().getCountExcludingKeys(suffixes));
         
-        printer.println(" - Where the following suffices have not been acounted for: "
-                + getMapOfFileSuffixes().getMissingKeys(suffices));
+        printer.println(" - Where the following suffixes have not been acounted for: "
+                + getMapOfFileSuffixes().getMissingKeys(suffixes));
     }
 }

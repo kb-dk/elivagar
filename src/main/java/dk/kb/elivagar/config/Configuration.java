@@ -28,7 +28,7 @@ import dk.kb.elivagar.utils.YamlUtils;
  *     <li>license_key: DO_NOT_PUT_LICENSE_IN_GITHUB_FILE</li>
  *     <li>characterization_script: bin/run_fits.sh (optional)</li>
  *     <li>xslt_dir: scripts</li>
- *     <li>statistic_dir: /path/to/statistics/dir/</li>
+ *     <li>statistics_dir: /path/to/statistics/dir/</li>
  *     <li>ebook_formats:</li>
  *     <ul>
  *       <li>- pdf</li>
@@ -86,7 +86,7 @@ public class Configuration {
     /** The configuration name for the list of formats for the audio books.*/
     public static final String CONF_AUDIO_FORMATS = "audio_formats";
     /** The directory where the output statistics will be placed.*/
-    public static final String CONF_STATISTIC_DIR = "statistic_dir";
+    public static final String CONF_STATISTIC_DIR = "statistics_dir";
     
     /** The configuration Aleph element.*/
     public static final String CONF_ALEPH_ROOT = "aleph";

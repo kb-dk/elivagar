@@ -8,7 +8,7 @@ import dk.kb.elivagar.config.Configuration;
 public class AudioSuffixValidator extends FileSuffixValidator {
     /**
      * Constructor.
-     * @param conf The configuration with the valid suffices for the audio books.
+     * @param conf The configuration with the valid suffixes for the audio books.
      */
     public AudioSuffixValidator(Configuration conf) {
         super(conf.getAudioFormats());

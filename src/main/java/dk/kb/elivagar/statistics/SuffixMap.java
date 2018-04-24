@@ -55,7 +55,7 @@ public class SuffixMap {
     }
     
     /**
-     * Retrieving the summed count of all suffices ending with the given key.
+     * Retrieving the summed count of all suffixes ending with the given key.
      * @param key The suffix ending for the counts to be summed.
      * @return The total count of entries ending with the given key.
      */
@@ -89,7 +89,7 @@ public class SuffixMap {
     /**
      * Retrieves the count of all the other suffixes, than the ones given keys.
      * @param keys The keys to ignore when calculating all the remaining keys.
-     * @return The combined count of the suffices, which are not amongst the keys.
+     * @return The combined count of the suffixes, which are not amongst the keys.
      */
     public int getCountExcludingKeys(Collection<String> keys) {
         int res = 0;

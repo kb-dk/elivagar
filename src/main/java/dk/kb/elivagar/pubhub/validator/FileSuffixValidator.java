@@ -16,7 +16,7 @@ public abstract class FileSuffixValidator {
 
     /**
      * Constructor.
-     * @param validSuffices The list of valid suffices.
+     * @param validSuffices The list of valid suffixes.
      */
     protected FileSuffixValidator(List<String> validSuffices) {
         ArgumentCheck.checkNotNull(validSuffices, "List<String> validSuffices");

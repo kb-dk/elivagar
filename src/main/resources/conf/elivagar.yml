@@ -6,7 +6,7 @@ elivagar:
   license_key: LICENSE_KEY
   characterization_script: src/main/resources/bin/run_fits.sh
   xslt_dir: scripts
-  statistic_dir: tempDir/statistic
+  statistics_dir: tempDir/statistic
   ebook_formats:
     - pdf
     - epub

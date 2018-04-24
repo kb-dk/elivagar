@@ -8,7 +8,7 @@ import dk.kb.elivagar.config.Configuration;
 public class EbookSuffixValidator extends FileSuffixValidator {
     /**
      * Constructor.
-     * @param conf The configuration with the valid suffices for the ebooks.
+     * @param conf The configuration with the valid suffixes for the ebooks.
      */
     public EbookSuffixValidator(Configuration conf) {
         super(conf.getEbookFormats());

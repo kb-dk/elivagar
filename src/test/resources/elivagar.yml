@@ -6,7 +6,7 @@ elivagar:
   license_key: DO_NOT_PUT_LICENSE_IN_GITHUB_FILE
   characterization_script: src/main/resources/bin/run_fits.sh
   xslt_dir: tempDir/scripts
-  statistic_dir: tempDir/statistic
+  statistics_dir: tempDir/statistic
   ebook_formats:
     - pdf
     - epub
