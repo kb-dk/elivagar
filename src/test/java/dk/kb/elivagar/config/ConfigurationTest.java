@@ -10,6 +10,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import dk.kb.elivagar.config.Configuration;
+import dk.kb.elivagar.testutils.TestConfigurations;
 import dk.kb.elivagar.testutils.TestFileUtils;
 
 public class ConfigurationTest extends ExtendedTestCase {
@@ -61,5 +62,11 @@ public class ConfigurationTest extends ExtendedTestCase {
         Assert.assertNotNull(conf.getTransferConfiguration().getRequiredFormats());
         Assert.assertTrue(conf.getTransferConfiguration().getUpdateContentDir().isDirectory());
         Assert.assertTrue(conf.getTransferConfiguration().getUpdateMetadataDir().isDirectory());
+    }
+    
+    @Test
+    public void testConfigurationWithoutTransfer() throws IOException {
+        Configuration conf = TestConfigurations.getConfigurationForTestWithoutTransfer();
+        Assert.assertNull(conf.getTransferConfiguration());
     }
 }

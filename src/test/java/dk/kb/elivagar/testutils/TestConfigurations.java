@@ -107,4 +107,39 @@ public class TestConfigurations {
             throw new RuntimeException("", e);
         }
     }
+    
+
+    public static Configuration getConfigurationForTestWithoutTransfer(){
+        File passwordFile = new File(licenseFilePath);
+        if(!passwordFile.isFile()) {
+            throw new SkipException("No license file is found at '" + licenseFilePath + ".");
+        }
+        try {
+            String license = TestFileUtils.readFile(passwordFile);
+
+            File baseDir = TestFileUtils.createEmptyDirectory(TestFileUtils.getTempDir().getAbsolutePath());
+            File baseBookMetadataDir = TestFileUtils.createEmptyDirectory(baseDir.getAbsolutePath() + "/books_metadata");
+            File baseBookFileDir = TestFileUtils.createEmptyDirectory(baseDir.getAbsolutePath() + "/books_files");
+            File baseAudioMetadataDir = TestFileUtils.createEmptyDirectory(baseDir.getAbsolutePath() + "/audio_metadata");
+            File baseAudioFileDir = TestFileUtils.createEmptyDirectory(baseDir.getAbsolutePath() + "/audio_files");
+            File statisticsDir = TestFileUtils.createEmptyDirectory(baseDir.getAbsolutePath() + "/statistic");
+
+            Map<String, Object> confMap = new HashMap<String, Object>();
+            confMap.put(Configuration.CONF_EBOOK_OUTPUT_DIR, baseBookMetadataDir.getAbsolutePath());
+            confMap.put(Configuration.CONF_AUDIO_OUTPUT_DIR, baseAudioMetadataDir.getAbsolutePath());
+            confMap.put(Configuration.CONF_EBOOK_FILE_DIR, baseBookFileDir.getAbsolutePath());
+            confMap.put(Configuration.CONF_AUDIO_FILE_DIR, baseAudioFileDir.getAbsolutePath());
+            confMap.put(Configuration.CONF_LICENSE_KEY, license);
+            confMap.put(Configuration.CONF_AUDIO_FORMATS, Arrays.asList("mp3"));
+            confMap.put(Configuration.CONF_EBOOK_FORMATS, Arrays.asList("pdf", "epub"));
+            confMap.put(Configuration.CONF_XSLT_DIR, TestFileUtils.getTempDir().getAbsolutePath());
+            confMap.put(Configuration.CONF_STATISTIC_DIR, statisticsDir.getAbsolutePath());
+            
+            confMap.put(Configuration.CONF_ALEPH_ROOT, getAlephMap());
+
+            return new Configuration(confMap);
+        } catch (Exception e) {
+            throw new RuntimeException("", e);
+        }
+    }
 }
