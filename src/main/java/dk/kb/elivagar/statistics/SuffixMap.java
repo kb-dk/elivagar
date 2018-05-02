@@ -61,9 +61,9 @@ public class SuffixMap {
      */
     public int getValuesEndingWithKey(String key) {
         int res = 0;
-        for(String suffix : suffixCount.keySet()) {
-            if(suffix.endsWith(key)) {
-                res += suffixCount.get(suffix);
+        for(Map.Entry<String, Integer> keyValue : suffixCount.entrySet()) {
+            if(keyValue.getKey().endsWith(key)) {
+                res += keyValue.getValue();
             }
         }
         return res;

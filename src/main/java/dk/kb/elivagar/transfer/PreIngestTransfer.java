@@ -375,10 +375,8 @@ public class PreIngestTransfer {
         List<File> res = new ArrayList<File>();
         for(File f : FileUtils.getFilesInDirectory(bookDir)) {
             for(String suffix : suffixes) {
-                if(f.getName().endsWith(suffix)) {
-                    if(f.lastModified() > lastModifiedLimit.getTime()) {
-                        res.add(f);
-                    }
+                if(f.getName().endsWith(suffix) && f.lastModified() > lastModifiedLimit.getTime()) {
+                    res.add(f);
                 }
             }
         }

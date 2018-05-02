@@ -1,4 +1,4 @@
-package dk.kb.elivagar;
+package dk.kb.elivagar.pubhub;
 
 import static org.mockito.Mockito.*;
 
@@ -18,10 +18,12 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.characterization.CharacterizationHandler;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
 import dk.kb.elivagar.pubhub.PubhubPacker;
+import dk.kb.elivagar.pubhub.PubhubWorkflow;
 import dk.kb.elivagar.testutils.TestConfigurations;
 import dk.kb.elivagar.testutils.TestFileUtils;
 import dk.kb.elivagar.utils.FileUtils;

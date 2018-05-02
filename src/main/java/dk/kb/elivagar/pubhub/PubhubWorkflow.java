@@ -1,4 +1,4 @@
-package dk.kb.elivagar;
+package dk.kb.elivagar.pubhub;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 import dk.kb.elivagar.characterization.CharacterizationHandler;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.exception.ArgumentCheck;
-import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
-import dk.kb.elivagar.pubhub.PubhubPacker;
 import dk.kb.elivagar.statistics.ElivagarStatistics;
 import dk.pubhub.service.Book;
 

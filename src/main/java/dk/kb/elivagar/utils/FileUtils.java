@@ -88,11 +88,11 @@ public class FileUtils {
      */
     public static Collection<File> getFilesInDirectory(File dir) {
         ArgumentCheck.checkExistsDirectory(dir, "File dir");
-        if(dir.listFiles() == null) {
+        if(dir.listFiles() != null) {
+            return Arrays.asList(dir.listFiles());
+        } else {
             throw new IllegalStateException("Unable to obtain the list of files from directory "
                     + dir.getAbsolutePath());
-        } else {
-            return Arrays.asList(dir.listFiles());
         }
     }
     

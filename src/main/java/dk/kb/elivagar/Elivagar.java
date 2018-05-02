@@ -16,6 +16,8 @@ import dk.kb.elivagar.metadata.AlephPacker;
 import dk.kb.elivagar.metadata.MetadataTransformer;
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
 import dk.kb.elivagar.pubhub.PubhubPacker;
+import dk.kb.elivagar.pubhub.PubhubWorkflow;
+import dk.kb.elivagar.transfer.TransferWorkflow;
 import dk.kb.elivagar.utils.CalendarUtils;
 
 /**
@@ -108,6 +110,8 @@ public class Elivagar {
                     new HttpClient());
             AlephPacker alephWorkflow = new AlephPacker(conf, alephRetriever, transformer);
 
+            TransferWorkflow transferWorkflow = new TransferWorkflow(conf);
+            
             if(modifyDate < 0) {
                 pubhubWorkflow.retrieveAllBooks(maxDownloads);
             } else if(modifyDate > 0) {
@@ -118,6 +122,7 @@ public class Elivagar {
             }
             pubhubWorkflow.packFilesForBooks();
             alephWorkflow.packAlephMetadataForBooks();
+            transferWorkflow.run();
             
             File statisticsFile = new File(conf.getStatisticsDir(), 
                     CalendarUtils.getDateAsString(new Date()) + ".txt");

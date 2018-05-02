@@ -44,7 +44,7 @@ import dk.kb.elivagar.utils.YamlUtils;
  *       <li>aleph_base: $ALEPH_BASE</li>
  *       <li>temp_dir: $TEMP_DIR</li>
  *     </ul>
- *     <li>transfer:</li>
+ *     <li>transfer: (THIS ELEMENT IS NOT REQUIRED)</li>
  *     <ul>
  *       <li>ingest_path: /transfer/path/root/ingest/</li>
  *       <li>update_content_path: /transfer/path/root/content/</li>
@@ -139,8 +139,8 @@ public class Configuration {
     /** The Aleph configuration.*/
     protected final AlephConfiguration alephConfiguration;
     
-    /** The transfer configuration.*/
-    protected final TransferConfiguration transferConfiguration;
+    /** The transfer configuration. This may be null.*/
+    protected TransferConfiguration transferConfiguration;
     
     /**
      * Constructor.
@@ -161,7 +161,6 @@ public class Configuration {
         ArgumentCheck.checkThatMapContainsKey(confMap, CONF_XSLT_DIR, "confMap");
         ArgumentCheck.checkThatMapContainsKey(confMap, CONF_STATISTIC_DIR, "confMap");
         ArgumentCheck.checkThatMapContainsKey(confMap, CONF_ALEPH_ROOT, "confMap");
-        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_TRANSFER_ROOT, "confMap");
         
         ebookOutputDir = FileUtils.createDirectory((String) confMap.get(CONF_EBOOK_OUTPUT_DIR));
         abookOutputDir = FileUtils.createDirectory((String) confMap.get(CONF_AUDIO_OUTPUT_DIR));
@@ -178,7 +177,12 @@ public class Configuration {
         audioFormats = (List<String>) confMap.get(CONF_AUDIO_FORMATS);
         
         this.alephConfiguration = getAlephConfiguration((Map<String, Object>) confMap.get(CONF_ALEPH_ROOT));
-        this.transferConfiguration = getTransferConfiguration((Map<String, Object>) confMap.get(CONF_TRANSFER_ROOT));
+        if(confMap.containsKey(CONF_TRANSFER_ROOT)) {
+            this.transferConfiguration = getTransferConfiguration((Map<String, Object>) 
+                    confMap.get(CONF_TRANSFER_ROOT));
+        } else {
+            this.transferConfiguration = null;
+        }
     }
     
     /**
