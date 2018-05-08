@@ -16,11 +16,11 @@ public abstract class FileSuffixValidator {
 
     /**
      * Constructor.
-     * @param validSuffices The list of valid suffixes.
+     * @param validSuffixes The list of valid suffixes.
      */
-    protected FileSuffixValidator(List<String> validSuffices) {
-        ArgumentCheck.checkNotNull(validSuffices, "List<String> validSuffices");
-        this.validSuffices = new ArrayList<String>(validSuffices);
+    protected FileSuffixValidator(List<String> validSuffixes) {
+        ArgumentCheck.checkNotNull(validSuffixes, "List<String> validSuffixes");
+        this.validSuffices = new ArrayList<String>(validSuffixes);
     }
 
     /**

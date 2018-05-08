@@ -52,7 +52,7 @@ public class ConfigurationTest extends ExtendedTestCase {
         Assert.assertNotNull(conf.getAlephConfiguration().getTempDir());
         Assert.assertTrue(conf.getAlephConfiguration().getTempDir().isDirectory());
         
-        addStep("Test the transfer configuraiton", "");
+        addStep("Test the transfer configuration", "");
         Assert.assertNotNull(conf.getTransferConfiguration());
         Assert.assertNotNull(conf.getTransferConfiguration().getUpdateContentDir());
         Assert.assertNotNull(conf.getTransferConfiguration().getUpdateMetadataDir());

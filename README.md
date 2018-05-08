@@ -1,7 +1,9 @@
 
 # elivagar
-Fetch and marshall e-book metadata from the PubHub web service (https://service.pubhub.dk/).
-
+Fetch and marshall e-book and audio book metadata from the PubHub web service (https://service.pubhub.dk/).
+Performs the characterization of the e-book and audio book files.
+Retrieves the corresponding Aleph metadata for the e-books and audio books.
+Can also perform the transfer to pre-ingest area for the preservation repository.
 
 Prerequisite
 --------------------------

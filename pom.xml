@@ -44,6 +44,37 @@
     <assembly.main.class.name>dk.kb.elivagar.Elivagar</assembly.main.class.name>
   </properties>
 
+  <developers>
+    <developer>
+      <name>Jonas Lindberg Frellesen</name>
+      <email>jolf@kb.dk</email>
+      <organization>kb</organization>
+      <organizationUrl>http://kb.dk</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Claus Jensen</name>
+      <email>cjen@kb.dk</email>
+      <organization>kb</organization>
+      <organizationUrl>http://kb.dk</organizationUrl>
+      <roles>
+        <role>Project lead and reviewer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Søren Vejdrup Clausen</name>
+      <email>svc@kb.dk</email>
+      <organization>kb</organization>
+      <organizationUrl>http://kb.dk</organizationUrl>
+      <roles>
+        <role>Reviewer</role>
+      </roles>
+    </developer>
+  </developers>
+
+
   <dependencies>
     <dependency>
       <groupId>dk.pubhub.service</groupId>

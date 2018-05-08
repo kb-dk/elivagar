@@ -59,7 +59,7 @@ public class PubhubWorkflow {
     /**
      * Retrieves all the books.
      * @param max The maximum number of books to retrieve.
-     * @throws JAXBException If XML marshaling fail
+     * @throws JAXBException If XML marshalling fail.
      * @throws IOException If files cannot be created or downloaded.
      */
     public void retrieveAllBooks(long max) throws JAXBException, IOException {
@@ -104,7 +104,7 @@ public class PubhubWorkflow {
     protected void packFilesForEbooks() {
         File[] eBooks = conf.getEbookFileDir().listFiles();
         if(eBooks == null) {
-            log.info("No ebook files to package.");
+            log.info("No ebook files to package. We are done.");
             return;
         } else {
             for(File fileForBook : eBooks) {
@@ -112,7 +112,7 @@ public class PubhubWorkflow {
                     if(fileForBook.isFile()) {
                         packer.packFileForEbook(fileForBook);
                     } else {
-                        log.trace("Cannot package directory: " + fileForBook.getAbsolutePath());
+                        log.warn("Cannot package directory: " + fileForBook.getAbsolutePath());
                     }
                 } catch (IOException e) {
                     log.error("Failed to package the file '" + fileForBook.getAbsolutePath() + "' for a book. "
@@ -132,7 +132,7 @@ public class PubhubWorkflow {
     protected void packFilesForAudioBooks() {
         File[] audioBooks = conf.getAudioFileDir().listFiles();
         if(audioBooks == null) {
-            log.info("No audio files to package.");
+            log.info("No audio files to package. We are done.");
             return;
         } else {
             for(File audioBookBaseDir : audioBooks) {
@@ -140,19 +140,19 @@ public class PubhubWorkflow {
                 File audioBookFileDir = new File(audioBookBaseDir, AUDIO_SUB_DIR_PATH);
                 File[] audioBookFiles = audioBookFileDir.listFiles();
                 if(audioBookFiles == null) {
-                    log.trace("Cannot handle non-existing Audio-book file: " 
+                    log.warn("Cannot handle non-existing Audio-book file: " 
                             + audioBookFileDir.getAbsolutePath());
                 } else {
                     for(File audioBookFile : audioBookFiles) {
                         try {
                             if(!audioBookFile.getName().startsWith(id)) {
-                                log.info("Ignores the file '" + audioBookFile.getAbsolutePath() + " since it does not "
-                                        + "comply with the format '{ID}/" + AUDIO_SUB_DIR_PATH + "{ID}.{suffix}");
+                                log.info("Ignoring the file '" + audioBookFile.getAbsolutePath() + " since it does "
+                                        + "not comply with the format '{ID}/" + AUDIO_SUB_DIR_PATH + "{ID}.{suffix}");
                             } else {
                                 if(audioBookFile.isFile()) {
                                     packer.packFileForAudio(audioBookFile);
                                 } else {
-                                    log.trace("Cannot handle directory: " 
+                                    log.warn("Cannot handle directory: " 
                                             + audioBookFile.getAbsolutePath());
                                 }
                             }

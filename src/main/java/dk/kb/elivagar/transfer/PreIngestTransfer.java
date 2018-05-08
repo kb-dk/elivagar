@@ -29,9 +29,9 @@ import dk.kb.elivagar.utils.FileUtils;
 /**
  * Class for dealing with the transfer of the packaged data to the pre-ingest area of the preservation repository.
  * 
- * This does two things; transfer new uningsted books to the ingest-area, and transfer new files to their designated 
+ * This does two things; transfer new uningested books to the ingest-area, and transfer new files to their designated 
  * update area.
- * Several requirements have to be meet before performing the ingest transfer.
+ * Several requirements have to be meet before performing the pre-ingest transfer.
  * And it will first try to update, when it has been ingested.
  * 
  * When updating, the content files and technical metadata files will be copied to the designated update content 
@@ -47,10 +47,16 @@ public class PreIngestTransfer {
     /** The date format for the publication date in the pubhub metadata file.*/
     protected static final String DATE_FORMAT_PUBLICATION_DATE = "dd-MM-yyyy";
     
-    /** The list of suffixes of the metadata files, which should be updated at the metadata destination.*/
+    /** 
+     * The list of suffixes of the metadata files, which should be updated at the metadata destination.
+     * This is currently the MODS metadata and the pubhub metadata.
+     */
     protected static final List<String> UPDATE_METADATA_SUFFIXES = Collections.unmodifiableList(Arrays.asList(
             Constants.PUBHUB_METADATA_SUFFIX, Constants.MODS_METADATA_SUFFIX));
-    /** The list of suffixes of technical metadata files which should be update along the content destination.*/
+    /** 
+     * The list of suffixes of technical metadata files which should be update at the content destination.
+     * This is currently the FITS metadata and the EpubCheck metadata.
+     */
     protected static final List<String> UPDATE_TECH_METADATA_SUFFIXES = Collections.unmodifiableList(Arrays.asList(
             Constants.EPUBCHECK_METADATA_SUFFIX, Constants.FITS_METADATA_SUFFIX));
 
@@ -98,7 +104,8 @@ public class PreIngestTransfer {
             for(File bookDir : FileUtils.getFilesInDirectory(dir)) {
                 String id = bookDir.getName();
                 if(!bookDir.isDirectory()) {
-                    log.warn("Dir for book '" + id + "' is not a directory ('" + bookDir.getAbsolutePath() + "').");
+                    log.warn("Dir for book '" + id + "' is not a directory ('" + bookDir.getAbsolutePath() + "'). "
+                            + "Skipping.");
                     continue;
                 }
 
@@ -127,7 +134,8 @@ public class PreIngestTransfer {
     protected void updateBook(File bookDir, TransferRegistry register) throws IOException {
         Date updateDate = register.getLatestUpdateDate();
         if(updateDate == null) {
-            log.warn("Cannot retrieve neither update date nor ingest date from the registry. ");
+            log.warn("Cannot retrieve neither update date nor ingest date from the registry. "
+                    + "Skipping update of book-dir: " + bookDir.getAbsolutePath());
             return;
         }
         boolean updated = false;
@@ -135,7 +143,7 @@ public class PreIngestTransfer {
         // Check for any metadata to update
         List<File> metadataFiles = getNewFilesWithSuffix(bookDir, UPDATE_METADATA_SUFFIXES, updateDate);
         if(!metadataFiles.isEmpty()) {
-            log.info("Found new metadata files for update.");
+            log.info("Found " + metadataFiles.size() + " new metadata files for update.");
             File updateDir = getUpdateMetadataDir(bookDir);
             copyToUpdateDir(updateDir, metadataFiles);
             updated = true;
@@ -144,7 +152,7 @@ public class PreIngestTransfer {
         // Check for any technical metadata to update
         List<File> techMetadataFiles = getNewFilesWithSuffix(bookDir, UPDATE_TECH_METADATA_SUFFIXES, updateDate);
         if(!techMetadataFiles.isEmpty()) {
-            log.info("Found new technical metadata files for update.");
+            log.info("Found " + techMetadataFiles.size() + " new technical metadata files for update.");
             File updateDir = getUpdateContentDir(bookDir);
             copyToUpdateDir(updateDir, techMetadataFiles);
             updated = true;
@@ -153,7 +161,7 @@ public class PreIngestTransfer {
         // Check for any content files to update.
         List<File> contentFiles = getNewContentFiles(bookDir, updateDate);
         if(!contentFiles.isEmpty()) {
-            log.info("Found new content files for update.");
+            log.info("Found " + contentFiles.size() + "new content files for update.");
             File updateDir = getUpdateContentDir(bookDir);
             copyToUpdateDir(updateDir, contentFiles);
             updated = true;            
@@ -180,11 +188,11 @@ public class PreIngestTransfer {
     }
 
     /**
-     * Checks whether a given book directory meets to the requirements for the ingest transfer.
+     * Checks whether a given book directory meets the requirements for the ingest transfer.
      * It must comply to the requirements:
-     * The book has all the needed files.
-     * The content file of the book is old enough (creation date and modify date).
-     * The publication date from Publizon must not be too new.
+     * - The book has all the needed files.
+     * - The content file of the book is old enough (creation date and modify date), according to the configuration.
+     * - The publication date from Publizon must exist and be older than the configuration requires.
      * 
      * @param bookDir The directory of the book.
      * @return Whether or not the current book directory is ready for the transfer.
@@ -282,7 +290,7 @@ public class PreIngestTransfer {
     }
 
     /**
-     * Check whether the given file has the right dates, both create-date and last-modify-date.
+     * Check whether the given file has the correct dates, both create-date and last-modify-date.
      * 
      * @param path The path to the file to check.
      * @return Whether or not it has a new enough date.

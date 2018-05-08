@@ -56,6 +56,7 @@ import dk.kb.elivagar.utils.YamlUtils;
  *       <ul>
  *         <li>- fits.xml</li>
  *         <li>- mods.xml</li>
+ *         <li>- pubhub.xml</li>
  *       </ul>
  *     </ul>
  *   </ul>
@@ -109,7 +110,7 @@ public class Configuration {
     public static final String CONF_TRANSFER_RETAIN_CREATE_DATE = "retain_create_date";
     /** The retain interval for the modify data, in millis.*/
     public static final String CONF_TRANSFER_RETAIN_MODIFY_DATE = "retain_modify_date";
-    /** The retain interval for the publicatoin date, in millis.*/
+    /** The retain interval for the publication date, in millis.*/
     public static final String CONF_TRANSFER_RETAIN_PUBLICATION_DATE = "retain_pub_date";
     /** The list of required formats for initiating the transfer.*/
     public static final String CONF_TRANSFER_REQUIRED_FORMATS = "required_formats";

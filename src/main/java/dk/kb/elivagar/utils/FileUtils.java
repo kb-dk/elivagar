@@ -72,12 +72,7 @@ public class FileUtils {
     public static void copyFileFollowSymbolicLinks(File fromFile, File toFile) throws IOException {
         ArgumentCheck.checkExistsNormalFile(fromFile, "File from");
         Path toPath = toFile.toPath();
-        Path fromPath;
-        if(Files.isSymbolicLink(fromFile.toPath())) {
-            fromPath = Files.readSymbolicLink(fromFile.toPath());
-        } else {
-            fromPath = fromFile.toPath();
-        }
+        Path fromPath = getFileOrSymlinkPath(fromFile);
         Files.copy(fromPath, toPath);
     }
     
