@@ -175,7 +175,7 @@ public class PubhubWorkflow {
     public void makeStatistics(PrintStream printer, long date) {
         ArgumentCheck.checkNotNull(printer, "PrintStream printer");
         
-        ElivagarStatistics statistics = new ElivagarStatistics();
+        ElivagarStatistics statistics = new ElivagarStatistics(conf);
         if(conf.getEbookOutputDir().list() != null) {
             statistics.traverseBaseDir(conf.getEbookOutputDir(), date);
         } else {
@@ -186,6 +186,6 @@ public class PubhubWorkflow {
         } else {
             printer.println("No audio books to make statistics upon.");
         }
-        statistics.printStatistics(printer, conf);
+        statistics.printStatistics(printer);
     }
 }
