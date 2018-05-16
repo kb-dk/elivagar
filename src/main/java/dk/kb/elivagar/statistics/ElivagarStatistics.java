@@ -69,7 +69,7 @@ public class ElivagarStatistics {
             + "' to make statistics on.");
         } else {
             log.info("Calculating the statistics on the books in directory '" + baseDir.getAbsolutePath()
-            + "'. Expecting '" + directories.length + "' books.");
+                    + "'. Expecting '" + directories.length + "' books.");
             for(File dir : directories) {
                 calculateStatisticsOnBookDir(dir, date);
             }
@@ -279,7 +279,7 @@ public class ElivagarStatistics {
     }
     
     /**
-     * Adds the statistics for the amount of directories traversed.
+     * Adds the statistics for the suffixes, which was not handled in the other elements.
      * @param root The root element.
      * @param doc The document.
      */
