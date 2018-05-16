@@ -149,8 +149,9 @@ public class ElivagarStatistics {
     /**
      * Prints the statistics to the print-stream.
      * @param printer The printstream where the statistics will be printed.
+     * @throws IllegalStateException If it fails to create the statistics.
      */
-    public void printStatistics(PrintStream printer) {
+    public void printStatistics(PrintStream printer) throws IllegalStateException {
         ArgumentCheck.checkNotNull(printer, "PrintStream printer");
         ArgumentCheck.checkNotNull(conf, "Configuration conf");
 
@@ -164,7 +165,7 @@ public class ElivagarStatistics {
             addXmlElementsForDirsTraversed(rootElement, doc);
             addXmlElementsForFormats(rootElement, doc);
             addXmlElementsForMetadataFormats(rootElement, doc);
-            addXmlElementsForOtherSuffices(rootElement, doc);
+            addXmlElementsForOtherSuffixes(rootElement, doc);
 
             // write the content into xml file
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -190,12 +191,9 @@ public class ElivagarStatistics {
         Element dirElement = doc.createElement("directories_traversed");
         root.appendChild(dirElement);
         
-        Element totalField = doc.createElement("total");
-        dirElement.appendChild(totalField);
-        totalField.appendChild(doc.createTextNode("" + getTotalCount()));
-        Element newField = doc.createElement("new");
-        dirElement.appendChild(newField);
-        newField.appendChild(doc.createTextNode("" + getNewDirCount()));
+        addNewAndTotalXmlElements(dirElement, doc, 
+                Long.toString(getTotalCount()), 
+                Long.toString(getNewDirCount()));
         Element nonStandardField = doc.createElement("nonStandard");
         dirElement.appendChild(nonStandardField);
         nonStandardField.appendChild(doc.createTextNode("" + getNonStandardNamedCount()));
@@ -212,14 +210,9 @@ public class ElivagarStatistics {
 
         Element ebookField = doc.createElement("ebooks");
         formatsElement.appendChild(ebookField);
-        Element totalEbookField = doc.createElement("total");
-        ebookField.appendChild(totalEbookField);
-        totalEbookField.appendChild(doc.createTextNode("" + getMapOfFileSuffixes().getMultiKeyCount(
-                conf.getEbookFormats())));
-        Element newEbookField = doc.createElement("new");
-        ebookField.appendChild(newEbookField);
-        newEbookField.appendChild(doc.createTextNode("" + getMapOfNewFileSuffixes().getMultiKeyCount(
-                conf.getEbookFormats())));
+        addNewAndTotalXmlElements(ebookField, doc, 
+                Integer.toString(getMapOfFileSuffixes().getMultiKeyCount(conf.getEbookFormats())), 
+                Integer.toString(getMapOfFileSuffixes().getMultiKeyCount(conf.getEbookFormats())));
 
         for(String ebookFormat : conf.getEbookFormats()) {
             String suffix = "." + ebookFormat;
@@ -227,39 +220,26 @@ public class ElivagarStatistics {
             Element suffixField = doc.createElement(ebookFormat);
             ebookField.appendChild(suffixField);
 
-            Element totalSuffixField = doc.createElement("total");
-            suffixField.appendChild(totalSuffixField);
-            totalSuffixField.appendChild(doc.createTextNode("" + getMapOfFileSuffixes().getValue(suffix)));
-
-            Element newSuffixField = doc.createElement("new");
-            suffixField.appendChild(newSuffixField);
-            newSuffixField.appendChild(doc.createTextNode("" + getMapOfNewFileSuffixes().getValue(suffix)));
+            addNewAndTotalXmlElements(suffixField, doc, 
+                    Integer.toString(getMapOfFileSuffixes().getValue(suffix)), 
+                    Integer.toString(getMapOfNewFileSuffixes().getValue(suffix)));
         }
 
         Element audioField = doc.createElement("audio");
         formatsElement.appendChild(audioField);
-        Element totalAudioField = doc.createElement("total");
-        audioField.appendChild(totalAudioField);
-        totalAudioField.appendChild(doc.createTextNode("" + getMapOfFileSuffixes().getMultiKeyCount(
-                conf.getAudioFormats())));
-        Element newAudioField = doc.createElement("new");
-        audioField.appendChild(newAudioField);
-        newAudioField.appendChild(doc.createTextNode("" + getMapOfNewFileSuffixes().getMultiKeyCount(
-                conf.getAudioFormats())));
+        addNewAndTotalXmlElements(audioField, doc, 
+                Integer.toString(getMapOfFileSuffixes().getMultiKeyCount(conf.getAudioFormats())), 
+                Integer.toString(getMapOfNewFileSuffixes().getMultiKeyCount(conf.getAudioFormats())));
 
         for(String audioFormat : conf.getAudioFormats()) {
             String suffix = "." + audioFormat;
 
             Element suffixField = doc.createElement(audioFormat);
             audioField.appendChild(suffixField);
-
-            Element totalSuffixField = doc.createElement("total");
-            suffixField.appendChild(totalSuffixField);
-            totalSuffixField.appendChild(doc.createTextNode("" + getMapOfFileSuffixes().getValue(suffix)));
-
-            Element newSuffixField = doc.createElement("new");
-            suffixField.appendChild(newSuffixField);
-            newSuffixField.appendChild(doc.createTextNode("" + getMapOfNewFileSuffixes().getValue(suffix)));
+            
+            addNewAndTotalXmlElements(suffixField, doc, 
+                    Integer.toString(getMapOfFileSuffixes().getValue(suffix)), 
+                    Integer.toString(getMapOfNewFileSuffixes().getValue(suffix)));
         }
     }
     
@@ -274,47 +254,28 @@ public class ElivagarStatistics {
         
         Element pubhubElement = doc.createElement("pubhub");
         metadataElement.appendChild(pubhubElement);
-        Element totalPubhubField = doc.createElement("total");
-        pubhubElement.appendChild(totalPubhubField);
-        totalPubhubField.appendChild(doc.createTextNode("" + getMapOfFileSuffixes().getValuesEndingWithKey(
-                Constants.PUBHUB_METADATA_SUFFIX)));
-        Element newPubhubField = doc.createElement("new");
-        pubhubElement.appendChild(newPubhubField);
-        newPubhubField.appendChild(doc.createTextNode("" + getMapOfNewFileSuffixes().getValuesEndingWithKey(
-                Constants.PUBHUB_METADATA_SUFFIX)));
+        addNewAndTotalXmlElements(pubhubElement, doc, 
+                Integer.toString(getMapOfFileSuffixes().getValuesEndingWithKey(Constants.PUBHUB_METADATA_SUFFIX)), 
+                Integer.toString(getMapOfNewFileSuffixes().getValuesEndingWithKey(Constants.PUBHUB_METADATA_SUFFIX)));
         
         Element modsElement = doc.createElement("mods");
         metadataElement.appendChild(modsElement);
-        Element totalModsField = doc.createElement("total");
-        modsElement.appendChild(totalModsField);
-        totalModsField.appendChild(doc.createTextNode("" + getMapOfFileSuffixes().getValuesEndingWithKey(
-                Constants.MODS_METADATA_SUFFIX)));
-        Element newModsField = doc.createElement("new");
-        modsElement.appendChild(newModsField);
-        newModsField.appendChild(doc.createTextNode("" + getMapOfNewFileSuffixes().getValuesEndingWithKey(
-                Constants.MODS_METADATA_SUFFIX)));
+        addNewAndTotalXmlElements(modsElement, doc, 
+                Integer.toString(getMapOfFileSuffixes().getValuesEndingWithKey(Constants.MODS_METADATA_SUFFIX)), 
+                Integer.toString(getMapOfNewFileSuffixes().getValuesEndingWithKey(Constants.MODS_METADATA_SUFFIX)));
 
         Element fitsElement = doc.createElement("fits");
         metadataElement.appendChild(fitsElement);
-        Element totalFitsField = doc.createElement("total");
-        fitsElement.appendChild(totalFitsField);
-        totalFitsField.appendChild(doc.createTextNode("" + getMapOfFileSuffixes().getValuesEndingWithKey(
-                Constants.FITS_METADATA_SUFFIX)));
-        Element newFitsField = doc.createElement("new");
-        fitsElement.appendChild(newFitsField);
-        newFitsField.appendChild(doc.createTextNode("" + getMapOfNewFileSuffixes().getValuesEndingWithKey(
-                Constants.FITS_METADATA_SUFFIX)));
+        addNewAndTotalXmlElements(fitsElement, doc, 
+                Integer.toString(getMapOfFileSuffixes().getValuesEndingWithKey(Constants.FITS_METADATA_SUFFIX)), 
+                Integer.toString(getMapOfNewFileSuffixes().getValuesEndingWithKey(Constants.FITS_METADATA_SUFFIX)));
         
         Element epubcheckElement = doc.createElement("epubcheck");
         metadataElement.appendChild(epubcheckElement);
-        Element totalEpubcheckField = doc.createElement("total");
-        epubcheckElement.appendChild(totalEpubcheckField);
-        totalEpubcheckField.appendChild(doc.createTextNode("" + getMapOfFileSuffixes().getValuesEndingWithKey(
-                Constants.EPUBCHECK_METADATA_SUFFIX)));
-        Element newEpubcheckField = doc.createElement("new");
-        epubcheckElement.appendChild(newEpubcheckField);
-        newEpubcheckField.appendChild(doc.createTextNode("" + getMapOfNewFileSuffixes().getValuesEndingWithKey(
-                Constants.EPUBCHECK_METADATA_SUFFIX)));
+        addNewAndTotalXmlElements(epubcheckElement, doc, 
+                Integer.toString(getMapOfFileSuffixes().getValuesEndingWithKey(Constants.EPUBCHECK_METADATA_SUFFIX)), 
+                Integer.toString(getMapOfNewFileSuffixes().getValuesEndingWithKey(
+                        Constants.EPUBCHECK_METADATA_SUFFIX)));
     }
     
     /**
@@ -322,7 +283,7 @@ public class ElivagarStatistics {
      * @param root The root element.
      * @param doc The document.
      */
-    protected void addXmlElementsForOtherSuffices(Element root, Document doc) {
+    protected void addXmlElementsForOtherSuffixes(Element root, Document doc) {
         List<String> suffixes = new ArrayList<String>();
         suffixes.addAll(conf.getAudioFormats());
         for(String suffix : conf.getAudioFormats()) {
@@ -342,25 +303,35 @@ public class ElivagarStatistics {
 
         Element otherElement = doc.createElement("other");
         root.appendChild(otherElement);
-        Element totalOtherField = doc.createElement("total");
-        otherElement.appendChild(totalOtherField);
-        totalOtherField.appendChild(doc.createTextNode("" + getMapOfFileSuffixes().getCountExcludingKeys(suffixes)));
-        Element newOtherField = doc.createElement("new");
-        otherElement.appendChild(newOtherField);
-        newOtherField.appendChild(doc.createTextNode("" + getMapOfNewFileSuffixes().getCountExcludingKeys(suffixes)));
+        addNewAndTotalXmlElements(otherElement, doc, 
+                Integer.toString(getMapOfFileSuffixes().getCountExcludingKeys(suffixes)), 
+                Integer.toString(getMapOfNewFileSuffixes().getCountExcludingKeys(suffixes)));
 
         for(String otherSuffix : getMapOfFileSuffixes().getMissingKeys(suffixes)) {
 
             Element suffixField = doc.createElement(otherSuffix);
             otherElement.appendChild(suffixField);
 
-            Element totalSuffixField = doc.createElement("total");
-            suffixField.appendChild(totalSuffixField);
-            totalSuffixField.appendChild(doc.createTextNode("" + getMapOfFileSuffixes().getValue(otherSuffix)));
-
-            Element newSuffixField = doc.createElement("new");
-            suffixField.appendChild(newSuffixField);
-            newSuffixField.appendChild(doc.createTextNode("" + getMapOfNewFileSuffixes().getValue(otherSuffix)));
+            addNewAndTotalXmlElements(otherElement, doc, 
+                    Integer.toString(getMapOfFileSuffixes().getValue(otherSuffix)), 
+                    Integer.toString(getMapOfNewFileSuffixes().getValue(otherSuffix)));
         }
+    }
+    
+    /**
+     * Adds XML leaf-elements for the total and new values.
+     * These will be added to the branch xml element.
+     * @param branch The XML branch element, which will gain the total and new leaf elements.
+     * @param doc The XML document.
+     * @param totalValue The value for the total leaf element.
+     * @param newValue The value for the new leaf element.
+     */
+    protected void addNewAndTotalXmlElements(Element branch, Document doc, String totalValue, String newValue) {
+        Element totalEpubcheckField = doc.createElement("total");
+        branch.appendChild(totalEpubcheckField);
+        totalEpubcheckField.appendChild(doc.createTextNode(totalValue));
+        Element newEpubcheckField = doc.createElement("new");
+        branch.appendChild(newEpubcheckField);
+        newEpubcheckField.appendChild(doc.createTextNode(newValue));
     }
 }
