@@ -136,11 +136,11 @@ public class PubhubPacker {
      * Packs a file for the ebook. This is expected to be the content file in an ebook format 
      * - according to the configured formats (e.g. pdf or epub).
      * 
-     * This makes a symbolic link to the file from the ebook folder to the original file.
+     * This makes a hard link to the file from the ebook folder to the original file.
      * It is a prerequisite that the file has the name of the ID.
      * Also, if the file is ignored, if it does not have an ebook suffix.
      * @param bookFile The file for the ebook.
-     * @throws IOException If the book directory cannot be instantiated, or if the symbolic link from the
+     * @throws IOException If the book directory cannot be instantiated, or if the hard link from the
      * original ebook file cannot be created.
      */
     public void packFileForEbook(File bookFile) throws IOException {
@@ -152,11 +152,11 @@ public class PubhubPacker {
         String id = StringUtils.getPrefix(bookFile.getName());
         log.info("Packaging book file for book-id: " + id);
         File bookDir = getBookDir(id, BookTypeEnum.EBOG);
-        File symbolicBookFile = new File(bookDir, bookFile.getName());
-        if(symbolicBookFile.isFile()) {
+        File bookLinkFile = new File(bookDir, bookFile.getName());
+        if(bookLinkFile.isFile()) {
             log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
         } else {
-            Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
+            Files.createLink(bookLinkFile.toPath(), bookFile.toPath().toAbsolutePath());
         }
         characterizationHandler.characterize(bookFile, bookDir);
     }
@@ -165,7 +165,7 @@ public class PubhubPacker {
      * Packs a file for the audio book. 
      * This is expected to be the content file in an audio format - according to the configured formats (e.g. mp3).
      * 
-     * This makes a symbolic link to the file from the audio book folder to the original file.
+     * This makes a hard link to the file from the audio book folder to the original file.
      * It is a prerequisite that the file has the name of the ID.
      * The file name might be in upper-case, but the ID should be in lower-case, therefore
      * it is lowercased for the directory, the symbolic link and the characterization file.
@@ -174,7 +174,7 @@ public class PubhubPacker {
      * This will also perform the characterization, if needed.
      * 
      * @param bookFile The file for the audio book.
-     * @throws IOException If the book directory cannot be instantiated, or if the symbolic link from the
+     * @throws IOException If the book directory cannot be instantiated, or if the hard link from the
      * original audio file cannot be created.
      */
     public void packFileForAudio(File bookFile) throws IOException {
@@ -186,11 +186,11 @@ public class PubhubPacker {
         String id = StringUtils.getPrefix(bookFile.getName()).toLowerCase(); 
         log.info("Packaging book file for book-id: " + id);
         File bookDir = getBookDir(id, BookTypeEnum.LYDBOG);
-        File symbolicBookFile = new File(bookDir, bookFile.getName().toLowerCase());
-        if(symbolicBookFile.isFile()) {
+        File bookLinkFile = new File(bookDir, bookFile.getName().toLowerCase());
+        if(bookLinkFile.isFile()) {
             log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
         } else {
-            Files.createSymbolicLink(symbolicBookFile.toPath(), bookFile.toPath().toAbsolutePath());
+            Files.createLink(bookLinkFile.toPath(), bookFile.toPath().toAbsolutePath());
         }
         characterizationHandler.characterize(bookFile, bookDir);
     }
