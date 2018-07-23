@@ -9,6 +9,7 @@ tempDir/
 
 aleph-conf.txt
 pubhub-license.txt
+fits.log
 
 .idea/
 ginnungagap.iml

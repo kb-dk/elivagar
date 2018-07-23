@@ -145,7 +145,7 @@ public class ElivagarStatisticsTest extends ExtendedTestCase {
         Configuration conf = TestConfigurations.getConfigurationForTest();
         ElivagarStatistics statistics = new ElivagarStatistics(conf);
         
-        String suffix = "" + new Random().nextBoolean();
+        String suffix = "." + new Random().nextBoolean();
         
         File bookDir = TestFileUtils.createEmptyDirectory(TestFileUtils.getTempDir() + "/" + UUID.randomUUID().toString());
         
@@ -161,8 +161,31 @@ public class ElivagarStatisticsTest extends ExtendedTestCase {
     }
 
     @Test
-    public void testCalculateStatisticsOnBookDirWithNonSuffix() throws Exception {
-        addDescription("Test the calculateStatisticsOnBookDir method when the directory has a file with an non-standard suffix.");
+    public void testCalculateStatisticsOnBookDirWithNonSuffixWithDot() throws Exception {
+        addDescription("Test the calculateStatisticsOnBookDir method when the directory has a file with an non-standard suffix, with a dot.");
+        Configuration conf = TestConfigurations.getConfigurationForTest();
+        ElivagarStatistics statistics = new ElivagarStatistics(conf);
+        
+        String suffix = ".suffix" + new Random().nextInt(100);
+        
+        File bookDir = TestFileUtils.createEmptyDirectory(TestFileUtils.getTempDir() + "/" + UUID.randomUUID().toString());
+        
+        File bookFile = new File(bookDir, bookDir.getName() + suffix);
+        TestFileUtils.createFile(bookFile, UUID.randomUUID().toString());
+        
+        statistics.calculateStatisticsOnBookDir(bookDir, 0);
+        
+        Assert.assertEquals(statistics.totalCount, 1);
+        Assert.assertEquals(statistics.getNonStandardNamedCount(), 0);
+        Assert.assertEquals(statistics.getMapOfFileSuffixes().getValue(suffix), 1);
+        Assert.assertEquals(statistics.getMapOfNewFileSuffixes().getValue(suffix), 1);
+        
+        statistics.printStatistics(System.out);
+    }
+
+    @Test
+    public void testCalculateStatisticsOnBookDirWithNonSuffixWithoutDot() throws Exception {
+        addDescription("Test the calculateStatisticsOnBookDir method when the directory has a file with an non-standard suffix, without a dot.");
         Configuration conf = TestConfigurations.getConfigurationForTest();
         ElivagarStatistics statistics = new ElivagarStatistics(conf);
         

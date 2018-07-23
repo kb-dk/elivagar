@@ -39,4 +39,20 @@ public class EpubCharacterizerTest extends ExtendedTestCase {
         epubCharacterizer.characterize(f, outputFile);
         Assert.assertTrue(outputFile.exists());
     }
+    
+    @Test
+    public void testPdf() throws IOException {
+        File f = TestFileUtils.copyFileToTemp(new File("src/test/resources/book-files/doc.pdf"));
+        
+        EpubCheckerCharacterizer epubCharacterizer = new EpubCheckerCharacterizer();
+        
+        Assert.assertFalse(epubCharacterizer.hasRequiredExtension(f));
+        
+        File outputFile = new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString());
+        
+        Assert.assertFalse(outputFile.exists());
+        
+        epubCharacterizer.characterize(f, outputFile);
+        Assert.assertTrue(outputFile.exists());
+    }
 }

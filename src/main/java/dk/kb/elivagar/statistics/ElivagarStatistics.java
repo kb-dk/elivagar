@@ -308,8 +308,12 @@ public class ElivagarStatistics {
                 Integer.toString(getMapOfNewFileSuffixes().getCountExcludingKeys(suffixes)));
 
         for(String otherSuffix : getMapOfFileSuffixes().getMissingKeys(suffixes)) {
-
-            Element suffixField = doc.createElement(otherSuffix);
+            Element suffixField; 
+            if(otherSuffix.startsWith(".")) {
+                suffixField = doc.createElement(otherSuffix.substring(1));
+            } else {
+                suffixField = doc.createElement(otherSuffix);
+            }
             otherElement.appendChild(suffixField);
 
             addNewAndTotalXmlElements(otherElement, doc, 
