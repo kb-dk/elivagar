@@ -131,7 +131,8 @@ public class AlephPacker {
             alephMetadata.deleteOnExit();
             marcMetadata.deleteOnExit();
         } catch (Exception e) {
-            log.warn("Failed to handle the book directory '" + dir.getAbsolutePath() + "'", e);
+            log.info("Non-critical failure while trying to retrieve the Aleph metadata for the book directory '" 
+                    + dir.getAbsolutePath() + "'", e);
         }
     }
     
