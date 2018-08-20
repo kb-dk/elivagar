@@ -1,8 +1,11 @@
 package dk.kb.elivagar;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
+
+import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,7 +133,7 @@ public class Elivagar {
                 pubhubWorkflow.makeStatistics(ps, beginDate);                
             }
             log.info("Finished! Written statistics at " + statisticsFile.getAbsolutePath());
-        } catch (Exception e) {
+        } catch (IOException | JAXBException | RuntimeException e) {
             log.error("Failure to run the workflow. \nThe waters of Elivagar must have frozen over!", e);
             System.exit(1);
         }

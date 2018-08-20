@@ -212,7 +212,7 @@ public class ElivagarStatistics {
         formatsElement.appendChild(ebookField);
         addNewAndTotalXmlElements(ebookField, doc, 
                 Integer.toString(getMapOfFileSuffixes().getMultiKeyCount(conf.getEbookFormats())), 
-                Integer.toString(getMapOfFileSuffixes().getMultiKeyCount(conf.getEbookFormats())));
+                Integer.toString(getMapOfNewFileSuffixes().getMultiKeyCount(conf.getEbookFormats())));
 
         for(String ebookFormat : conf.getEbookFormats()) {
             String suffix = "." + ebookFormat;
@@ -308,15 +308,15 @@ public class ElivagarStatistics {
                 Integer.toString(getMapOfNewFileSuffixes().getCountExcludingKeys(suffixes)));
 
         for(String otherSuffix : getMapOfFileSuffixes().getMissingKeys(suffixes)) {
-            Element suffixField; 
+            Element suffixElement; 
             if(otherSuffix.startsWith(".")) {
-                suffixField = doc.createElement(otherSuffix.substring(1));
+                suffixElement = doc.createElement(otherSuffix.substring(1));
             } else {
-                suffixField = doc.createElement(otherSuffix);
+                suffixElement = doc.createElement(otherSuffix);
             }
-            otherElement.appendChild(suffixField);
+            otherElement.appendChild(suffixElement);
 
-            addNewAndTotalXmlElements(otherElement, doc, 
+            addNewAndTotalXmlElements(suffixElement, doc, 
                     Integer.toString(getMapOfFileSuffixes().getValue(otherSuffix)), 
                     Integer.toString(getMapOfNewFileSuffixes().getValue(otherSuffix)));
         }
