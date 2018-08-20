@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.exception.ArgumentCheck;
 import dk.kb.elivagar.utils.FileUtils;
+import dk.kb.elivagar.utils.LongUtils;
 import dk.kb.elivagar.utils.YamlUtils;
 
 /**
@@ -229,9 +230,9 @@ public class Configuration {
         String baseMetadataPath = (String) transferMap.get(CONF_TRANSFER_UPDATE_METADATA_PATH);
         File baseMetadataDir = FileUtils.createDirectory(baseMetadataPath);
 
-        Long retainCreateDate = ((Integer) transferMap.get(CONF_TRANSFER_RETAIN_CREATE_DATE)).longValue();
-        Long retainModifyDate = ((Integer) transferMap.get(CONF_TRANSFER_RETAIN_MODIFY_DATE)).longValue();
-        Long retainPublicationDate = ((Integer) transferMap.get(CONF_TRANSFER_RETAIN_PUBLICATION_DATE)).longValue();
+        Long retainCreateDate = LongUtils.getLong(transferMap.get(CONF_TRANSFER_RETAIN_CREATE_DATE));
+        Long retainModifyDate = LongUtils.getLong(transferMap.get(CONF_TRANSFER_RETAIN_MODIFY_DATE));
+        Long retainPublicationDate = LongUtils.getLong(transferMap.get(CONF_TRANSFER_RETAIN_PUBLICATION_DATE));
         List<String> requiredFormats = (List<String>) transferMap.get(CONF_TRANSFER_REQUIRED_FORMATS);
         return new TransferConfiguration(baseIngestDir, baseContentDir, baseMetadataDir, retainCreateDate, 
                 retainModifyDate, retainPublicationDate, requiredFormats);
