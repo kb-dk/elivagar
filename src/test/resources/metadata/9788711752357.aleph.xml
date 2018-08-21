@@ -1,0 +1,113 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<present>
+<record>
+<record_header>
+<set_entry>000000001</set_entry>
+</record_header>
+<doc_number>003513107</doc_number>
+<metadata>
+<oai_marc>
+<fixfield id="FMT">BK</fixfield>
+<fixfield id="LDR">00996name-22002890--450-</fixfield>
+<varfield id="001" i1="0" i2="0">
+<subfield label="a">x953100678</subfield>
+<subfield label="f">a</subfield>
+</varfield>
+<varfield id="004" i1="0" i2="0">
+<subfield label="r">n</subfield>
+<subfield label="a">e</subfield>
+</varfield>
+<varfield id="008" i1="0" i2="0">
+<subfield label="t">m</subfield>
+<subfield label="u">f</subfield>
+<subfield label="a">2017</subfield>
+<subfield label="b">dk</subfield>
+<subfield label="d">y</subfield>
+<subfield label="l">dan</subfield>
+<subfield label="n">b</subfield>
+<subfield label="x">06</subfield>
+<subfield label="v">0</subfield>
+<subfield label="w">1</subfield>
+</varfield>
+<varfield id="009" i1="0" i2="0">
+<subfield label="a">a</subfield>
+<subfield label="g">xe</subfield>
+</varfield>
+<varfield id="021" i1="0" i2="0">
+<subfield label="e">9788711752357</subfield>
+</varfield>
+<varfield id="032" i1="0" i2="0">
+<subfield label="a">DBF201723</subfield>
+<subfield label="x">BKM201723</subfield>
+</varfield>
+<varfield id="096" i1="0" i2="0">
+<subfield label="a"></subfield>
+</varfield>
+<varfield id="100" i1="0" i2="0">
+<subfield label="a">Hansen</subfield>
+<subfield label="h">René</subfield>
+<subfield label="4">aut</subfield>
+</varfield>
+<varfield id="245" i1="0" i2="0">
+<subfield label="a">Kvinder til salg</subfield>
+</varfield>
+<varfield id="250" i1="0" i2="0">
+<subfield label="a">1. e-bogsudgave</subfield>
+</varfield>
+<varfield id="260" i1="0" i2="0">
+<subfield label="b">Lindhardt og Ringhof</subfield>
+<subfield label="g">[sælges på internettet]</subfield>
+<subfield label="c">2017</subfield>
+</varfield>
+<varfield id="440" i1="0" i2="0">
+<subfield label="a">Dansk kriminalreportage</subfield>
+<subfield label="v">2001</subfield>
+</varfield>
+<varfield id="504" i1="0" i2="0">
+<subfield label="a">Den 30. juni 1998 foretog politiet en samlet aktion mod fire massageklinikker og en privat bopæl i København, der blev til den hidtil største sag om rufferi i Danmark</subfield>
+</varfield>
+<varfield id="512" i1="0" i2="0">
+<subfield label="a">Downloades i EPUB-format</subfield>
+</varfield>
+<varfield id="520" i1="0" i2="0">
+<subfield label="i">Også udgivet som del af</subfield>
+<subfield label="t">Dansk kriminalreportage 00&apos;erne. 2001</subfield>
+</varfield>
+<varfield id="595" i1="0" i2="0">
+<subfield label="a">e-pligt</subfield>
+</varfield>
+<varfield id="631" i1="0" i2="0">
+<subfield label="a">prostitution</subfield>
+</varfield>
+<varfield id="631" i1="0" i2="0">
+<subfield label="a">rufferi</subfield>
+</varfield>
+<varfield id="631" i1="0" i2="0">
+<subfield label="a">massageklinikker</subfield>
+</varfield>
+<varfield id="631" i1="0" i2="0">
+<subfield label="a">København</subfield>
+</varfield>
+<varfield id="631" i1="0" i2="0">
+<subfield label="a">1990-1999</subfield>
+</varfield>
+<varfield id="652" i1="0" i2="0">
+<subfield label="m">34.31</subfield>
+</varfield>
+<fixfield id="BAS">bcx</fixfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">dig1723imp</subfield>
+<subfield label="b"></subfield>
+<subfield label="c">20170605</subfield>
+<subfield label="l">KGL02</subfield>
+<subfield label="h">1101</subfield>
+</varfield>
+<varfield id="UID" i1=" " i2=" ">
+<subfield label="a">x953100678bcx</subfield>
+</varfield>
+</oai_marc>
+</metadata>
+</record>
+<session-id>VS1EA4XUX48TVI2YSAUSIEEU9VMV77NVGPC658L7IC7A1YIXXB</session-id>
+</present>
+ 

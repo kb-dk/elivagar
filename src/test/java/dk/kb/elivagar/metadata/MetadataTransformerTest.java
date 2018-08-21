@@ -80,6 +80,22 @@ public class MetadataTransformerTest extends ExtendedTestCase {
 //        Assert.assertTrue(content.contains("<subTitle> sandheder og skrøner om den globale opvarmning</subTitle>"));
 //        Assert.assertTrue(content.contains("<identifier type=\"isbn\">9788711436981</identifier>"));
     }
+
+    @Test
+    public void testTransformingAlephMetadataToMods3() throws IOException {
+        addDescription("Test the transformation of Aleph metadata");
+        File metadataFile = TestFileUtils.copyFileToTemp(new File("src/test/resources/metadata/9788711752357.aleph.xml"));
+        MetadataTransformer transformer = new MetadataTransformer(TestFileUtils.getTempDir());
+        File intermediaryMarcFile = new File(TestFileUtils.getTempDir(), "marc-" + UUID.randomUUID().toString() + ".xml");
+        transformer.transformMetadata(new FileInputStream(metadataFile), new FileOutputStream(intermediaryMarcFile), MetadataTransformer.TransformationType.ALEPH_TO_MARC21);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        transformer.transformMetadata(new FileInputStream(intermediaryMarcFile), output, MetadataTransformer.TransformationType.MARC21_TO_MODS);
+        
+//        String content = output.toString();
+//        Assert.assertTrue(content.contains("<title>Køl af</title>"));
+//        Assert.assertTrue(content.contains("<subTitle> sandheder og skrøner om den globale opvarmning</subTitle>"));
+//        Assert.assertTrue(content.contains("<identifier type=\"isbn\">9788711436981</identifier>"));
+    }
     
     @Test
     public void testTransformationTypes() {
