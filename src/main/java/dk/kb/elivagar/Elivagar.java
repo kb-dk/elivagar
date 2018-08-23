@@ -128,7 +128,7 @@ public class Elivagar {
             transferWorkflow.run();
             
             File statisticsFile = new File(conf.getStatisticsDir(), 
-                    CalendarUtils.getDateAsString(new Date()) + ".txt");
+                    CalendarUtils.getDateAsString(new Date()) + ".xml");
             try (PrintStream ps = new PrintStream(statisticsFile)) {
                 pubhubWorkflow.makeStatistics(ps, beginDate);                
             }

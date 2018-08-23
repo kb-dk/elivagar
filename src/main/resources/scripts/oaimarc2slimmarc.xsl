@@ -10,7 +10,11 @@
 
   <xsl:param name="pdfUri"  select="''" />
 
-  <!-- http://biblstandard.dk/kat/konv_danmarc2_to_marc21.htm -->
+  <!-- Dead link: http://biblstandard.dk/kat/konv_danmarc2_to_marc21.htm -->
+
+  <!-- See instead:
+       https://slks.dk/fileadmin/user_upload/0_SLKS/Dokumenter/Biblioteker/BIR/Publikationer/Konvertering_fra_danMARC2_til_MARC21.pdf
+  -->
 
   <xsl:output method="xml"
 	      indent="yes"
@@ -380,43 +384,40 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="varfield[@id='520']">
+  <xsl:template match="varfield[@id='520'][count(subfield)=1 and subfield[@label='a']]">
+    <xsl:element name="marc:subfield">
+      <xsl:attribute name="ind1"> </xsl:attribute>
+      <xsl:attribute name="ind2"> </xsl:attribute>
+      <xsl:attribute name="tag">500</xsl:attribute>
+      <xsl:attribute name="code">a</xsl:attribute>
+      <xsl:apply-templates/>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="varfield[@id='520'][count(subfield)&gt;1]">
     <xsl:element name="marc:datafield">
-      <xsl:choose>
-	<xsl:when test="contains('itedxb',subfield/@label)"> 
-	  <xsl:attribute name="ind1"> </xsl:attribute>
-	  <xsl:attribute name="ind2"> </xsl:attribute>
-	  <xsl:attribute name="tag">534</xsl:attribute>
-	  <xsl:for-each select="subfield">
-	    <xsl:element name="marc:subfield">
-	      <xsl:choose>
-		<xsl:when test="@label='a'">
-		  <xsl:attribute name="code">p</xsl:attribute>
-		</xsl:when>
-		<xsl:when test="@label='i'">
-		  <xsl:attribute name="code">p</xsl:attribute>
-		</xsl:when>
-		<xsl:when test="@label='t'">
-		  <xsl:attribute name="code">t</xsl:attribute>
-		</xsl:when>
-		<xsl:when test="@label='d'">
-		  <xsl:attribute name="code">a</xsl:attribute>
-		</xsl:when>
-	      </xsl:choose>
-	      <xsl:apply-templates/>
-	    </xsl:element>
-	  </xsl:for-each>
-	</xsl:when>
-	<xsl:when test="not(contains('itedxb',subfield/@label)) and contains('a',subfield/@label)">
-	  <xsl:attribute name="ind1"> </xsl:attribute>
-	  <xsl:attribute name="ind2"> </xsl:attribute>
-	  <xsl:attribute name="tag">500</xsl:attribute>
-	  <xsl:element name="marc:subfield">
-	    <xsl:attribute name="code">a</xsl:attribute>
-	    <xsl:apply-templates/>
-	  </xsl:element>
-	</xsl:when>
-      </xsl:choose>
+      <xsl:attribute name="ind1"> </xsl:attribute>
+      <xsl:attribute name="ind2"> </xsl:attribute>
+      <xsl:attribute name="tag">534</xsl:attribute>
+      <xsl:for-each select="subfield">
+	<xsl:element name="marc:subfield">
+	  <xsl:choose>
+	    <xsl:when test="@label='a'">
+	      <xsl:attribute name="code">p</xsl:attribute>
+	    </xsl:when>
+	    <xsl:when test="@label='i'">
+	      <xsl:attribute name="code">p</xsl:attribute>
+	    </xsl:when>
+	    <xsl:when test="@label='t'">
+	      <xsl:attribute name="code">t</xsl:attribute>
+	    </xsl:when>
+	    <xsl:when test="@label='d'">
+	      <xsl:attribute name="code">a</xsl:attribute>
+	    </xsl:when>
+	  </xsl:choose>
+	  <xsl:apply-templates/>
+	</xsl:element>
+      </xsl:for-each>
     </xsl:element>
   </xsl:template>
 
