@@ -62,9 +62,12 @@ public class TestConfigurations {
     protected static Map<String, Object> getTransferMap() throws Exception {
         
         Map<String, Object> res = new HashMap<String, Object>();
-        res.put(Configuration.CONF_TRANSFER_INGEST_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/ingest");
-        res.put(Configuration.CONF_TRANSFER_UPDATE_CONTENT_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/content");
-        res.put(Configuration.CONF_TRANSFER_UPDATE_METADATA_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/metadata");
+        res.put(Configuration.CONF_TRANSFER_EBOOK_INGEST_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/ebook/ingest");
+        res.put(Configuration.CONF_TRANSFER_EBOOK_UPDATE_CONTENT_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/ebook/content");
+        res.put(Configuration.CONF_TRANSFER_EBOOK_UPDATE_METADATA_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/ebook/metadata");
+        res.put(Configuration.CONF_TRANSFER_AUDIO_INGEST_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/audio/ingest");
+        res.put(Configuration.CONF_TRANSFER_AUDIO_UPDATE_CONTENT_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/audio/content");
+        res.put(Configuration.CONF_TRANSFER_AUDIO_UPDATE_METADATA_PATH, TestFileUtils.getTempDir().getAbsolutePath() + "/audio/metadata");
         res.put(Configuration.CONF_TRANSFER_RETAIN_CREATE_DATE, new Integer(3600000));
         res.put(Configuration.CONF_TRANSFER_RETAIN_MODIFY_DATE, new Integer(60000));
         res.put(Configuration.CONF_TRANSFER_RETAIN_PUBLICATION_DATE, new Integer(0));

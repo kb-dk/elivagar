@@ -17,9 +17,12 @@ elivagar:
     aleph_base: $ALEPH_BASE
     temp_dir: tempDir/aleph
   transfer:
-    ingest_path: tempDir/transfer/ingest
-    update_content_path: tempDir/transfer/content/
-    update_metadata_path: tempDir/transfer/metadata/
+    ingest_ebook_path: tempDir/transfer/ebook/ingest
+    update_ebook_content_path: tempDir/transfer/ebook/content/
+    update_ebook_metadata_path: tempDir/transfer/ebook/metadata/
+    ingest_audio_path: tempDir/transfer/audio/ingest
+    update_audio_content_path: tempDir/transfer/audio/content/
+    update_audio_metadata_path: tempDir/transfer/audio/metadata/
     retain_create_date: -1
     retain_modify_date: -1
     retain_pub_date: -1

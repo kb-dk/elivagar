@@ -29,6 +29,7 @@ import dk.kb.elivagar.config.TransferConfiguration;
 import dk.kb.elivagar.testutils.TestFileUtils;
 import dk.kb.elivagar.utils.CalendarUtils;
 import dk.kb.elivagar.utils.FileUtils;
+import dk.pubhub.service.BookTypeEnum;
 
 public class PreIngestTransferTest extends ExtendedTestCase {
     
@@ -103,7 +104,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         TestFileUtils.createFile(mockBookDir, UUID.randomUUID().toString());
         
         PreIngestTransfer pit = new PreIngestTransfer(conf);
-        pit.transferBook(bookBaseDir);
+        pit.transferBook(bookBaseDir, BookTypeEnum.EBOG);
         
         verifyNoMoreInteractions(conf);
         verifyNoMoreInteractions(transferConf);
@@ -126,7 +127,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         
         PreIngestTransfer pit = new PreIngestTransfer(conf);
         
-        pit.transferBook(bookBaseDir);
+        pit.transferBook(bookBaseDir, BookTypeEnum.EBOG);
         
         verify(conf).getTransferConfiguration();
         verifyNoMoreInteractions(conf);
@@ -160,7 +161,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         
         PreIngestTransfer pit = new PreIngestTransfer(conf);
         
-        pit.transferBook(bookBaseDir);
+        pit.transferBook(bookBaseDir, BookTypeEnum.EBOG);
         
         verify(conf).getAudioFormats();
         verify(conf).getEbookFormats();
@@ -188,14 +189,15 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         when(conf.getAudioFormats()).thenReturn(new ArrayList<String>());
         when(conf.getEbookFormats()).thenReturn(Arrays.asList("pdf"));
         when(conf.getTransferConfiguration()).thenReturn(transferConf);
-        when(transferConf.getUpdateContentDir()).thenReturn(destinationDir);
+        when(transferConf.getUpdateEbookContentDir()).thenReturn(destinationDir);
+        when(transferConf.getUpdateAudioContentDir()).thenReturn(destinationDir);
         
         addStep("Set the destination directory to un-writable", "Provokes an IOException");
         PreIngestTransfer pit = new PreIngestTransfer(conf);
         try {
             destinationDir.setWritable(false);
         
-            pit.transferBook(bookBaseDir);
+            pit.transferBook(bookBaseDir, BookTypeEnum.EBOG);
         } finally {
             destinationDir.setWritable(true);
         }
@@ -204,7 +206,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         verify(conf).getEbookFormats();
         verify(conf).getTransferConfiguration();
         verifyNoMoreInteractions(conf);
-        verify(transferConf).getUpdateContentDir();
+        verify(transferConf).getUpdateEbookContentDir();
         verifyNoMoreInteractions(transferConf);
     }
 
@@ -231,8 +233,8 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         when(conf.getTransferConfiguration()).thenReturn(transferConf);
         when(conf.getAudioFormats()).thenReturn(Arrays.asList("mp3"));
         when(conf.getEbookFormats()).thenReturn(Arrays.asList("pdf"));
-        when(transferConf.getUpdateContentDir()).thenReturn(updateContentBaseDir);
-        when(transferConf.getUpdateMetadataDir()).thenReturn(updateMetadataBaseDir);
+        when(transferConf.getUpdateEbookContentDir()).thenReturn(updateContentBaseDir);
+        when(transferConf.getUpdateEbookMetadataDir()).thenReturn(updateMetadataBaseDir);
         when(register.getLatestUpdateDate()).thenReturn(new Date(0L));
         
         PreIngestTransfer pit = new PreIngestTransfer(conf);
@@ -240,7 +242,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         Assert.assertEquals(updateContentBookDir.list().length, 0);
         Assert.assertEquals(updateMetadataBookDir.list().length, 0);
         
-        pit.updateBook(bookDir, register);
+        pit.updateBook(bookDir, register, BookTypeEnum.EBOG);
         
         Assert.assertEquals(updateContentBookDir.list().length, 2);
         Assert.assertEquals(updateMetadataBookDir.list().length, 1);
@@ -252,8 +254,8 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         verify(conf).getAudioFormats();
         verify(conf).getEbookFormats();
         verifyNoMoreInteractions(conf);
-        verify(transferConf, times(2)).getUpdateContentDir();
-        verify(transferConf).getUpdateMetadataDir();
+        verify(transferConf, times(2)).getUpdateEbookContentDir();
+        verify(transferConf).getUpdateEbookMetadataDir();
         verifyNoMoreInteractions(transferConf);
         
         verify(register).getLatestUpdateDate();
@@ -284,7 +286,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         Assert.assertEquals(updateContentDir.list().length, 0);
         Assert.assertEquals(updateMetadataDir.list().length, 0);
         
-        pit.updateBook(bookDir, register);
+        pit.updateBook(bookDir, register, BookTypeEnum.EBOG);
         
         Assert.assertEquals(updateContentDir.list().length, 0);
         Assert.assertEquals(updateMetadataDir.list().length, 0);
@@ -314,7 +316,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         
         PreIngestTransfer pit = new PreIngestTransfer(conf);
         
-        pit.updateBook(bookDir, register);
+        pit.updateBook(bookDir, register, BookTypeEnum.EBOG);
 
         verifyZeroInteractions(conf);
         verifyZeroInteractions(transferConf);
@@ -340,7 +342,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         PreIngestTransfer pit = new PreIngestTransfer(conf);
         
         Assert.assertEquals(destinationDir.list().length, 0);
-        pit.ingestBook(bookDir, register);
+        pit.ingestBook(bookDir, register, BookTypeEnum.EBOG);
         Assert.assertEquals(destinationDir.list().length, 0);
 
         verify(conf).getTransferConfiguration();
@@ -370,12 +372,12 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         when(transferConf.getRetainCreateDate()).thenReturn(-1L);
         when(transferConf.getRetainModifyDate()).thenReturn(-1L);
         when(transferConf.getRetainPublicationDate()).thenReturn(-1L);
-        when(transferConf.getIngestDir()).thenReturn(destinationDir);
+        when(transferConf.getEbookIngestDir()).thenReturn(destinationDir);
         
         PreIngestTransfer pit = new PreIngestTransfer(conf);
         
         Assert.assertEquals(destinationDir.list().length, 0);
-        pit.ingestBook(bookDir, register);
+        pit.ingestBook(bookDir, register, BookTypeEnum.EBOG);
         Assert.assertEquals(destinationDir.list().length, 1);
         Assert.assertEquals(destinationDir.listFiles()[0].getName(), bookDir.getName());
         Assert.assertEquals(destinationDir.listFiles()[0].list().length, bookDir.list().length);
@@ -388,7 +390,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         verify(transferConf).getRetainCreateDate();
         verify(transferConf).getRetainModifyDate();
         verify(transferConf).getRetainPublicationDate();
-        verify(transferConf).getIngestDir();
+        verify(transferConf).getEbookIngestDir();
         verifyNoMoreInteractions(transferConf);
         
         verify(register).setIngestDate(any(Date.class));
@@ -603,18 +605,18 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         File contentDir = new File(TestFileUtils.getTempDir().getAbsolutePath(), UUID.randomUUID().toString());
         File bookDir = new File(TestFileUtils.getTempDir().getAbsolutePath(), UUID.randomUUID().toString());
         
-        when(transferConf.getUpdateMetadataDir()).thenReturn(contentDir);
+        when(transferConf.getUpdateEbookMetadataDir()).thenReturn(contentDir);
         
         PreIngestTransfer pit = new PreIngestTransfer(conf);
         
-        File updateDir = pit.getUpdateMetadataDir(bookDir);
+        File updateDir = pit.getUpdateMetadataDir(bookDir, BookTypeEnum.EBOG);
         Assert.assertEquals(updateDir.getParentFile(), contentDir);
         Assert.assertEquals(updateDir.getName(), bookDir.getName());
         
         verify(conf).getTransferConfiguration();
         verifyNoMoreInteractions(conf);
         
-        verify(transferConf).getUpdateMetadataDir();
+        verify(transferConf).getUpdateEbookMetadataDir();
         verifyNoMoreInteractions(transferConf);
     }
     
@@ -628,18 +630,18 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         File contentDir = new File(TestFileUtils.getTempDir().getAbsolutePath(), UUID.randomUUID().toString());
         File bookDir = new File(TestFileUtils.getTempDir().getAbsolutePath(), UUID.randomUUID().toString());
         
-        when(transferConf.getUpdateContentDir()).thenReturn(contentDir);
+        when(transferConf.getUpdateEbookContentDir()).thenReturn(contentDir);
         
         PreIngestTransfer pit = new PreIngestTransfer(conf);
         
-        File updateDir = pit.getUpdateContentDir(bookDir);
+        File updateDir = pit.getUpdateContentDir(bookDir, BookTypeEnum.EBOG);
         Assert.assertEquals(updateDir.getParentFile(), contentDir);
         Assert.assertEquals(updateDir.getName(), bookDir.getName());
         
         verify(conf).getTransferConfiguration();
         verifyNoMoreInteractions(conf);
         
-        verify(transferConf).getUpdateContentDir();
+        verify(transferConf).getUpdateEbookContentDir();
         verifyNoMoreInteractions(transferConf);
     }
     

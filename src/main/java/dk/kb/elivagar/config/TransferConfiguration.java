@@ -11,12 +11,18 @@ import dk.kb.elivagar.exception.ArgumentCheck;
  * Configuration for the transfer of data from Elivagar to Preservica pre-ingest area.
  */
 public class TransferConfiguration {
-    /** The base directory for the ingest.*/
-    protected final File ingestDir;
-    /** The base directory for the content files and the technical metadata.*/
-    protected final File updateContentDir;
-    /** The base directory for the metadata (except technical metadata).*/
-    protected final File updateMetadataDir;
+    /** The base directory for the ingest for the ebooks.*/
+    protected final File ingestEbookDir;
+    /** The base directory for the content files and the technical metadata for the ebooks.*/
+    protected final File updateEbookContentDir;
+    /** The base directory for the metadata (except technical metadata) for the ebooks.*/
+    protected final File updateEbookMetadataDir;
+    /** The base directory for the ingest for the audio books.*/
+    protected final File ingestAudioDir;
+    /** The base directory for the content files and the technical metadata for the audio books.*/
+    protected final File updateAudioContentDir;
+    /** The base directory for the metadata (except technical metadata) for the audio books.*/
+    protected final File updateAudioMetadataDir;
     /** The retain interval for the create date, in millis.*/
     protected final Long retainCreateDate;
     /** The retain interval for the modify data, in millis.*/
@@ -28,46 +34,71 @@ public class TransferConfiguration {
     
     /**
      * Constructor.
-     * @param ingestDir The directory for the ingest.
-     * @param updateContentDir The base directory for the content files and the technical metadata.
-     * @param updateMetadataDir The base directory for the metadata (except technical metadata).
+     * @param ingestEbookDir The directory for the ingest of ebooks.
+     * @param updateEbookContentDir The base directory for the content files and the technical metadata of ebooks.
+     * @param updateEbookMetadataDir The base directory for the metadata (except technical metadata) of ebooks.
+     * @param ingestAudioDir The directory for the ingest of audio books.
+     * @param updateAudioContentDir The base directory for the content files and the technical metadata of audio books.
+     * @param updateAudioMetadataDir The base directory for the metadata (except technical metadata) of audio books.
      * @param retainCreateDate The retain interval for the create date, in millis.
      * @param retainModifyDate The retain interval for the modify data, in millis.
      * @param retainPublicationDate The retain interval for the publication date, in millis.
      * @param requiredFormats The list of required formats for initiating the transfer.
      */
-    public TransferConfiguration(File ingestDir, File updateContentDir, File updateMetadataDir, Long retainCreateDate, 
+    public TransferConfiguration(File ingestEbookDir, File updateEbookContentDir, File updateEbookMetadataDir, 
+            File ingestAudioDir,  File updateAudioContentDir, File updateAudioMetadataDir, Long retainCreateDate, 
             Long retainModifyDate, Long retainPublicationDate, Collection<String> requiredFormats) {
-        ArgumentCheck.checkExistsDirectory(ingestDir, "File ingestDir");
-        ArgumentCheck.checkExistsDirectory(updateContentDir, "File baseContentDir");
-        ArgumentCheck.checkExistsDirectory(updateMetadataDir, "File baseMetadataDir");
+        ArgumentCheck.checkExistsDirectory(ingestEbookDir, "File ingestEbookDir");
+        ArgumentCheck.checkExistsDirectory(updateEbookContentDir, "File baseEbookContentDir");
+        ArgumentCheck.checkExistsDirectory(updateEbookMetadataDir, "File baseEbookMetadataDir");
+        ArgumentCheck.checkExistsDirectory(ingestAudioDir, "File ingestAudioDir");
+        ArgumentCheck.checkExistsDirectory(updateAudioContentDir, "File baseAudioContentDir");
+        ArgumentCheck.checkExistsDirectory(updateAudioMetadataDir, "File baseAudioMetadataDir");
         ArgumentCheck.checkNotNull(retainCreateDate, "Long retainCreateDate");
         ArgumentCheck.checkNotNull(retainModifyDate, "Long retainModifyDate");
         ArgumentCheck.checkNotNull(retainPublicationDate, "Long retainPublicationDate");
         ArgumentCheck.checkNotNullOrEmpty(requiredFormats, "Collection<String> requiredFormats");
         
-        this.ingestDir = ingestDir;
-        this.updateContentDir = updateContentDir;
-        this.updateMetadataDir = updateMetadataDir;
+        this.ingestEbookDir = ingestEbookDir;
+        this.updateEbookContentDir = updateEbookContentDir;
+        this.updateEbookMetadataDir = updateEbookMetadataDir;
+        this.ingestAudioDir = ingestAudioDir;
+        this.updateAudioContentDir = updateAudioContentDir;
+        this.updateAudioMetadataDir = updateAudioMetadataDir;
         this.retainCreateDate = retainCreateDate;
         this.retainModifyDate = retainModifyDate;
         this.retainPublicationDate = retainPublicationDate;
         this.requiredFormats = new ArrayList<String>(requiredFormats);
     }
     
-    /** @return The base directory for the ingest.*/
-    public File getIngestDir() {
-        return ingestDir;
+    /** @return The base directory for the ingest for the ebooks.*/
+    public File getEbookIngestDir() {
+        return ingestEbookDir;
     }
 
-    /** @return The base directory for the content files and the technical metadata.*/
-    public File getUpdateContentDir() {
-        return updateContentDir;
+    /** @return The base directory for the content files and the technical metadata for the ebooks.*/
+    public File getUpdateEbookContentDir() {
+        return updateEbookContentDir;
     }
     
-    /** @return The base directory for the metadata (except technical metadata).*/
-    public File getUpdateMetadataDir() {
-        return updateMetadataDir;
+    /** @return The base directory for the metadata (except technical metadata) for the ebooks.*/
+    public File getUpdateEbookMetadataDir() {
+        return updateEbookMetadataDir;
+    }
+    
+    /** @return The base directory for the ingest for the audio books.*/
+    public File getAudioIngestDir() {
+        return ingestAudioDir;
+    }
+
+    /** @return The base directory for the content files and the technical metadata for the audio books.*/
+    public File getUpdateAudioContentDir() {
+        return updateAudioContentDir;
+    }
+    
+    /** @return The base directory for the metadata (except technical metadata) for the audio books.*/
+    public File getUpdateAudioMetadataDir() {
+        return updateAudioMetadataDir;
     }
     
     /** @return The retain interval for the create date, in millis.*/

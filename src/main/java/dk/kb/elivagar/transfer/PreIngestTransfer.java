@@ -25,6 +25,7 @@ import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.utils.CalendarUtils;
 import dk.kb.elivagar.utils.FileUtils;
+import dk.pubhub.service.BookTypeEnum;
 
 /**
  * Class for dealing with the transfer of the packaged data to the pre-ingest area of the preservation repository.
@@ -85,21 +86,22 @@ public class PreIngestTransfer {
      */
     public void transferReadyBooks() {
         File ebookDir = conf.getEbookOutputDir();
-        transferBook(ebookDir);
+        transferBook(ebookDir, BookTypeEnum.EBOG);
 
         File audioDir = conf.getAudioOutputDir();
         if(audioDir == ebookDir) {
             log.info("Ebook and Audio books have the same directory.");
         } else {
-            transferBook(audioDir);
+            transferBook(audioDir, BookTypeEnum.LYDBOG);
         }
     }
 
     /**
      * Transfer the books, who need to be transfered.
      * @param dir The root directory which contains the book directories.
+     * @param bookType The type of book.
      */
-    protected void transferBook(File dir) {
+    protected void transferBook(File dir, BookTypeEnum bookType) {
         try {
             for(File bookDir : FileUtils.getFilesInDirectory(dir)) {
                 String id = bookDir.getName();
@@ -112,9 +114,9 @@ public class PreIngestTransfer {
                 TransferRegistry register = new TransferRegistry(bookDir);
 
                 if(register.hasBeenIngested()) {
-                    updateBook(bookDir, register);
+                    updateBook(bookDir, register, bookType);
                 } else {
-                    ingestBook(bookDir, register);
+                    ingestBook(bookDir, register, bookType);
                 }
             }
         } catch (IOException e) {
@@ -130,8 +132,9 @@ public class PreIngestTransfer {
      * that a new update has occurred.
      * @param bookDir The directory of the book.
      * @param register The register for the book.
+     * @param bookType The type of book.
      */
-    protected void updateBook(File bookDir, TransferRegistry register) throws IOException {
+    protected void updateBook(File bookDir, TransferRegistry register, BookTypeEnum bookType) throws IOException {
         Date updateDate = register.getLatestUpdateDate();
         if(updateDate == null) {
             log.warn("Cannot retrieve neither update date nor ingest date from the registry. "
@@ -144,7 +147,7 @@ public class PreIngestTransfer {
         List<File> metadataFiles = getNewFilesWithSuffix(bookDir, UPDATE_METADATA_SUFFIXES, updateDate);
         if(!metadataFiles.isEmpty()) {
             log.info("Found " + metadataFiles.size() + " new metadata files for update.");
-            File updateDir = getUpdateMetadataDir(bookDir);
+            File updateDir = getUpdateMetadataDir(bookDir, bookType);
             copyToUpdateDir(updateDir, metadataFiles);
             updated = true;
         }
@@ -153,7 +156,7 @@ public class PreIngestTransfer {
         List<File> techMetadataFiles = getNewFilesWithSuffix(bookDir, UPDATE_TECH_METADATA_SUFFIXES, updateDate);
         if(!techMetadataFiles.isEmpty()) {
             log.info("Found " + techMetadataFiles.size() + " new technical metadata files for update.");
-            File updateDir = getUpdateContentDir(bookDir);
+            File updateDir = getUpdateContentDir(bookDir, bookType);
             copyToUpdateDir(updateDir, techMetadataFiles);
             updated = true;
         }
@@ -162,9 +165,9 @@ public class PreIngestTransfer {
         List<File> contentFiles = getNewContentFiles(bookDir, updateDate);
         if(!contentFiles.isEmpty()) {
             log.info("Found " + contentFiles.size() + "new content files for update.");
-            File updateDir = getUpdateContentDir(bookDir);
+            File updateDir = getUpdateContentDir(bookDir, bookType);
             copyToUpdateDir(updateDir, contentFiles);
-            updated = true;            
+            updated = true;
         }
         
         if(updated) {
@@ -177,11 +180,12 @@ public class PreIngestTransfer {
      * Performs the ingest of a book directory.
      * @param bookDir The book directory.
      * @param register The register for the book.
+     * @param bookType The type of book.
      * @throws IOException If it fails to transfer the book.
      */
-    protected void ingestBook(File bookDir, TransferRegistry register) throws IOException {
+    protected void ingestBook(File bookDir, TransferRegistry register, BookTypeEnum bookType) throws IOException {
         if(readyForIngest(bookDir)) {
-            File outputDir = new File(conf.getTransferConfiguration().getIngestDir(), bookDir.getName());
+            File outputDir = getIngestDir(bookDir, bookType);
             FileUtils.copyDirectory(bookDir, outputDir);
             register.setIngestDate(new Date());
         }
@@ -257,24 +261,54 @@ public class PreIngestTransfer {
     /**
      * Retrieves the directory for updating the metadata for the given book.
      * @param bookDir The current directory of the book.
+     * @param bookType The type of book.
      * @return The update metadata directory for the book.
      * @throws IOException If it fails to create/retrieve the directory.
      */
-    protected File getUpdateMetadataDir(File bookDir) throws IOException {
-        File updateDir = new File(conf.getTransferConfiguration().getUpdateMetadataDir(), bookDir.getName());
-        return FileUtils.createDirectory(updateDir.getAbsolutePath());
+    protected File getUpdateMetadataDir(File bookDir, BookTypeEnum bookType) throws IOException {
+        File dir;
+        if(bookType == BookTypeEnum.LYDBOG) {
+            dir = new File(conf.getTransferConfiguration().getUpdateAudioMetadataDir(), bookDir.getName());
+        } else {
+            dir = new File(conf.getTransferConfiguration().getUpdateEbookMetadataDir(), bookDir.getName());
+        }
+        return FileUtils.createDirectory(dir.getAbsolutePath());
     }
     
     /**
      * Retrieves the directory for updating the content and technical metadata for the given book.
      * @param bookDir The current directory of the book.
+     * @param bookType The type of book.
      * @return The update content directory for the book.
      * @throws IOException If it fails to create/retrieve the directory.
      */
-    protected File getUpdateContentDir(File bookDir) throws IOException {
-        File updateDir = new File(conf.getTransferConfiguration().getUpdateContentDir(), bookDir.getName());
-        return FileUtils.createDirectory(updateDir.getAbsolutePath());
+    protected File getUpdateContentDir(File bookDir, BookTypeEnum bookType) throws IOException {
+        File dir;
+        if(bookType == BookTypeEnum.LYDBOG) {
+            dir = new File(conf.getTransferConfiguration().getUpdateAudioContentDir(), bookDir.getName());
+        } else {
+            dir = new File(conf.getTransferConfiguration().getUpdateEbookContentDir(), bookDir.getName());
+        }
+        return FileUtils.createDirectory(dir.getAbsolutePath());
     }
+    
+    /**
+     * Retrieves the ingest directory for the given book.
+     * @param bookDir The current directory of the book.
+     * @param bookType The type of book.
+     * @return The ingest directory for the book.
+     * @throws IOException If it fails to create/retrieve the directory.
+     */
+    protected File getIngestDir(File bookDir, BookTypeEnum bookType) throws IOException {
+        File dir;
+        if(bookType == BookTypeEnum.LYDBOG) {
+            dir = new File(conf.getTransferConfiguration().getAudioIngestDir(), bookDir.getName());
+        } else {
+            dir = new File(conf.getTransferConfiguration().getEbookIngestDir(), bookDir.getName());
+        }
+        return FileUtils.createDirectory(dir.getAbsolutePath());        
+    }
+
     
     /**
      * Copies all the files to the update directory.

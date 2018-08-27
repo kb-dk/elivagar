@@ -54,14 +54,22 @@ public class ConfigurationTest extends ExtendedTestCase {
         
         addStep("Test the transfer configuration", "");
         Assert.assertNotNull(conf.getTransferConfiguration());
-        Assert.assertNotNull(conf.getTransferConfiguration().getUpdateContentDir());
-        Assert.assertNotNull(conf.getTransferConfiguration().getUpdateMetadataDir());
+        Assert.assertNotNull(conf.getTransferConfiguration().getEbookIngestDir());
+        Assert.assertNotNull(conf.getTransferConfiguration().getUpdateEbookContentDir());
+        Assert.assertNotNull(conf.getTransferConfiguration().getUpdateEbookMetadataDir());
+        Assert.assertNotNull(conf.getTransferConfiguration().getAudioIngestDir());
+        Assert.assertNotNull(conf.getTransferConfiguration().getUpdateAudioContentDir());
+        Assert.assertNotNull(conf.getTransferConfiguration().getUpdateAudioMetadataDir());
         Assert.assertNotNull(conf.getTransferConfiguration().getRetainCreateDate());
         Assert.assertNotNull(conf.getTransferConfiguration().getRetainModifyDate());
         Assert.assertNotNull(conf.getTransferConfiguration().getRetainPublicationDate());
         Assert.assertNotNull(conf.getTransferConfiguration().getRequiredFormats());
-        Assert.assertTrue(conf.getTransferConfiguration().getUpdateContentDir().isDirectory());
-        Assert.assertTrue(conf.getTransferConfiguration().getUpdateMetadataDir().isDirectory());
+        Assert.assertTrue(conf.getTransferConfiguration().getEbookIngestDir().isDirectory());
+        Assert.assertTrue(conf.getTransferConfiguration().getUpdateEbookContentDir().isDirectory());
+        Assert.assertTrue(conf.getTransferConfiguration().getUpdateEbookMetadataDir().isDirectory());
+        Assert.assertTrue(conf.getTransferConfiguration().getAudioIngestDir().isDirectory());
+        Assert.assertTrue(conf.getTransferConfiguration().getUpdateAudioContentDir().isDirectory());
+        Assert.assertTrue(conf.getTransferConfiguration().getUpdateAudioMetadataDir().isDirectory());
     }
     
     @Test

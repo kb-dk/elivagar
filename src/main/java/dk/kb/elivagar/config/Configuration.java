@@ -47,9 +47,12 @@ import dk.kb.elivagar.utils.YamlUtils;
  *     </ul>
  *     <li>transfer: (THIS ELEMENT IS NOT REQUIRED)</li>
  *     <ul>
- *       <li>ingest_path: /transfer/path/root/ingest/</li>
- *       <li>update_content_path: /transfer/path/root/content/</li>
- *       <li>update_metadata_path: /transfer/path/root/metadata/</li>
+ *       <li>ingest_ebook_path: /transfer/path/root/ingest/ebook/</li>
+ *       <li>update_ebook_content_path: /transfer/path/root/content/ebook/</li>
+ *       <li>update_ebook_metadata_path: /transfer/path/root/metadata/ebook/</li>
+ *       <li>ingest_audio_path: /transfer/path/root/ingest/audio/</li>
+ *       <li>update_audio_content_path: /transfer/path/root/content/audio/</li>
+ *       <li>update_audio_metadata_path: /transfer/path/root/metadata/audio/</li>
  *       <li>retain_create_date: -1 // TIME IN MILLIS</li>
  *       <li>retain_modify_date: -1 // TIME IN MILLIS</li>
  *       <li>retain_pub_date: -1 </li>
@@ -101,12 +104,18 @@ public class Configuration {
     
     /** The configuration transfer element.*/
     public static final String CONF_TRANSFER_ROOT = "transfer";
-    /** The base path for the ingest dir.*/
-    public static final String CONF_TRANSFER_INGEST_PATH = "ingest_path";
-    /** The base path for update dir for content and technical metadata.*/
-    public static final String CONF_TRANSFER_UPDATE_CONTENT_PATH = "update_content_path";
-    /** The base path for update dir for metadata (except technical metadata).*/
-    public static final String CONF_TRANSFER_UPDATE_METADATA_PATH = "update_metadata_path";
+    /** The base path for the ingest dir for ebooks.*/
+    public static final String CONF_TRANSFER_EBOOK_INGEST_PATH = "ingest_ebook_path";
+    /** The base path for update dir for ebook content and technical metadata.*/
+    public static final String CONF_TRANSFER_EBOOK_UPDATE_CONTENT_PATH = "update_ebook_content_path";
+    /** The base path for update dir for ebook metadata (except technical metadata).*/
+    public static final String CONF_TRANSFER_EBOOK_UPDATE_METADATA_PATH = "update_ebook_metadata_path";
+    /** The base path for the ingest dir for audio books.*/
+    public static final String CONF_TRANSFER_AUDIO_INGEST_PATH = "ingest_audio_path";
+    /** The base path for update dir for audio content and technical metadata.*/
+    public static final String CONF_TRANSFER_AUDIO_UPDATE_CONTENT_PATH = "update_audio_content_path";
+    /** The base path for update dir for audio metadata (except technical metadata).*/
+    public static final String CONF_TRANSFER_AUDIO_UPDATE_METADATA_PATH = "update_audio_metadata_path";
     /** The retain interval for the create date, in millis.*/
     public static final String CONF_TRANSFER_RETAIN_CREATE_DATE = "retain_create_date";
     /** The retain interval for the modify data, in millis.*/
@@ -213,28 +222,41 @@ public class Configuration {
      */
     @SuppressWarnings("unchecked")
     protected TransferConfiguration getTransferConfiguration(Map<String, Object> transferMap) throws IOException {
-        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_INGEST_PATH, "transferMap");
-        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_UPDATE_CONTENT_PATH, "transferMap");
-        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_UPDATE_METADATA_PATH, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_EBOOK_INGEST_PATH, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_EBOOK_UPDATE_CONTENT_PATH, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_EBOOK_UPDATE_METADATA_PATH, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_AUDIO_INGEST_PATH, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_AUDIO_UPDATE_CONTENT_PATH, "transferMap");
+        ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_AUDIO_UPDATE_METADATA_PATH, "transferMap");
         ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_RETAIN_CREATE_DATE, "transferMap");
         ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_RETAIN_MODIFY_DATE, "transferMap");
         ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_RETAIN_PUBLICATION_DATE, "transferMap");
         ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_REQUIRED_FORMATS, "transferMap");
 
-        String baseIngestPath = (String) transferMap.get(CONF_TRANSFER_INGEST_PATH);
-        File baseIngestDir = FileUtils.createDirectory(baseIngestPath);
+        String baseIngestEbookPath = (String) transferMap.get(CONF_TRANSFER_EBOOK_INGEST_PATH);
+        File baseIngestEbookDir = FileUtils.createDirectory(baseIngestEbookPath);
 
-        String baseContentPath = (String) transferMap.get(CONF_TRANSFER_UPDATE_CONTENT_PATH);
-        File baseContentDir = FileUtils.createDirectory(baseContentPath);
+        String baseContentEbookPath = (String) transferMap.get(CONF_TRANSFER_EBOOK_UPDATE_CONTENT_PATH);
+        File baseContentEbookDir = FileUtils.createDirectory(baseContentEbookPath);
 
-        String baseMetadataPath = (String) transferMap.get(CONF_TRANSFER_UPDATE_METADATA_PATH);
-        File baseMetadataDir = FileUtils.createDirectory(baseMetadataPath);
+        String baseMetadataEbookPath = (String) transferMap.get(CONF_TRANSFER_EBOOK_UPDATE_METADATA_PATH);
+        File baseMetadataEbookDir = FileUtils.createDirectory(baseMetadataEbookPath);
+
+        String baseIngestAudioPath = (String) transferMap.get(CONF_TRANSFER_AUDIO_INGEST_PATH);
+        File baseIngestAudioDir = FileUtils.createDirectory(baseIngestAudioPath);
+
+        String baseContentAudioPath = (String) transferMap.get(CONF_TRANSFER_AUDIO_UPDATE_CONTENT_PATH);
+        File baseContentAudioDir = FileUtils.createDirectory(baseContentAudioPath);
+
+        String baseMetadataAudioPath = (String) transferMap.get(CONF_TRANSFER_AUDIO_UPDATE_METADATA_PATH);
+        File baseMetadataAudioDir = FileUtils.createDirectory(baseMetadataAudioPath);
 
         Long retainCreateDate = LongUtils.getLong(transferMap.get(CONF_TRANSFER_RETAIN_CREATE_DATE));
         Long retainModifyDate = LongUtils.getLong(transferMap.get(CONF_TRANSFER_RETAIN_MODIFY_DATE));
         Long retainPublicationDate = LongUtils.getLong(transferMap.get(CONF_TRANSFER_RETAIN_PUBLICATION_DATE));
         List<String> requiredFormats = (List<String>) transferMap.get(CONF_TRANSFER_REQUIRED_FORMATS);
-        return new TransferConfiguration(baseIngestDir, baseContentDir, baseMetadataDir, retainCreateDate, 
+        return new TransferConfiguration(baseIngestEbookDir, baseContentEbookDir, baseMetadataEbookDir, 
+                baseIngestAudioDir, baseContentAudioDir, baseMetadataAudioDir, retainCreateDate, 
                 retainModifyDate, retainPublicationDate, requiredFormats);
     }
     
