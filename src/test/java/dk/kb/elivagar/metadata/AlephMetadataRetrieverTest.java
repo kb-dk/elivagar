@@ -192,7 +192,7 @@ public class AlephMetadataRetrieverTest extends ExtendedTestCase {
         addDescription("Test the retrieval of search results from Aleph.");
         HttpClient httpClient = mock(HttpClient.class);
 
-        String id = UUID.randomUUID().toString();
+        final String id = UUID.randomUUID().toString();
 
         AlephMetadataRetriever retriever = new AlephMetadataRetriever(configuration, httpClient);
 
