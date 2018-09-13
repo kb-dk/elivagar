@@ -4,7 +4,7 @@
 
   <groupId>dk.kb</groupId>
   <artifactId>elivagar</artifactId>
-  <version>1.4.2-java7</version>
+  <version>1.4.3</version>
   <packaging>jar</packaging>
 
   <name>elivagar</name>
@@ -77,9 +77,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>dk.pubhub.service</groupId>
+      <groupId>dk.kb.pubhub.service</groupId>
       <artifactId>pubhubWSClient</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.yaml</groupId>
