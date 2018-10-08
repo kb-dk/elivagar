@@ -58,8 +58,10 @@ public class CharacterizationHandler {
         if(shouldCharacterize(outputFile, inputFile)) {
             try {
                 epubCharacterizer.characterize(inputFile, outputFile);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 log.warn("Failure when trying to characterize the epub file: " + inputFile.getAbsolutePath(), e);
+                log.info("Trying to cleanup memory. Then continue.");
+                System.gc();
             }
         } else {
             log.trace("No need to characterizing the epub file: " + inputFile.getAbsolutePath());
@@ -84,7 +86,7 @@ public class CharacterizationHandler {
         if(shouldCharacterize(characterizationOutputFile, inputFile)) {
             try { 
                 fitsCharacterizer.performCharacterization(inputFile, characterizationOutputFile);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 log.warn("Failure when trying to do the FITS characterization for the file: "
                         + inputFile.getAbsolutePath(), e);
             }
