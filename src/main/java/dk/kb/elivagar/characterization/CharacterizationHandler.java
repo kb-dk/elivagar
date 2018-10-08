@@ -98,11 +98,13 @@ public class CharacterizationHandler {
     /**
      * Checks whether the given type of characterization should be performed.
      * If the output file does not exist, or if it is older than the input file, then a characterization is needed.
+     * Or if the output file is of size zero.
      * @param outputFile The output file.
      * @param inputFile The input file.
      * @return Whether a new characterization is needed.
      */
     protected boolean shouldCharacterize(File outputFile, File inputFile) {
-        return !outputFile.exists() || outputFile.lastModified() < inputFile.lastModified();
+        return !outputFile.exists() || outputFile.lastModified() < inputFile.lastModified() 
+                || outputFile.length() == 0;
     }
 }
