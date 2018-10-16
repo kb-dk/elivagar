@@ -154,7 +154,7 @@ public class PubhubPacker {
         File bookDir = getBookDir(id, BookTypeEnum.EBOG);
         File bookLinkFile = new File(bookDir, bookFile.getName());
         if(bookLinkFile.isFile()) {
-            log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
+            log.trace("The hard link for the book file for book-id '" + id + "' already exists.");
         } else {
             Files.createLink(bookLinkFile.toPath(), bookFile.toPath().toAbsolutePath());
         }
@@ -168,7 +168,7 @@ public class PubhubPacker {
      * This makes a hard link to the file from the audio book folder to the original file.
      * It is a prerequisite that the file has the name of the ID.
      * The file name might be in upper-case, but the ID should be in lower-case, therefore
-     * it is lowercased for the directory, the symbolic link and the characterization file.
+     * it is lowercased for the directory, the hard link and the characterization file.
      * Also, if the file is ignored, if it does not have an audio book suffix.
      * 
      * This will also perform the characterization, if needed.
@@ -188,7 +188,7 @@ public class PubhubPacker {
         File bookDir = getBookDir(id, BookTypeEnum.LYDBOG);
         File bookLinkFile = new File(bookDir, bookFile.getName().toLowerCase());
         if(bookLinkFile.isFile()) {
-            log.trace("The symbolic link for the book file for book-id '" + id + "' already exists.");
+            log.trace("The hard link for the book file for book-id '" + id + "' already exists.");
         } else {
             Files.createLink(bookLinkFile.toPath(), bookFile.toPath().toAbsolutePath());
         }
