@@ -23,7 +23,7 @@ do
 done
 #echo $CP
 if [ -z "${JAVA_OPTS}" ]; then
-  JAVA_OPTS="-Xms256m -Xmx2048m"
+  JAVA_OPTS="-Xms256m -Xmx4096m"
 fi
 
 cd ${assembly.home.env.name.ref}
