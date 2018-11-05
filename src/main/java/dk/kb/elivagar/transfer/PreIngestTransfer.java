@@ -308,7 +308,6 @@ public class PreIngestTransfer {
         }
         return FileUtils.createDirectory(dir.getAbsolutePath());        
     }
-
     
     /**
      * Copies all the files to the update directory.

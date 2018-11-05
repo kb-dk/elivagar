@@ -63,8 +63,8 @@ public class ElivagarVerification {
     protected static boolean validateConfiguration(Configuration conf) {
         boolean failure = false;
         
-        failure = validateDirectory(conf.getEbookOutputDir(), "Ebook Output Dir") || failure;
-        failure = validateDirectory(conf.getAudioOutputDir(), "Audio Output Dir") || failure;
+        failure = validateReadWriteDirectory(conf.getEbookOutputDir(), "Ebook Output Dir") || failure;
+        failure = validateReadWriteDirectory(conf.getAudioOutputDir(), "Audio Output Dir") || failure;
         failure = validateReadOnlyDirectory(conf.getEbookFileDir(), "Ebook Orig Dir") || failure;
         failure = validateReadOnlyDirectory(conf.getAudioFileDir(), "Audio Orig Dir") || failure;
         // TODO: Validate LICENSE ??
@@ -103,7 +103,7 @@ public class ElivagarVerification {
     protected static boolean verifyAlephConfiguration(AlephConfiguration alephConf) {
         boolean failure = false;
         
-        failure = validateDirectory(alephConf.getTempDir(), "Aleph Temp Dir");
+        failure = validateReadWriteDirectory(alephConf.getTempDir(), "Aleph Temp Dir");
         try {
             HttpClient httpClient = new HttpClient();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -125,15 +125,15 @@ public class ElivagarVerification {
      */
     protected static boolean verifyTransferConfiguration(TransferConfiguration transferConf) {
         boolean failure = false;
-        failure = validateDirectory(transferConf.getEbookIngestDir(), "Transfer Ingest Ebook Dir") || failure;
-        failure = validateDirectory(transferConf.getUpdateEbookContentDir(), 
+        failure = validateReadWriteDirectory(transferConf.getEbookIngestDir(), "Transfer Ingest Ebook Dir") || failure;
+        failure = validateReadWriteDirectory(transferConf.getUpdateEbookContentDir(), 
                 "Transfer Update Ebook Content Dir") || failure;
-        failure = validateDirectory(transferConf.getUpdateEbookMetadataDir(), 
+        failure = validateReadWriteDirectory(transferConf.getUpdateEbookMetadataDir(), 
                 "Transfer Update Ebook Metadata Dir") || failure;
-        failure = validateDirectory(transferConf.getAudioIngestDir(), "Transfer Ingest Audio Dir") || failure;
-        failure = validateDirectory(transferConf.getUpdateAudioContentDir(), 
+        failure = validateReadWriteDirectory(transferConf.getAudioIngestDir(), "Transfer Ingest Audio Dir") || failure;
+        failure = validateReadWriteDirectory(transferConf.getUpdateAudioContentDir(), 
                 "Transfer Update Audio Content Dir") || failure;
-        failure = validateDirectory(transferConf.getUpdateAudioMetadataDir(), 
+        failure = validateReadWriteDirectory(transferConf.getUpdateAudioMetadataDir(), 
                 "Transfer Update Audio Metadata Dir") || failure;
         // TODO: Validate retain dirs or formats?
         
@@ -146,7 +146,7 @@ public class ElivagarVerification {
      * @param configurationName The name of the related configuration.
      * @return Whether or not the directory is valid.
      */
-    protected static boolean validateDirectory(File dir, String configurationName) {
+    protected static boolean validateReadWriteDirectory(File dir, String configurationName) {
         if(dir.isDirectory()) {
             System.out.println(configurationName + " (" + dir.getAbsolutePath() + ") is a valid directory.");
         } else {
