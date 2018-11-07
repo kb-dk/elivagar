@@ -148,4 +148,60 @@ public class FileUtilsTest extends ExtendedTestCase {
         
         FileUtils.getFilesInDirectory(dir);
     }
+    
+    @Test
+    public void testMoveFileOntoEmptyLocation() throws Exception {
+        addDescription("Test the moveFile method with non-existing file as destination.");
+        File orig = TestFileUtils.createTempFile(UUID.randomUUID().toString());
+        File dest = new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString());
+        
+        String origPath = orig.getAbsolutePath();
+        String destPath = dest.getAbsolutePath();
+        
+        Assert.assertTrue(new File(origPath).exists());
+        Assert.assertFalse(new File(destPath).exists());
+        
+        FileUtils.moveFile(orig, dest);
+
+        Assert.assertFalse(new File(origPath).exists());
+        Assert.assertTrue(new File(destPath).exists());
+    }
+    
+    @Test
+    public void testMoveFileOverride() throws Exception {
+        addDescription("Test the moveFile method with existing file as destination.");
+        String content = UUID.randomUUID().toString();
+        File orig = TestFileUtils.createTempFile(content);
+        File dest = TestFileUtils.createTempFile(UUID.randomUUID().toString());
+        
+        String origPath = orig.getAbsolutePath();
+        String destPath = dest.getAbsolutePath();
+        
+        Assert.assertTrue(new File(origPath).exists());
+        Assert.assertTrue(new File(destPath).exists());
+        
+        FileUtils.moveFile(orig, dest);
+
+        Assert.assertFalse(new File(origPath).exists());
+        Assert.assertTrue(new File(destPath).exists());
+        
+        String newContent = TestFileUtils.readFile(new File(destPath));
+        Assert.assertEquals(newContent, content);
+    }
+    
+    @Test
+    public void testAreFilesIdentical() throws Exception {
+        addDescription("Test the areFilesIdentical method");
+        addStep("Test with two files with identical content", "Must return true.");
+        String content = UUID.randomUUID().toString();
+        File f1 = TestFileUtils.createTempFile(content);
+        File f2 = TestFileUtils.createTempFile(content);
+        
+        Assert.assertTrue(FileUtils.areFilesIdentical(f1, f2));
+        
+        addStep("Test with two files with different content", "Must return false.");
+        File f3 = TestFileUtils.createTempFile(UUID.randomUUID().toString());
+
+        Assert.assertFalse(FileUtils.areFilesIdentical(f1, f3));
+    }
 }

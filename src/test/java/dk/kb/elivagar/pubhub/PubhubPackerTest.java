@@ -8,10 +8,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
@@ -31,6 +33,7 @@ import dk.kb.elivagar.characterization.CharacterizationHandler;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.testutils.TestConfigurations;
 import dk.kb.elivagar.testutils.TestFileUtils;
+import dk.kb.elivagar.utils.FileUtils;
 import dk.pubhub.service.ArrayOfImage;
 import dk.pubhub.service.Book;
 import dk.pubhub.service.BookTypeEnum;
@@ -126,6 +129,95 @@ public class PubhubPackerTest extends ExtendedTestCase {
         verifyNoMoreInteractions(httpClient);
     }
 
+    @Test
+    public void testPackBookAlreadyExistsDifferent() throws Exception {
+        addDescription("Test the packBook method when another different file already exists in the place of the pubhub metadata.");
+        String serviceNamespace = "test-" + UUID.randomUUID().toString();
+        CharacterizationHandler characterizer = mock(CharacterizationHandler.class);
+        HttpClient httpClient = mock(HttpClient.class);
+        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, characterizer, httpClient);
+        
+        String id = UUID.randomUUID().toString();
+        
+        File bookDir = new File(conf.getEbookOutputDir(), id);
+        FileUtils.createDirectory(bookDir.getAbsolutePath());
+        File metadataFile = new File(bookDir, id + Constants.PUBHUB_METADATA_SUFFIX);
+        TestFileUtils.createFile(metadataFile, UUID.randomUUID().toString());
+        long origFileLength = metadataFile.length();
+
+        Book book = new Book();
+        book.setBookId(id);
+        book.setBookType(BookTypeEnum.EBOG);
+        
+        ArrayOfImage images = mock(ArrayOfImage.class);
+        book.setImages(images);
+        when(images.getImage()).thenReturn(new ArrayList<Image>());
+        
+        Assert.assertTrue(bookDir.exists());
+        Assert.assertTrue(metadataFile.exists());
+
+        packer.packBook(book);
+
+        Assert.assertTrue(bookDir.exists());
+        Assert.assertTrue(bookDir.isDirectory());
+        Assert.assertTrue(metadataFile.exists(), metadataFile.getAbsolutePath());
+        Assert.assertTrue(metadataFile.isFile());
+        
+        verify(images).getImage();
+        verifyNoMoreInteractions(images);
+        
+        verifyZeroInteractions(characterizer);
+        verifyZeroInteractions(httpClient);
+        
+        Assert.assertFalse(origFileLength == metadataFile.length());
+    }
+
+    @Test
+    public void testPackBookAlreadyExistsIdentical() throws Exception {
+        addDescription("Test the packBook method when another identical file already exists in the place of the pubhub metadata.");
+        String serviceNamespace = "test-" + UUID.randomUUID().toString();
+        CharacterizationHandler characterizer = mock(CharacterizationHandler.class);
+        HttpClient httpClient = mock(HttpClient.class);
+        PubhubPacker packer = new PubhubPacker(conf, serviceNamespace, characterizer, httpClient);
+        
+        String id = UUID.randomUUID().toString();
+        String content = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+                + "<ns2:Book xmlns=\"http://service.pubhub.dk/\" xmlns:ns2=\"" + serviceNamespace + "\">\n"
+                + "    <BookType>Ebog</BookType>\n"
+                + "    <BookId>" + id + "</BookId>\n"
+                + "    <BookFormat xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:nil=\"true\"/>\n"
+                + "    <SubscriptionSaleAllowed>false</SubscriptionSaleAllowed>\n"
+                + "    <Images/>\n"
+                + "</ns2:Book>\n";
+        
+        File bookDir = new File(conf.getEbookOutputDir(), id);
+        FileUtils.createDirectory(bookDir.getAbsolutePath());
+        File metadataFile = new File(bookDir, id + Constants.PUBHUB_METADATA_SUFFIX);
+        TestFileUtils.createFile(metadataFile, content);
+
+        Book book = new Book();
+        book.setBookId(id);
+        book.setBookType(BookTypeEnum.EBOG);
+        
+        ArrayOfImage images = mock(ArrayOfImage.class);
+        book.setImages(images);
+        when(images.getImage()).thenReturn(new ArrayList<Image>());
+        
+        Assert.assertTrue(bookDir.exists());
+        Assert.assertTrue(metadataFile.exists());
+
+        packer.packBook(book);
+
+        Assert.assertTrue(bookDir.exists());
+        Assert.assertTrue(bookDir.isDirectory());
+        Assert.assertTrue(metadataFile.exists(), metadataFile.getAbsolutePath());
+        Assert.assertTrue(metadataFile.isFile());
+        
+        verifyZeroInteractions(images);
+        verifyZeroInteractions(characterizer);
+        verifyZeroInteractions(httpClient);
+    }
+    
     @Test
     public void testPackBookImageFailure() throws Exception {
         addDescription("Test the packBook method, when it fails to retrieve an image");

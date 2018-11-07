@@ -1,7 +1,9 @@
 package dk.kb.elivagar.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -103,6 +105,43 @@ public class FileUtils {
             return Files.readSymbolicLink(f.toPath());
         } else {
             return f.toPath();
+        }
+    }
+    
+    /**
+     * Moves one file to another destination.
+     * @param orig The original file to move.
+     * @param dest The destination for file.
+     * @throws IOException If it fails to move the file.
+     */
+    public static void moveFile(File orig, File dest) throws IOException {
+        ArgumentCheck.checkExistsNormalFile(orig, "File orig");
+        if(dest.exists()) {
+            deleteFile(dest);
+        }
+        
+        boolean success = orig.renameTo(dest);
+        if(!success) {
+            throw new IOException("Failed to move the file.");
+        }
+    }
+    
+    /**
+     * Checks whether two files are identical. Calculates the checksum and compares them.
+     * Returns false, if they are not identical.
+     * @param f1 The first file.
+     * @param f2 The second file.
+     * @return Whether or not they are identical.
+     * @throws IOException If it fails to calculate the checksum of the files.
+     */
+    public static boolean areFilesIdentical(File f1, File f2) throws IOException {
+        ArgumentCheck.checkExistsNormalFile(f1, "File f1");
+        ArgumentCheck.checkExistsNormalFile(f2, "File f2");
+        try (InputStream in1 = new FileInputStream(f1);
+                InputStream in2 = new FileInputStream(f2);) {
+            String c1 = ChecksumUtils.generateMD5Checksum(in1);
+            String c2 = ChecksumUtils.generateMD5Checksum(in2);
+            return c1.equals(c2);
         }
     }
 }

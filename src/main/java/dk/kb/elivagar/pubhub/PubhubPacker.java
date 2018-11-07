@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -112,10 +113,22 @@ public class PubhubPacker {
 
         JAXBElement<Book> rootElement = null;
         Marshaller marshaller = getMarshallerForClass(book.getClass());
-        File bookFile = new File(bookDir, book.getBookId() +  Constants.PUBHUB_METADATA_SUFFIX);
         rootElement = new JAXBElement<Book>(new QName(namespace, Book.class.getSimpleName()), 
                 Book.class, book);
-        marshaller.marshal(rootElement, bookFile);
+        
+        File bookFile = new File(bookDir, book.getBookId() +  Constants.PUBHUB_METADATA_SUFFIX);
+        if(bookFile.exists()) {
+            File tempBookFile = new File(bookDir, UUID.randomUUID().toString());
+            marshaller.marshal(rootElement, tempBookFile);
+            if(FileUtils.areFilesIdentical(bookFile, tempBookFile)) {
+                FileUtils.deleteFile(tempBookFile);
+                return;
+            } else {
+                FileUtils.moveFile(tempBookFile, bookFile);
+            }
+        } else {
+            marshaller.marshal(rootElement, bookFile);
+        }
 
         for(Image image : book.getImages().getImage()) {
             try {
