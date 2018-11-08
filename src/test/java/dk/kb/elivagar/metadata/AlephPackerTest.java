@@ -1,10 +1,9 @@
 package dk.kb.elivagar.metadata;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -19,21 +18,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import org.apache.log4j.lf5.util.StreamUtils;
 import org.jaccept.structure.ExtendedTestCase;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import dk.kb.elivagar.Constants;
-import dk.kb.elivagar.HttpClient;
-import dk.kb.elivagar.config.AlephConfiguration;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.metadata.MetadataTransformer.TransformationType;
 import dk.kb.elivagar.testutils.TestConfigurations;
 import dk.kb.elivagar.testutils.TestFileUtils;
+import dk.kb.elivagar.utils.StreamUtils;
 
 public class AlephPackerTest extends ExtendedTestCase {
 
@@ -43,6 +41,11 @@ public class AlephPackerTest extends ExtendedTestCase {
     public void setup() throws Exception {
         TestFileUtils.setup();
         configuration = TestConfigurations.getConfigurationForTest();
+    }
+    
+    @AfterClass
+    public void tearDown() throws Exception {
+//        TestFileUtils.tearDown();
     }
     
     @Test
@@ -130,11 +133,22 @@ public class AlephPackerTest extends ExtendedTestCase {
         String expectedIsbn = "9788711436981";
         String id = UUID.randomUUID().toString();
         File dir = TestFileUtils.createEmptyDirectory(new File(TestFileUtils.getTempDir(), id).getAbsolutePath());
+        final File modsTestFile = new File("src/test/resources/metadata/mods.xml");
+        Assert.assertTrue(modsTestFile.isFile());
         
         TestFileUtils.copyFile(new File("src/test/resources/metadata/pubhub_metadata.xml"), new File(dir, dir.getName() + Constants.PUBHUB_METADATA_SUFFIX));
         
         File modsFile = new File(dir, dir.getName() + Constants.MODS_METADATA_SUFFIX);
         Assert.assertFalse(modsFile.exists());
+        
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                OutputStream out = (OutputStream) invocation.getArguments()[1];
+                StreamUtils.copyInputStreamToOutputStream(new FileInputStream(modsTestFile), out);
+                return null;
+            }
+        }).when(transformer).transformMetadata(any(InputStream.class), any(OutputStream.class), eq(TransformationType.MARC21_TO_MODS));
         
         packer.packageMetadataForBook(dir);
 

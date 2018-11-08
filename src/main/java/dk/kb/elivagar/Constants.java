@@ -23,4 +23,7 @@ public class Constants {
 
     /** The suffix for the epub files.*/
     public static final String EPUB_FILE_SUFFIX = ".epub";
+    
+    /** The suffix for a file containing an error.*/
+    public static final String ERROR_SUFFIX = ".error";
 }

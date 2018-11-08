@@ -35,7 +35,7 @@ public class Base16Utils {
      */
     public static byte[] encodeBase16(String hexString) {
         ArgumentCheck.checkNotNullOrEmpty(hexString, "String hexString");
-        ArgumentCheck.checkTrue((hexString.length() % 2) == 0, "String hexString, '" + hexString 
+        ArgumentCheck.checkTrue(hexString.length() % 2 == 0, "String hexString, '" + hexString 
                 + "', must be an even number of characters.");
         
         int len = hexString.length();

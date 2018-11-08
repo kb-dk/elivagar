@@ -21,6 +21,7 @@ import org.w3c.dom.Document;
 import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.exception.ArgumentCheck;
+import dk.kb.elivagar.utils.FileUtils;
 
 /**
  * The Aleph packer.
@@ -46,12 +47,13 @@ public class AlephPacker {
     protected final AlephMetadataRetriever metadataRetriever;
     /** The metadata transformer, for transforming the Aleph metadata first into MARC21 and then into MODS.*/
     protected final MetadataTransformer transformer;
+    /** The metadata validator.*/
+    protected final MetadataValidator validator;
 
     /** The document builder factory.*/
     protected final DocumentBuilderFactory factory;
     /** The XPath factory.*/
     protected final XPathFactory xPathfactory;
-
     
     /**
      * Constructor.
@@ -68,6 +70,7 @@ public class AlephPacker {
         this.transformer = transformer;
         this.factory = DocumentBuilderFactory.newInstance();
         this.xPathfactory = XPathFactory.newInstance();
+        this.validator = new MetadataValidator();
     }
     
     /**
@@ -127,12 +130,28 @@ public class AlephPacker {
             try (OutputStream out = new FileOutputStream(modsMetadata)) {
                 transformMarcToMods(marcMetadata, out);
             }
-
-            alephMetadata.deleteOnExit();
-            marcMetadata.deleteOnExit();
+            
+            FileUtils.deleteFile(alephMetadata);
+            FileUtils.deleteFile(marcMetadata);
+            
+            handleXmlValidity(modsMetadata);
         } catch (Exception e) {
             log.info("Non-critical failure while trying to retrieve the Aleph metadata for the book directory '" 
                     + dir.getAbsolutePath() + "'", e);
+        }
+    }
+    
+    /**
+     * Checks whether an XML file is valid, and if it is not, then move it to 'XXX.error'.
+     * @param xmlFile The XML file to validate.
+     */
+    protected void handleXmlValidity(File xmlFile) throws IOException {
+        if(validator.isValid(xmlFile)) {
+            log.debug("Valid MODS!");
+        } else {
+            log.warn("Invalid MODS! Moving it to error");
+            File errorFile = new File(xmlFile.getAbsolutePath() + Constants.ERROR_SUFFIX);
+            FileUtils.moveFile(xmlFile, errorFile);
         }
     }
     

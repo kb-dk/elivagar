@@ -85,8 +85,9 @@ public class FileUtils {
      */
     public static Collection<File> getFilesInDirectory(File dir) {
         ArgumentCheck.checkExistsDirectory(dir, "File dir");
-        if(dir.listFiles() != null) {
-            return Arrays.asList(dir.listFiles());
+        File[] files = dir.listFiles();
+        if(files != null) {
+            return Arrays.asList(files);
         } else {
             throw new IllegalStateException("Unable to obtain the list of files from directory "
                     + dir.getAbsolutePath());

@@ -122,9 +122,11 @@ public class PubhubPacker {
             marshaller.marshal(rootElement, tempBookFile);
             if(FileUtils.areFilesIdentical(bookFile, tempBookFile)) {
                 FileUtils.deleteFile(tempBookFile);
+                log.debug("Do not pack book '" + book.getBookId() + "'. Identical to latest retrieved version.");
                 return;
             } else {
                 FileUtils.moveFile(tempBookFile, bookFile);
+                log.debug("Overriding metadata for book '" + book.getBookId() + "'.");
             }
         } else {
             marshaller.marshal(rootElement, bookFile);
@@ -135,6 +137,7 @@ public class PubhubPacker {
                 log.debug("Retrieving image file for '" + book.getBookId() + "', at " + image.getValue());
                 String suffix = StringUtils.getSuffix(image.getValue());
                 File imageFile = new File(bookDir, book.getBookId() + "_" + image.getType() + "." + suffix);
+                // TODO: if the file already exists, then check last modify through http HEAD
 
                 try (OutputStream os = new FileOutputStream(imageFile)) {
                     httpClient.retrieveUrlContent(image.getValue(), os);
