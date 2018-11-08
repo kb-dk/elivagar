@@ -126,13 +126,19 @@ public class AlephPacker {
             
             File alephMetadata = getAlephMetadata(isbn);
             File marcMetadata = transformAlephMetadataToMarc(alephMetadata, isbn);
+            File tempModsFile = new File(dir, dir.getName() + Constants.TEMP_MODS_METADATA_SUFFIX);
 
-            try (OutputStream out = new FileOutputStream(modsMetadata)) {
+            try (OutputStream out = new FileOutputStream(tempModsFile)) {
                 transformMarcToMods(marcMetadata, out);
+            }
+            
+            try (OutputStream out = new FileOutputStream(modsMetadata)) {
+                transformModsCleanup(tempModsFile, out);
             }
             
             FileUtils.deleteFile(alephMetadata);
             FileUtils.deleteFile(marcMetadata);
+            FileUtils.deleteFile(tempModsFile);
             
             handleXmlValidity(modsMetadata);
         } catch (Exception e) {
@@ -231,6 +237,19 @@ public class AlephPacker {
     protected void transformMarcToMods(File marcMetadata, OutputStream modsOutput) throws IOException {
         try (InputStream in = new FileInputStream(marcMetadata)) {
             transformer.transformMetadata(in, modsOutput, MetadataTransformer.TransformationType.MARC21_TO_MODS);
+            modsOutput.flush();
+        } 
+    }
+    
+    /**
+     * Transforms a potential dirty MODS file to a clean MODS file.
+     * @param marcMetadata The dirty MODS file.
+     * @param modsOutput The output stream, where the clean MODS metadata is written.
+     * @throws IOException If it somehow fails to make the transformation.
+     */
+    protected void transformModsCleanup(File dirtyModsMetadata, OutputStream modsOutput) throws IOException {
+        try (InputStream in = new FileInputStream(dirtyModsMetadata)) {
+            transformer.transformMetadata(in, modsOutput, MetadataTransformer.TransformationType.MODS_CLEANUP);
             modsOutput.flush();
         } 
     }

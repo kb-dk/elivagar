@@ -159,6 +159,7 @@ public class AlephPackerTest extends ExtendedTestCase {
         
         verify(transformer).transformMetadata(any(InputStream.class), any(OutputStream.class), eq(TransformationType.ALEPH_TO_MARC21));
         verify(transformer).transformMetadata(any(InputStream.class), any(OutputStream.class), eq(TransformationType.MARC21_TO_MODS));
+        verify(transformer).transformMetadata(any(InputStream.class), any(OutputStream.class), eq(TransformationType.MODS_CLEANUP));
         verifyNoMoreInteractions(transformer);
     }
     
@@ -397,6 +398,24 @@ public class AlephPackerTest extends ExtendedTestCase {
         verifyZeroInteractions(retriever);
         
         verify(transformer).transformMetadata(any(InputStream.class), any(OutputStream.class), eq(MetadataTransformer.TransformationType.MARC21_TO_MODS));
+        verifyNoMoreInteractions(transformer);
+    }
+    
+    @Test
+    public void testTransformModsCleanup() throws Exception {
+        addDescription("Test the transformMarcToMods method");
+        AlephMetadataRetriever retriever = mock(AlephMetadataRetriever.class);
+        MetadataTransformer transformer = mock(MetadataTransformer.class);
+        
+        AlephPacker packer = new AlephPacker(configuration, retriever, transformer);
+        
+        File marcMetadata = TestFileUtils.createTempFile(UUID.randomUUID().toString());
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        packer.transformModsCleanup(marcMetadata, output);
+        
+        verifyZeroInteractions(retriever);
+        
+        verify(transformer).transformMetadata(any(InputStream.class), any(OutputStream.class), eq(MetadataTransformer.TransformationType.MODS_CLEANUP));
         verifyNoMoreInteractions(transformer);
     }
 }
