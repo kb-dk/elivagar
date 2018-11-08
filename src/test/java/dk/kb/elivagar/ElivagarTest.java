@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 
 import dk.kb.elivagar.testutils.PreventSystemExit;
 import dk.kb.elivagar.testutils.TestFileUtils;
+import dk.kb.elivagar.utils.FileUtils;
 
 public class ElivagarTest extends ExtendedTestCase {
 
@@ -21,6 +22,13 @@ public class ElivagarTest extends ExtendedTestCase {
     public void setup() throws IOException {
         testDir = TestFileUtils.createEmptyDirectory("tempDir");
         Assert.assertTrue(testConfFile.isFile());
+        
+        FileUtils.createDirectory("tempDir/transfer/ebook/ingest");
+        FileUtils.createDirectory("tempDir/transfer/ebook/content");
+        FileUtils.createDirectory("tempDir/transfer/ebook/metadata");
+        FileUtils.createDirectory("tempDir/transfer/audio/ingest");
+        FileUtils.createDirectory("tempDir/transfer/audio/content");
+        FileUtils.createDirectory("tempDir/transfer/audio/metadata");
     }
     
     @Test

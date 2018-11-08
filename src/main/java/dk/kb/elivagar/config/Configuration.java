@@ -234,22 +234,22 @@ public class Configuration {
         ArgumentCheck.checkThatMapContainsKey(transferMap, CONF_TRANSFER_REQUIRED_FORMATS, "transferMap");
 
         String baseIngestEbookPath = (String) transferMap.get(CONF_TRANSFER_EBOOK_INGEST_PATH);
-        File baseIngestEbookDir = FileUtils.createDirectory(baseIngestEbookPath);
+        File baseIngestEbookDir = FileUtils.getExistingDirectory(baseIngestEbookPath);
 
         String baseContentEbookPath = (String) transferMap.get(CONF_TRANSFER_EBOOK_UPDATE_CONTENT_PATH);
-        File baseContentEbookDir = FileUtils.createDirectory(baseContentEbookPath);
+        File baseContentEbookDir = FileUtils.getExistingDirectory(baseContentEbookPath);
 
         String baseMetadataEbookPath = (String) transferMap.get(CONF_TRANSFER_EBOOK_UPDATE_METADATA_PATH);
-        File baseMetadataEbookDir = FileUtils.createDirectory(baseMetadataEbookPath);
+        File baseMetadataEbookDir = FileUtils.getExistingDirectory(baseMetadataEbookPath);
 
         String baseIngestAudioPath = (String) transferMap.get(CONF_TRANSFER_AUDIO_INGEST_PATH);
-        File baseIngestAudioDir = FileUtils.createDirectory(baseIngestAudioPath);
+        File baseIngestAudioDir = FileUtils.getExistingDirectory(baseIngestAudioPath);
 
         String baseContentAudioPath = (String) transferMap.get(CONF_TRANSFER_AUDIO_UPDATE_CONTENT_PATH);
-        File baseContentAudioDir = FileUtils.createDirectory(baseContentAudioPath);
+        File baseContentAudioDir = FileUtils.getExistingDirectory(baseContentAudioPath);
 
         String baseMetadataAudioPath = (String) transferMap.get(CONF_TRANSFER_AUDIO_UPDATE_METADATA_PATH);
-        File baseMetadataAudioDir = FileUtils.createDirectory(baseMetadataAudioPath);
+        File baseMetadataAudioDir = FileUtils.getExistingDirectory(baseMetadataAudioPath);
 
         Long retainCreateDate = LongUtils.getLong(transferMap.get(CONF_TRANSFER_RETAIN_CREATE_DATE));
         Long retainModifyDate = LongUtils.getLong(transferMap.get(CONF_TRANSFER_RETAIN_MODIFY_DATE));

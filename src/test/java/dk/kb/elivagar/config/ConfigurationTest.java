@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.testutils.TestConfigurations;
 import dk.kb.elivagar.testutils.TestFileUtils;
+import dk.kb.elivagar.utils.FileUtils;
 
 public class ConfigurationTest extends ExtendedTestCase {
 
@@ -27,6 +28,13 @@ public class ConfigurationTest extends ExtendedTestCase {
     
     @Test
     public void testLoadingFromFile() throws IOException {
+        FileUtils.createDirectory("tempDir/transfer/ebook/ingest");
+        FileUtils.createDirectory("tempDir/transfer/ebook/content");
+        FileUtils.createDirectory("tempDir/transfer/ebook/metadata");
+        FileUtils.createDirectory("tempDir/transfer/audio/ingest");
+        FileUtils.createDirectory("tempDir/transfer/audio/content");
+        FileUtils.createDirectory("tempDir/transfer/audio/metadata");
+        
         Configuration conf = Configuration.createFromYAMLFile(new File("src/test/resources/elivagar.yml"));
         Assert.assertNotNull(conf);
         Assert.assertNotNull(conf.getAudioFileDir());

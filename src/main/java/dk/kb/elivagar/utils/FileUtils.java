@@ -33,6 +33,20 @@ public class FileUtils {
     }
     
     /**
+     * Retrieves an existing directory. Or throws an exception, if the directory does not exist.
+     * @param dirPath The path to the directory.
+     * @return The directory.
+     */
+    public static File getExistingDirectory(String dirPath) {
+        ArgumentCheck.checkNotNullOrEmpty(dirPath, "String dirPath");
+        File res = new File(dirPath);
+        if(!res.isDirectory()) {
+            throw new IllegalStateException("The path '" + dirPath + "' must contain a directory.");
+        }
+        return res;
+    }
+    
+    /**
      * Delete method, which validates that the file is actually not present afterwards.
      * @param f The file to delete.
      */
