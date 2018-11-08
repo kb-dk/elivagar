@@ -274,7 +274,7 @@ public class CharacterizationHandlerTest extends ExtendedTestCase {
 
         characterizer.runEpubCheckIfNeeded(inputFile, dir);
         
-        Assert.assertTrue(outputFile.exists());
+        Assert.assertFalse(outputFile.exists());
         verify(epubCharacterizer).hasRequiredExtension(eq(inputFile));
         verify(epubCharacterizer).characterize(eq(inputFile), eq(outputFile));
         verifyNoMoreInteractions(epubCharacterizer);

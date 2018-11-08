@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import dk.kb.elivagar.Constants;
+import dk.kb.elivagar.utils.FileUtils;
 
 /**
  * The characterization handler for performing different kinds of characterization.
@@ -62,6 +63,7 @@ public class CharacterizationHandler {
                 log.warn("Failure when trying to characterize the epub file: " + inputFile.getAbsolutePath(), e);
                 log.info("Trying to cleanup memory. Then continue.");
                 System.gc();
+                FileUtils.deleteFile(outputFile);
             }
         } else {
             log.trace("No need to characterizing the epub file: " + inputFile.getAbsolutePath());
@@ -89,6 +91,7 @@ public class CharacterizationHandler {
             } catch (Throwable e) {
                 log.warn("Failure when trying to do the FITS characterization for the file: "
                         + inputFile.getAbsolutePath(), e);
+                FileUtils.deleteFile(characterizationOutputFile);
             }
         } else {
             log.trace("FITS output file is newer that the file to characterize. Not characterizing again.");
@@ -105,6 +108,6 @@ public class CharacterizationHandler {
      */
     protected boolean shouldCharacterize(File outputFile, File inputFile) {
         return !outputFile.exists() || outputFile.lastModified() < inputFile.lastModified() 
-                || outputFile.length() == 0;
+                || outputFile.length() < 1L;
     }
 }
