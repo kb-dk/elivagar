@@ -1,6 +1,7 @@
 package dk.kb.elivagar.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.UUID;
@@ -189,6 +190,17 @@ public class FileUtilsTest extends ExtendedTestCase {
         Assert.assertEquals(newContent, content);
     }
     
+    @Test(expectedExceptions = IOException.class)
+    public void testMoveFileSillyFail() throws Exception {
+        File orig = Mockito.mock(File.class);
+        File dest = new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString());
+        
+        Mockito.when(orig.isFile()).thenReturn(true);
+        Mockito.when(orig.renameTo(Mockito.any(File.class))).thenReturn(false);
+        
+        FileUtils.moveFile(orig, dest);
+    }
+    
     @Test
     public void testAreFilesIdentical() throws Exception {
         addDescription("Test the areFilesIdentical method");
@@ -203,5 +215,41 @@ public class FileUtilsTest extends ExtendedTestCase {
         File f3 = TestFileUtils.createTempFile(UUID.randomUUID().toString());
 
         Assert.assertFalse(FileUtils.areFilesIdentical(f1, f3));
+    }
+    
+    @Test
+    public void testMoveDirectoryNoExists() throws Exception {
+        addDescription("Test the moveDirectory method, when the desination does not already exist.");
+        String origPath = TestFileUtils.getTempDir().getAbsolutePath() + "/" + UUID.randomUUID().toString();
+        String destPath = TestFileUtils.getTempDir().getAbsolutePath() + "/" + UUID.randomUUID().toString();
+        
+        File origDir = FileUtils.createDirectory(origPath);
+        File destDir = new File(destPath);
+        
+        Assert.assertTrue(new File(origPath).exists());
+        Assert.assertTrue(new File(origPath).isDirectory());
+        Assert.assertFalse(new File(destPath).exists());
+        Assert.assertFalse(new File(destPath).isDirectory());
+        
+        FileUtils.moveDirectory(origDir, destDir);
+        
+        Assert.assertFalse(new File(origPath).exists());
+        Assert.assertFalse(new File(origPath).isDirectory());
+        Assert.assertTrue(new File(destPath).exists());
+        Assert.assertTrue(new File(destPath).isDirectory());
+    }
+    
+    @Test(expectedExceptions = IOException.class)
+    public void testMoveDirectoryDestIsFile() throws Exception {
+        addDescription("Test the moveDirectory method, when the desination does not already exist.");
+        File origDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + UUID.randomUUID().toString());
+        File destDir = TestFileUtils.createTempFile(UUID.randomUUID().toString());
+        
+        Assert.assertTrue(origDir.isDirectory());
+        Assert.assertTrue(destDir.exists());
+        Assert.assertFalse(destDir.isDirectory());
+        Assert.assertTrue(destDir.isFile());
+        
+        FileUtils.moveDirectory(origDir, destDir);
     }
 }

@@ -159,4 +159,36 @@ public class FileUtils {
             return c1.equals(c2);
         }
     }
+    
+    /**
+     * Moves a directory.
+     * If the destination directory already exists, then all the files within the origDir is moved individually to 
+     * the destination folder.
+     * @param origDir The original directory, which should be moved.
+     * @param destDir The destination of the directory.
+     * @throws IOException If it fails to move the directory, or if the destination is a file.
+     */
+    public static void moveDirectory(File origDir, File destDir) throws IOException {
+        ArgumentCheck.checkExistsDirectory(origDir, "File origDir");
+        
+        if(destDir.exists()) {
+            if(!destDir.isDirectory()) {
+                throw new IOException("Cannot move a directory ('" + origDir.getAbsolutePath() + "') into a file ('"
+                        + destDir.getAbsolutePath() + "')");
+            }
+            
+            File[] files = origDir.listFiles();
+            if(files != null) {
+                for(File f : files) {
+                    File destFile = new File(destDir, f.getName());
+                    moveFile(f, destFile);
+                }
+            }
+            deleteFile(origDir);
+        } else {
+            origDir.renameTo(destDir);
+        }
+    }
+    
+    
 }

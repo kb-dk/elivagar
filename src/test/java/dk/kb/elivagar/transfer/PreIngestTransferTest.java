@@ -609,7 +609,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         
         PreIngestTransfer pit = new PreIngestTransfer(conf);
         
-        File updateDir = pit.getUpdateMetadataDir(bookDir, BookTypeEnum.EBOG);
+        File updateDir = new File(pit.getUpdateMetadataDir(bookDir, BookTypeEnum.EBOG));
         Assert.assertEquals(updateDir.getParentFile(), contentDir);
         Assert.assertEquals(updateDir.getName(), bookDir.getName());
         
@@ -634,7 +634,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         
         PreIngestTransfer pit = new PreIngestTransfer(conf);
         
-        File updateDir = pit.getUpdateContentDir(bookDir, BookTypeEnum.EBOG);
+        File updateDir = new File(pit.getUpdateContentDir(bookDir, BookTypeEnum.EBOG));
         Assert.assertEquals(updateDir.getParentFile(), contentDir);
         Assert.assertEquals(updateDir.getName(), bookDir.getName());
         
@@ -660,7 +660,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         
         Assert.assertEquals(destinationDir.list().length, 0);
         Assert.assertEquals(origDir.list().length, 1);
-        pit.copyToUpdateDir(destinationDir, Arrays.asList(origFile));
+        pit.copyUpdatedFiles(Arrays.asList(origFile), destinationDir.getAbsolutePath());
         Assert.assertEquals(destinationDir.list().length, 1);
         Assert.assertEquals(origDir.list().length, 1);
     }

@@ -48,6 +48,9 @@ public class PreIngestTransfer {
     /** The date format for the publication date in the pubhub metadata file.*/
     protected static final String DATE_FORMAT_PUBLICATION_DATE = "dd-MM-yyyy";
     
+    /** The suffix for the transferring dir name.*/
+    protected static final String TRANSFERRING_DIR_SUFFIX = "_transferring";
+    
     /** 
      * The list of suffixes of the metadata files, which should be updated at the metadata destination.
      * This is currently the MODS metadata and the pubhub metadata.
@@ -147,8 +150,8 @@ public class PreIngestTransfer {
         List<File> metadataFiles = getNewFilesWithSuffix(bookDir, UPDATE_METADATA_SUFFIXES, updateDate);
         if(!metadataFiles.isEmpty()) {
             log.info("Found " + metadataFiles.size() + " new metadata files for update.");
-            File updateDir = getUpdateMetadataDir(bookDir, bookType);
-            copyToUpdateDir(updateDir, metadataFiles);
+            String updateDirPath = getUpdateMetadataDir(bookDir, bookType);
+            copyUpdatedFiles(metadataFiles, updateDirPath);
             updated = true;
         }
         
@@ -156,8 +159,8 @@ public class PreIngestTransfer {
         List<File> techMetadataFiles = getNewFilesWithSuffix(bookDir, UPDATE_TECH_METADATA_SUFFIXES, updateDate);
         if(!techMetadataFiles.isEmpty()) {
             log.info("Found " + techMetadataFiles.size() + " new technical metadata files for update.");
-            File updateDir = getUpdateContentDir(bookDir, bookType);
-            copyToUpdateDir(updateDir, techMetadataFiles);
+            String updateDirPath = getUpdateContentDir(bookDir, bookType);
+            copyUpdatedFiles(techMetadataFiles, updateDirPath);
             updated = true;
         }
 
@@ -165,8 +168,8 @@ public class PreIngestTransfer {
         List<File> contentFiles = getNewContentFiles(bookDir, updateDate);
         if(!contentFiles.isEmpty()) {
             log.info("Found " + contentFiles.size() + "new content files for update.");
-            File updateDir = getUpdateContentDir(bookDir, bookType);
-            copyToUpdateDir(updateDir, contentFiles);
+            String updateDirPath = getUpdateContentDir(bookDir, bookType);
+            copyUpdatedFiles(contentFiles, updateDirPath);
             updated = true;
         }
         
@@ -174,6 +177,22 @@ public class PreIngestTransfer {
             log.debug("Setting the new update date in the register for book '" + bookDir.getName() + "'");
             register.setUpdateDate(new Date());
         }
+    }
+    
+    /**
+     * Move updated files to the destination directory, though through a transfer directory.
+     * @param files The files to copy to the destination directory.
+     * @param destDirPath The destination directory.
+     * @throws IOException If it fails to create directory or copy files.
+     */
+    protected void copyUpdatedFiles(List<File> files, String destDirPath) throws IOException {
+        File transferDir = getTransferDir(destDirPath);
+        for(File fromFile : files) {
+            File toFile = new File(transferDir, fromFile.getName());
+            FileUtils.copyFileFollowSymbolicLinks(fromFile, toFile);
+        }
+        File destDir = FileUtils.createDirectory(destDirPath);
+        FileUtils.moveDirectory(transferDir, destDir);
     }
 
     /**
@@ -185,8 +204,12 @@ public class PreIngestTransfer {
      */
     protected void ingestBook(File bookDir, TransferRegistry register, BookTypeEnum bookType) throws IOException {
         if(readyForIngest(bookDir)) {
-            File outputDir = getIngestDir(bookDir, bookType);
-            FileUtils.copyDirectory(bookDir, outputDir);
+            String outputDirPath = getIngestDir(bookDir, bookType);
+            File transferDir = getTransferDir(outputDirPath);
+            FileUtils.copyDirectory(bookDir, transferDir);
+            
+            File outputDir = FileUtils.createDirectory(outputDirPath);
+            FileUtils.moveDirectory(transferDir, outputDir);
             register.setIngestDate(new Date());
         }
     }
@@ -259,67 +282,51 @@ public class PreIngestTransfer {
     }
     
     /**
-     * Retrieves the directory for updating the metadata for the given book.
+     * Retrieves the path to the directory for updating the metadata for the given book.
      * @param bookDir The current directory of the book.
      * @param bookType The type of book.
-     * @return The update metadata directory for the book.
-     * @throws IOException If it fails to create/retrieve the directory.
+     * @return The path to the update metadata directory for the book.
      */
-    protected File getUpdateMetadataDir(File bookDir, BookTypeEnum bookType) throws IOException {
+    protected String getUpdateMetadataDir(File bookDir, BookTypeEnum bookType) {
         File dir;
         if(bookType == BookTypeEnum.LYDBOG) {
             dir = new File(conf.getTransferConfiguration().getUpdateAudioMetadataDir(), bookDir.getName());
         } else {
             dir = new File(conf.getTransferConfiguration().getUpdateEbookMetadataDir(), bookDir.getName());
         }
-        return FileUtils.createDirectory(dir.getAbsolutePath());
+        return dir.getAbsolutePath();
     }
     
     /**
-     * Retrieves the directory for updating the content and technical metadata for the given book.
+     * Retrieves the path to the directory for updating the content and technical metadata for the given book.
      * @param bookDir The current directory of the book.
      * @param bookType The type of book.
-     * @return The update content directory for the book.
-     * @throws IOException If it fails to create/retrieve the directory.
+     * @return The path to update content directory for the book.
      */
-    protected File getUpdateContentDir(File bookDir, BookTypeEnum bookType) throws IOException {
+    protected String getUpdateContentDir(File bookDir, BookTypeEnum bookType) {
         File dir;
         if(bookType == BookTypeEnum.LYDBOG) {
             dir = new File(conf.getTransferConfiguration().getUpdateAudioContentDir(), bookDir.getName());
         } else {
             dir = new File(conf.getTransferConfiguration().getUpdateEbookContentDir(), bookDir.getName());
         }
-        return FileUtils.createDirectory(dir.getAbsolutePath());
+        return dir.getAbsolutePath();
     }
     
     /**
-     * Retrieves the ingest directory for the given book.
+     * Retrieves the path to the ingest directory for the given book.
      * @param bookDir The current directory of the book.
      * @param bookType The type of book.
-     * @return The ingest directory for the book.
-     * @throws IOException If it fails to create/retrieve the directory.
+     * @return The path to the ingest directory for the book.
      */
-    protected File getIngestDir(File bookDir, BookTypeEnum bookType) throws IOException {
+    protected String getIngestDir(File bookDir, BookTypeEnum bookType) {
         File dir;
         if(bookType == BookTypeEnum.LYDBOG) {
             dir = new File(conf.getTransferConfiguration().getAudioIngestDir(), bookDir.getName());
         } else {
             dir = new File(conf.getTransferConfiguration().getEbookIngestDir(), bookDir.getName());
         }
-        return FileUtils.createDirectory(dir.getAbsolutePath());        
-    }
-    
-    /**
-     * Copies all the files to the update directory.
-     * @param updateDir The directory where the files should be copied to.
-     * @param files The file to update.
-     * @throws IOException If they fail to copy the files.
-     */
-    protected void copyToUpdateDir(File updateDir, List<File> files) throws IOException {
-        for(File fromFile : files) {
-            File toFile = new File(updateDir, fromFile.getName());
-            FileUtils.copyFileFollowSymbolicLinks(fromFile, toFile);
-        }
+        return dir.getAbsolutePath();        
     }
 
     /**
@@ -440,5 +447,15 @@ public class PreIngestTransfer {
             }
         }
         return res;
+    }
+    
+    /**
+     * Retrieves the active transferring directory 
+     * @param dirPath The path to the destination directory, when the data transfer is done.
+     * @return The transferring directory.
+     * @throws IOException If it fails to create the directory.
+     */
+    protected File getTransferDir(String dirPath) throws IOException {
+        return FileUtils.createDirectory(dirPath + TRANSFERRING_DIR_SUFFIX);
     }
 }
