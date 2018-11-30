@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -89,7 +90,7 @@ public class FileUtils {
         ArgumentCheck.checkExistsNormalFile(fromFile, "File from");
         Path toPath = toFile.toPath();
         Path fromPath = getFileOrSymlinkPath(fromFile);
-        Files.copy(fromPath, toPath);
+        Files.copy(fromPath, toPath, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
     }
     
     /**
@@ -131,14 +132,8 @@ public class FileUtils {
      */
     public static void moveFile(File orig, File dest) throws IOException {
         ArgumentCheck.checkExistsNormalFile(orig, "File orig");
-        if(dest.exists()) {
-            deleteFile(dest);
-        }
-        
-        boolean success = orig.renameTo(dest);
-        if(!success) {
-            throw new IOException("Failed to move the file.");
-        }
+        Files.move(orig.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING, 
+                StandardCopyOption.ATOMIC_MOVE);
     }
     
     /**
@@ -186,7 +181,7 @@ public class FileUtils {
             }
             deleteFile(origDir);
         } else {
-            origDir.renameTo(destDir);
+            Files.move(origDir.toPath(), destDir.toPath(), StandardCopyOption.ATOMIC_MOVE);
         }
     }
     

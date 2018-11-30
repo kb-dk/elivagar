@@ -49,7 +49,7 @@ public class PreIngestTransfer {
     protected static final String DATE_FORMAT_PUBLICATION_DATE = "dd-MM-yyyy";
     
     /** The suffix for the transferring dir name.*/
-    protected static final String TRANSFERRING_DIR_SUFFIX = "_transferring";
+    protected static final String TRANSFERRING_DIR_SUFFIX = "_transfer";
     
     /** 
      * The list of suffixes of the metadata files, which should be updated at the metadata destination.
