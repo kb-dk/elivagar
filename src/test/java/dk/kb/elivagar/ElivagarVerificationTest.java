@@ -38,7 +38,7 @@ public class ElivagarVerificationTest extends ExtendedTestCase {
         f.setExecutable(true);
         f.setReadable(true);
         
-        Boolean b = ElivagarVerification.validateExecutableFile(f, "configurationName");
+        Boolean b = ElivagarVerification.validateExecutableFile(f.getAbsolutePath(), "configurationName");
         
         Assert.assertFalse(b);
     }
@@ -49,7 +49,7 @@ public class ElivagarVerificationTest extends ExtendedTestCase {
         File f = new File(TestFileUtils.getTempDir(), UUID.randomUUID().toString());
         Assert.assertFalse(f.exists());
         
-        Boolean b = ElivagarVerification.validateExecutableFile(f, "configurationName");
+        Boolean b = ElivagarVerification.validateExecutableFile(f.getAbsolutePath(), "configurationName");
         
         Assert.assertTrue(b);
     }
@@ -61,7 +61,7 @@ public class ElivagarVerificationTest extends ExtendedTestCase {
         f.setExecutable(true);
         f.setReadable(false);
         
-        Boolean b = ElivagarVerification.validateExecutableFile(f, "configurationName");
+        Boolean b = ElivagarVerification.validateExecutableFile(f.getAbsolutePath(), "configurationName");
         
         Assert.assertTrue(b);
     }
@@ -73,7 +73,7 @@ public class ElivagarVerificationTest extends ExtendedTestCase {
         f.setExecutable(false);
         f.setReadable(true);
         
-        Boolean b = ElivagarVerification.validateExecutableFile(f, "configurationName");
+        Boolean b = ElivagarVerification.validateExecutableFile(f.getAbsolutePath(), "configurationName");
         
         Assert.assertTrue(b);
     }
