@@ -2,11 +2,13 @@ package dk.kb.elivagar;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
+import dk.kb.elivagar.utils.FileUtils;
 import dk.kb.elivagar.utils.YamlUtils;
 
 /**
@@ -106,8 +108,16 @@ public class ElivagarVerification {
     protected static boolean verifyAlephConfiguration(Map<String, Object> alephMap) {
         boolean failure = false;
         
-        failure = validateReadWriteDirectory((String) alephMap.get(Configuration.CONF_ALEPH_TEMP_DIR), 
-                "Aleph Temp Dir");
+        String alephTempDirPath = (String) alephMap.get(Configuration.CONF_ALEPH_TEMP_DIR);
+        try {
+            File alephTempdDir = FileUtils.createDirectory(alephTempDirPath);
+            failure = validateReadWriteDirectory(alephTempdDir.getAbsolutePath(), "Aleph Temp Dir");
+        } catch (IOException e) {
+            System.err.println("Could not instantiate the temporary directory for Aleph data at " + alephTempDirPath);
+            e.printStackTrace(System.out);
+            failure = true;            
+        }
+        
         String serverUrl = (String) alephMap.get(Configuration.CONF_ALEPH_URL);
         try {
             HttpClient httpClient = new HttpClient();
@@ -116,7 +126,7 @@ public class ElivagarVerification {
             System.out.println("Aleph Server Url (" + serverUrl + ") is responding");
         } catch (Exception e) {
             System.err.println("Aleph Server Url (" + serverUrl + ") is inaccessible or giving bad responses!");
-            e.printStackTrace(System.err);
+            e.printStackTrace(System.out);
             failure = true;
         }
         return failure;
