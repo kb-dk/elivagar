@@ -13,6 +13,9 @@ fits.log
 
 .idea/
 ginnungagap.iml
+elivagar.iml
+elivagar.ipr
+elivagar.iws
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

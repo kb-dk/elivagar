@@ -1,28 +1,5 @@
 package dk.kb.elivagar.transfer;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
-
-import org.jaccept.structure.ExtendedTestCase;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import dk.kb.elivagar.Constants;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.config.TransferConfiguration;
@@ -30,6 +7,17 @@ import dk.kb.elivagar.testutils.TestFileUtils;
 import dk.kb.elivagar.utils.CalendarUtils;
 import dk.kb.elivagar.utils.FileUtils;
 import dk.pubhub.service.BookTypeEnum;
+import org.jaccept.structure.ExtendedTestCase;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.util.*;
+
+import static org.mockito.Mockito.*;
 
 public class PreIngestTransferTest extends ExtendedTestCase {
     
@@ -153,20 +141,23 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         addStep("Setting the register to a date in the future (by one minute)", "Should not find anything to update.");
         TransferRegistry register = new TransferRegistry(bookDir);
         register.setIngestDate(new Date(System.currentTimeMillis() + 60000L));
-        register.registryFile.setLastModified(registryDate);
+        register.setChecksumAndDate(bookFile);
+        register.registryFile.setLastModified(registryDate.longValue());
 
         when(conf.getAudioFormats()).thenReturn(new ArrayList<String>());
         when(conf.getEbookFormats()).thenReturn(Arrays.asList("pdf"));
         when(conf.getTransferConfiguration()).thenReturn(transferConf);
         
         PreIngestTransfer pit = new PreIngestTransfer(conf);
-        
+
         pit.transferBook(bookBaseDir, BookTypeEnum.EBOG);
         
         verify(conf).getAudioFormats();
         verify(conf).getEbookFormats();
         verifyNoMoreInteractions(conf);
-        
+
+        verifyZeroInteractions(transferConf);
+
         Assert.assertEquals(register.registryFile.lastModified(), registryDate.longValue());
     }
     
@@ -202,11 +193,14 @@ public class PreIngestTransferTest extends ExtendedTestCase {
             destinationDir.setWritable(true);
         }
         
-        verify(conf).getAudioFormats();
-        verify(conf).getEbookFormats();
-        verify(conf).getTransferConfiguration();
+        verify(conf, times(2)).getAudioFormats();
+        verify(conf, times(2)).getEbookFormats();
+        verify(conf, times(2)).getTransferConfiguration();
         verifyNoMoreInteractions(conf);
-        verify(transferConf).getUpdateEbookContentDir();
+
+//        verify(transferConf).getUpdateEbookContentDir();
+        verify(transferConf).getRequiredFormats();
+        verify(transferConf).getRetainPublicationDate();
         verifyNoMoreInteractions(transferConf);
     }
 
@@ -236,6 +230,8 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         when(transferConf.getUpdateEbookContentDir()).thenReturn(updateContentBaseDir);
         when(transferConf.getUpdateEbookMetadataDir()).thenReturn(updateMetadataBaseDir);
         when(register.getLatestUpdateDate()).thenReturn(new Date(0L));
+        when(register.hasFileEntry(eq(bookFile))).thenReturn(true);
+        when(register.verifyFile(eq(bookFile))).thenReturn(false);
         
         PreIngestTransfer pit = new PreIngestTransfer(conf);
         
@@ -260,6 +256,9 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         
         verify(register).getLatestUpdateDate();
         verify(register).setUpdateDate(any(Date.class));
+        verify(register).hasFileEntry(eq(bookFile));
+        verify(register).verifyFile(eq(bookFile));
+        verify(register).updateFileEntries(eq(Arrays.asList(bookFile)));
         verifyNoMoreInteractions(register);
     }
 
@@ -877,12 +876,18 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         TestFileUtils.createFile(newFile, UUID.randomUUID().toString());
         File oldFile = new File(dir, dir.getName() + ".mp3");
         TestFileUtils.createFile(oldFile, UUID.randomUUID().toString());
-        
+
+        TransferRegistry registry = mock(TransferRegistry.class);
+        when(registry.hasFileEntry(any(File.class))).thenReturn(true);
+        when(registry.verifyFile(eq(newFile))).thenReturn(false);
+        when(registry.verifyFile(eq(oldFile))).thenReturn(true);
+
+
         Date d = new Date(1234567890);
         Assert.assertTrue(newFile.setLastModified(9999999999L));
         Assert.assertTrue(oldFile.setLastModified(0L));
 
-        List<File> newFiles = pit.getNewContentFiles(dir, d);
+        List<File> newFiles = pit.getNewContentFiles(dir, registry);
         
         Assert.assertFalse(newFiles.isEmpty());
         Assert.assertEquals(newFiles.size(), 1);
@@ -893,3 +898,4 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         verifyNoMoreInteractions(conf);
     }
 }
+

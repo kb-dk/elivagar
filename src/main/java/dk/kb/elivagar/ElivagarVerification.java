@@ -102,7 +102,7 @@ public class ElivagarVerification {
     
     /**
      * Validates the Aleph Configuration (false means no errors).
-     * @param alephConf The aleph configuration.
+     * @param alephMap The aleph configuration.
      * @return Whether or not the aleph configuration has errors.
      */
     protected static boolean verifyAlephConfiguration(Map<String, Object> alephMap) {

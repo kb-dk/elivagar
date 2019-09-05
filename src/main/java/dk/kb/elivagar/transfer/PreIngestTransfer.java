@@ -138,6 +138,7 @@ public class PreIngestTransfer {
      * @param bookType The type of book.
      */
     protected void updateBook(File bookDir, TransferRegistry register, BookTypeEnum bookType) throws IOException {
+        log.info("Updating the book: " + bookDir.getName());
         Date updateDate = register.getLatestUpdateDate();
         if(updateDate == null) {
             log.warn("Cannot retrieve neither update date nor ingest date from the registry. "
@@ -165,11 +166,12 @@ public class PreIngestTransfer {
         }
 
         // Check for any content files to update.
-        List<File> contentFiles = getNewContentFiles(bookDir, updateDate);
+        List<File> contentFiles = getNewContentFiles(bookDir, register);
         if(!contentFiles.isEmpty()) {
-            log.info("Found " + contentFiles.size() + "new content files for update.");
+            log.info("Found " + contentFiles.size() + " new content files for update.");
             String updateDirPath = getUpdateContentDir(bookDir, bookType);
             copyUpdatedFiles(contentFiles, updateDirPath);
+            register.updateFileEntries(contentFiles);
             updated = true;
         }
         
@@ -203,6 +205,7 @@ public class PreIngestTransfer {
      * @throws IOException If it fails to transfer the book.
      */
     protected void ingestBook(File bookDir, TransferRegistry register, BookTypeEnum bookType) throws IOException {
+        log.info("Ingesting the book: " + bookDir.getName());
         if(readyForIngest(bookDir)) {
             String outputDirPath = getIngestDir(bookDir, bookType);
             File transferDir = getTransferDir(outputDirPath);
@@ -433,16 +436,20 @@ public class PreIngestTransfer {
     
     /**
      * Retrieves the new content files from the given book directory.
+     * If no entries in the registry, then it is not doomed.
      * @param bookDir The book directory.
-     * @param lastModifiedLimit The lower limit for the last modified timestamp.
+     * @param register The register with the date and checksums for the files.
      * @return The list of content files, which are newer than the last modified timestamp limit.
      * @throws IOException If it fails to find the content files (through symlinks). 
      */
-    protected List<File> getNewContentFiles(File bookDir, Date lastModifiedLimit) throws IOException {
+    protected List<File> getNewContentFiles(File bookDir, TransferRegistry register) throws IOException {
         List<Path> contentFilePaths = getContentFiles(bookDir);
         List<File> res = new ArrayList<File>();
         for(Path p : contentFilePaths) {
-            if(p.toFile().lastModified() > lastModifiedLimit.getTime()) {
+            // If no entry, make one and assume no update.
+            if(!register.hasFileEntry(p.toFile())) {
+                register.setChecksumAndDate(p.toFile());
+            } else if(!register.verifyFile(p.toFile())) {
                 res.add(p.toFile());
             }
         }
