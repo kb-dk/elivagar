@@ -45,6 +45,11 @@ import dk.kb.elivagar.utils.YamlUtils;
  *       <li>aleph_base: $ALEPH_BASE</li>
  *       <li>temp_dir: $TEMP_DIR</li>
  *     </ul>
+ *     <li>alma:</li>
+ *     <ul>
+ *       <li>sru_base: $ALMA_SRU</li>
+*        <li>fixed_params: $ALMA_PARAMETERS</li>
+ *     </ul>
  *     <li>transfer: (THIS ELEMENT IS NOT REQUIRED)</li>
  *     <ul>
  *       <li>ingest_ebook_path: /transfer/path/root/ingest/ebook/</li>
@@ -92,7 +97,14 @@ public class Configuration {
     public static final String CONF_AUDIO_FORMATS = "audio_formats";
     /** The directory where the output statistics will be placed.*/
     public static final String CONF_STATISTIC_DIR = "statistics_dir";
-    
+
+    /** The configuration Alma element.*/
+    public static final String CONF_ALMA_ROOT = "alma";
+    /** The configuration name for the Alma SRU base url.*/
+    public static final String CONF_ALMA_SRU_BASE = "sru_base";
+    /** The configuration name for the fixed parameters for the Alma SRU service.*/
+    public static final String CONF_ALMA_FIXED_PARAMETERS = "fixed_params";
+
     /** The configuration Aleph element.*/
     public static final String CONF_ALEPH_ROOT = "aleph";
     /** The configuration name for the Aleph url.*/
@@ -149,7 +161,10 @@ public class Configuration {
     
     /** The Aleph configuration.*/
     protected final AlephConfiguration alephConfiguration;
-    
+
+    /** The Alma configuration.*/
+    protected final AlmaConfiguration almaConfiguration;
+
     /** The transfer configuration. This may be null.*/
     protected TransferConfiguration transferConfiguration;
     
@@ -188,6 +203,9 @@ public class Configuration {
         audioFormats = (List<String>) confMap.get(CONF_AUDIO_FORMATS);
         
         this.alephConfiguration = getAlephConfiguration((Map<String, Object>) confMap.get(CONF_ALEPH_ROOT));
+
+        this.almaConfiguration = getAlmaConfiguration((Map<String, String>) confMap.get(CONF_ALMA_ROOT));
+
         if(confMap.containsKey(CONF_TRANSFER_ROOT)) {
             this.transferConfiguration = getTransferConfiguration((Map<String, Object>) 
                     confMap.get(CONF_TRANSFER_ROOT));
@@ -213,7 +231,21 @@ public class Configuration {
         File tempDir = FileUtils.createDirectory(tempDirPath);
         return new AlephConfiguration(url, base, tempDir);
     }
-    
+
+    /**
+     * Instantiates the AlmaConfiguration from the given map.
+     * @param almaMap The map with the Alma elements.
+     * @return The configuration for retrieving data from Alma.
+     */
+    protected AlmaConfiguration getAlmaConfiguration(Map<String, String> almaMap) {
+        ArgumentCheck.checkThatMapContainsKey(almaMap, CONF_ALMA_SRU_BASE, "almaMap");
+        ArgumentCheck.checkThatMapContainsKey(almaMap, CONF_ALMA_FIXED_PARAMETERS, "almaMap");
+
+        String url = (String) almaMap.get(CONF_ALMA_SRU_BASE);
+        String parameters = (String) almaMap.get(CONF_ALMA_FIXED_PARAMETERS);
+        return new AlmaConfiguration(url, parameters);
+    }
+
     /**
      * Instantiates the TransferConfiguration from the given map.
      * @param transferMap The map with the Transfer elements.

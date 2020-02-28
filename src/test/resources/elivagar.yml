@@ -16,6 +16,9 @@ elivagar:
     aleph_url: $ALEPH_URL
     aleph_base: $ALEPH_BASE
     temp_dir: tempDir/aleph
+  alma:
+    sru_base: https://kbdk-kgl.alma.exlibrisgroup.com/view/sru/45KBDK_KGL?
+    fixed_params: version=1.2&operation=searchRetrieve&startRecord=0&maximumRecords=10
   transfer:
     ingest_ebook_path: tempDir/transfer/ebook/ingest
     update_ebook_content_path: tempDir/transfer/ebook/content/
