@@ -75,10 +75,9 @@ public class ElivagarVerification {
         failure = validateReadOnlyDirectory((String) confMap.get(Configuration.CONF_STATISTIC_DIR), 
                 "Statistics Dir") || failure;
         // TODO: Validate formats?
-        
-        failure = verifyAlephConfiguration((Map<String, Object>) confMap.get(Configuration.CONF_ALEPH_ROOT)) 
-                || failure;
-        failure = verifyTransferConfiguration((Map<String, Object>) confMap.get(Configuration.CONF_TRANSFER_ROOT)) 
+
+        failure = verifyAlmaUrl((String) confMap.get(Configuration.CONF_ALMA_SRU_SEARCH)) || failure;
+        failure = verifyTransferConfiguration((Map<String, Object>) confMap.get(Configuration.CONF_TRANSFER_ROOT))
                 || failure;
         
         return failure;
@@ -99,42 +98,29 @@ public class ElivagarVerification {
         System.out.println("Pubhub Metadata Retrieval operational.");
         return false;
     }
-    
+
     /**
-     * Validates the Aleph Configuration (false means no errors).
-     * @param alephMap The aleph configuration.
-     * @return Whether or not the aleph configuration has errors.
+     * Verifies the Alma URL.
+     * @param serverUrl The url for Alma.
+     * @return Whether or not it fails.
      */
-    protected static boolean verifyAlephConfiguration(Map<String, Object> alephMap) {
-        boolean failure = false;
-        
-        String alephTempDirPath = (String) alephMap.get(Configuration.CONF_ALEPH_TEMP_DIR);
-        try {
-            File alephTempdDir = FileUtils.createDirectory(alephTempDirPath);
-            failure = validateReadWriteDirectory(alephTempdDir.getAbsolutePath(), "Aleph Temp Dir");
-        } catch (IOException e) {
-            System.err.println("Could not instantiate the temporary directory for Aleph data at " + alephTempDirPath);
-            e.printStackTrace(System.out);
-            failure = true;            
-        }
-        
-        String serverUrl = (String) alephMap.get(Configuration.CONF_ALEPH_URL);
+    protected static boolean verifyAlmaUrl(String serverUrl) {
         try {
             HttpClient httpClient = new HttpClient();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             httpClient.retrieveUrlContent(serverUrl, out);
-            System.out.println("Aleph Server Url (" + serverUrl + ") is responding");
+            System.out.println("Alma Server Url (" + serverUrl + ") is responding");
         } catch (Exception e) {
-            System.err.println("Aleph Server Url (" + serverUrl + ") is inaccessible or giving bad responses!");
+            System.err.println("Alma Server Url (" + serverUrl + ") is inaccessible or giving bad responses!");
             e.printStackTrace(System.out);
-            failure = true;
+            return true;
         }
-        return failure;
+        return false;
     }
-    
+
     /**
      * Validates the transfer configuration (false means no errors).
-     * @param transferConf The transfer configuration.
+     * @param transferMap The transfer configuration.
      * @return Whether or not the transfer configuration is valid.
      */
     protected static boolean verifyTransferConfiguration(Map<String, Object> transferMap) {

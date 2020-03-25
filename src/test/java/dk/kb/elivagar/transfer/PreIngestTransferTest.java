@@ -19,6 +19,7 @@ import java.util.*;
 
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class PreIngestTransferTest extends ExtendedTestCase {
     
     @BeforeClass
