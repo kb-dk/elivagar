@@ -5,11 +5,33 @@ import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.exception.ArgumentCheck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 
 /**
  * Alma Metadata Retriever.
@@ -27,6 +49,13 @@ public class AlmaMetadataRetriever {
     /** The base query for performing ISBN search in Alma.*/
     protected static final String ALMA_QUERY_ISBN = "query=isbn=";
 
+
+    /** The XPATH for the number of records.*/
+    protected static final String XPATH_NUM_RESULTS = "/*:searchRetrieveResponse/*:numberOfRecords/text()";
+    /** The XPATH for the schema - must be MODS.*/
+    protected static final String XPATH_SCHEMA = "/searchRetrieveResponse/records/record/recordSchema";
+    /** The XPATH for the MODS record.*/
+    protected static final String XPATH_MODS_RECORD = "/*:searchRetrieveResponse/*:records/*:record/*:recordData/*:mods";
 
 //    /** The Aleph argument for performing the find-operation, for searching in Aleph.*/
 //    protected static final String OPERATION_FIND = "op=find";
@@ -76,13 +105,48 @@ public class AlmaMetadataRetriever {
     public void retrieveMetadataForISBN(String isbn, OutputStream out) {
         ArgumentCheck.checkNotNullOrEmpty(isbn, "String isbn");
         ArgumentCheck.checkNotNull(out, "OutputStream out");
-        
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
         log.debug("Retrieve Alma metadata for ISBN: " + isbn);
         try {
             String requestUrl = conf.getAlmaSruSearch() + ALMA_SEARCH_RANGE + ALMA_SCHEMA_MODS + ALMA_QUERY_ISBN + isbn;
-            httpClient.retrieveUrlContent(requestUrl, out);
+            httpClient.retrieveUrlContent(requestUrl, byteArrayOutputStream);
         } catch (IOException e) {
             throw new IllegalStateException("Could not download the metadata for set '" + isbn + "'", e);
+        }
+
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(byteArrayInputStream);
+            XPathFactory xPathfactory = XPathFactory.newInstance();
+
+            InputSource inputSource = new InputSource(byteArrayInputStream);
+            XPath xpath = xPathfactory.newXPath();
+
+            // assert numResults == 1
+            String numResults = (String) xpath.evaluate(XPATH_NUM_RESULTS, doc, XPathConstants.STRING);
+            if(!numResults.equals("1")) {
+                throw new IllegalStateException("Did not receive exactly 1 result for '" + isbn + "'. Received: " + numResults);
+            }
+
+            XPathExpression modsResultsXpath = xpath.compile(XPATH_MODS_RECORD);
+            NodeList modsResults = (NodeList) modsResultsXpath.evaluate(doc, XPathConstants.NODESET);
+
+            Node mods = modsResults.item(0);
+
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+            // Turn the node into a string
+            transformer.transform(new DOMSource(mods), new StreamResult(out));
+        } catch (Exception e) {
+            throw new IllegalStateException("Could not extract the MODS record", e);
         }
     }
 }

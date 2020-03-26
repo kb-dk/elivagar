@@ -23,14 +23,12 @@ public class AlmaMetadataRetrieverTest extends ExtendedTestCase {
         configuration = TestConfigurations.getConfigurationForTest();
     }
 
-
     @Test
     public void testCompleteRetrieval() {
         addDescription("Test a complete retrieval of metadata from Alma based on a ISBN.");
         HttpClient httpClient = new HttpClient();
 
         AlmaMetadataRetriever retriever = new AlmaMetadataRetriever(configuration, httpClient);
-//        AlephMetadataRetriever retriever = new AlephMetadataRetriever(configuration, httpClient);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         retriever.retrieveMetadataForISBN(ID, baos);
