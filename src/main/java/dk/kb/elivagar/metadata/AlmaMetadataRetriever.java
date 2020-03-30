@@ -37,6 +37,9 @@ import java.io.Writer;
  * Alma Metadata Retriever.
  *
  * Makes a direct ISBN search in Alma and extracts the MODS records.
+ *
+ * It should create MODS retrieval URLs like the following:
+ * https://kbdk-kgl.alma.exlibrisgroup.com/view/sru/45KBDK_KGL?version=1.2&operation=searchRetrieve&startRecord=1&maximumRecords=2&recordSchema=mods&query=isbn=$ISBN
  */
 public class AlmaMetadataRetriever {
     /** The logger.*/
@@ -52,26 +55,8 @@ public class AlmaMetadataRetriever {
 
     /** The XPATH for the number of records.*/
     protected static final String XPATH_NUM_RESULTS = "/*:searchRetrieveResponse/*:numberOfRecords/text()";
-    /** The XPATH for the schema - must be MODS.*/
-    protected static final String XPATH_SCHEMA = "/searchRetrieveResponse/records/record/recordSchema";
     /** The XPATH for the MODS record.*/
     protected static final String XPATH_MODS_RECORD = "/*:searchRetrieveResponse/*:records/*:record/*:recordData/*:mods";
-
-//    /** The Aleph argument for performing the find-operation, for searching in Aleph.*/
-//    protected static final String OPERATION_FIND = "op=find";
-//    /** The Aleph argument for performing the operation 'present', which retrieves the OAI XML. */
-//    protected static final String OPERATION_PRESENT = "op=present";
-//    /** The Aleph find argument for setting the code to 'WRD'.*/
-//    protected static final String CODE_WRD = "code=wrd";
-//    /** The Aleph present argument for only extracting the first entry from the entry set.*/
-//    protected static final String SET_ENTRY_SINGLE_RANGE = "set_entry=000000001-000000001";
-//
-//    /** The XPATH for extracting any error from the Aleph search results.*/
-//    protected static final String XPATH_FIND_ERROR = "/find/error/text()";
-//    /** The XPATH for extracting the SetNumber from the Aleph search results.*/
-//    protected static final String XPATH_FIND_SET_NUMBER = "/find/set_number/text()";
-//    /** The XPATH for extracting the number of entries in the Aleph search results.*/
-//    protected static final String XPATH_FIND_NUMBER_OF_ENTRIES = "/find/no_entries/text()";
 
     /** The configuration.*/
     protected final Configuration conf;
@@ -100,7 +85,7 @@ public class AlmaMetadataRetriever {
     /**
      * Retrieves the MODS metadata for a given ISBN from Alma.
      * @param isbn The ID to retrieve the Alma metadata for.
-     * @param out The output stream, where the Alma metadata will be written.
+     * @param out The output stream, where the MODS metadata from Alma will be written.
      */
     public void retrieveMetadataForISBN(String isbn, OutputStream out) {
         ArgumentCheck.checkNotNullOrEmpty(isbn, "String isbn");
@@ -122,12 +107,9 @@ public class AlmaMetadataRetriever {
             factory.setNamespaceAware(true);
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(byteArrayInputStream);
-            XPathFactory xPathfactory = XPathFactory.newInstance();
+            XPath xpath = xPathFactory.newXPath();
 
-            InputSource inputSource = new InputSource(byteArrayInputStream);
-            XPath xpath = xPathfactory.newXPath();
-
-            // assert numResults == 1
+            // assert numResults == 1 - else fail
             String numResults = (String) xpath.evaluate(XPATH_NUM_RESULTS, doc, XPathConstants.STRING);
             if(!numResults.equals("1")) {
                 throw new IllegalStateException("Did not receive exactly 1 result for '" + isbn + "'. Received: " + numResults);

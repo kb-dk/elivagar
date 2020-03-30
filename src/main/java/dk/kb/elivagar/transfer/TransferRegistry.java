@@ -92,7 +92,7 @@ public class TransferRegistry {
 
         try(InputStream input = new FileInputStream(registryFile)) {
             List<String> lines = StreamUtils.extractInputStreamAsLines(input);
-            for(String line : Lists.reverse(lines)) {
+            for(String line : lines) {
                 if(line.startsWith(LINE_PREFIX_INGEST)) {
                     Long date = Long.parseLong(line.replace(LINE_PREFIX_INGEST, ""));
                     return new Date(date);
