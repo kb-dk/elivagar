@@ -117,7 +117,7 @@ public class AlmaPacker {
 
             getAlmaMetadata(isbn, modsMetadata);
         } catch (Exception e) {
-            log.info("Non-critical failure while trying to retrieve the Aleph metadata for the book directory '" 
+            log.info("Non-critical failure while trying to retrieve the Alma metadata for the book directory '"
                     + dir.getAbsolutePath() + "'", e);
         }
     }

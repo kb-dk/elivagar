@@ -28,6 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
@@ -53,9 +54,11 @@ public class AlmaMetadataRetriever {
     protected static final String ALMA_QUERY_ISBN = "query=isbn=";
 
 
-    /** The XPATH for the number of records.*/
+    /** The XPATH for the number of records.
+     * Using '*' as wildcard for the namespace.*/
     protected static final String XPATH_NUM_RESULTS = "/*:searchRetrieveResponse/*:numberOfRecords/text()";
-    /** The XPATH for the MODS record.*/
+    /** The XPATH for the MODS record.
+     * Using '*' as wildcard for the namespace.*/
     protected static final String XPATH_MODS_RECORD = "/*:searchRetrieveResponse/*:records/*:record/*:recordData/*:mods";
 
     /** The configuration.*/
@@ -92,27 +95,46 @@ public class AlmaMetadataRetriever {
         ArgumentCheck.checkNotNull(out, "OutputStream out");
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        retrieveAlmaMetadata(isbn, byteArrayOutputStream);
 
-        log.debug("Retrieve Alma metadata for ISBN: " + isbn);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        extractModsFromAlma(byteArrayInputStream, out);
+    }
+
+    /**
+     * Retrieves the Alma metadata for the given ISBN and writes it to the output stream.
+     * @param isbn The ISBN number for the record to retrieve metadata for.
+     * @param out Output stream where the retrieved metadata is written.
+     */
+    protected void retrieveAlmaMetadata(String isbn, OutputStream out) {
+        log.debug("Retrieving Alma metadata for ISBN: " + isbn);
+
         try {
             String requestUrl = conf.getAlmaSruSearch() + ALMA_SEARCH_RANGE + ALMA_SCHEMA_MODS + ALMA_QUERY_ISBN + isbn;
-            httpClient.retrieveUrlContent(requestUrl, byteArrayOutputStream);
+            httpClient.retrieveUrlContent(requestUrl, out);
         } catch (IOException e) {
             throw new IllegalStateException("Could not download the metadata for set '" + isbn + "'", e);
         }
+    }
 
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+    /**
+     * Extracts the MODS record from the Alma record.
+     * @param almaInput The input stream with the Alma metadata.
+     * @param modsOutput The output stream with the MODS metadata.
+     */
+    protected void extractModsFromAlma(InputStream almaInput, OutputStream modsOutput) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(byteArrayInputStream);
+            Document doc = builder.parse(almaInput);
             XPath xpath = xPathFactory.newXPath();
 
             // assert numResults == 1 - else fail
+            // TODO: should we also fail, when it has more than 1 number of results?
             String numResults = (String) xpath.evaluate(XPATH_NUM_RESULTS, doc, XPathConstants.STRING);
             if(!numResults.equals("1")) {
-                throw new IllegalStateException("Did not receive exactly 1 result for '" + isbn + "'. Received: " + numResults);
+                throw new IllegalStateException("Did not receive exactly 1 result from Alma. Received: " + numResults);
             }
 
             XPathExpression modsResultsXpath = xpath.compile(XPATH_MODS_RECORD);
@@ -126,7 +148,7 @@ public class AlmaMetadataRetriever {
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
             // Turn the node into a string
-            transformer.transform(new DOMSource(mods), new StreamResult(out));
+            transformer.transform(new DOMSource(mods), new StreamResult(modsOutput));
         } catch (Exception e) {
             throw new IllegalStateException("Could not extract the MODS record", e);
         }
