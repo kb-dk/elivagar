@@ -106,7 +106,7 @@ public class Elivagar {
             PubhubWorkflow pubhubWorkflow = new PubhubWorkflow(conf, retriever, characterizer, packer);
             
             AlmaMetadataRetriever almaMetadataRetriever = new AlmaMetadataRetriever(conf, new HttpClient());
-            AlmaPacker alephWorkflow = new AlmaPacker(conf, almaMetadataRetriever);
+            AlmaPacker almaWorkflow = new AlmaPacker(conf, almaMetadataRetriever);
 
             TransferWorkflow transferWorkflow = new TransferWorkflow(conf);
             
@@ -119,7 +119,7 @@ public class Elivagar {
                 log.debug("No data retrieval.");
             }
             pubhubWorkflow.packFilesForBooks();
-            alephWorkflow.packAlmaMetadataForBooks();
+            almaWorkflow.packAlmaMetadataForBooks();
             transferWorkflow.run();
             
             File statisticsFile = new File(conf.getStatisticsDir(), 

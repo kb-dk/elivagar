@@ -20,12 +20,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * The Aleph packer.
+ * The Alma packer.
  * It will iterate through all the books - both E-books and Audio books.
  * The books which does not have a MODS metadata file in their package directory, will have the metadata retrieved.
  * This is done by extracting the ISBN number from the Publizon metadata file, then use this ISBN to retrieve the 
- * Aleph DanMarc2 metadata, and then transforming that Aleph metadata into MARC21, and finally transforming the
- * MARC21 metadata into MODS.
+ * MODS from Alma.
  * This MODS metadata file is then placed in the book's package directory.
  */
 public class AlmaPacker {
@@ -52,7 +51,7 @@ public class AlmaPacker {
     /**
      * Constructor.
      * @param conf The configuration.
-     * @param almaMetadataRetriever The retriever of Aleph metadata.
+     * @param almaMetadataRetriever The retriever of Alma metadata.
      */
     public AlmaPacker(Configuration conf, AlmaMetadataRetriever almaMetadataRetriever) {
         ArgumentCheck.checkNotNull(conf, "Configuration conf");
@@ -65,7 +64,7 @@ public class AlmaPacker {
     }
     
     /**
-     * Pack Aleph metadata for all books; both E-books and Audio books.
+     * Pack Alma metadata for all books; both E-books and Audio books.
      * Will not retrieve the metadata, if it has already been retrieved.
      * 
      * If the e-book package base directory and the audio book package base directory are the same, then they
@@ -81,13 +80,13 @@ public class AlmaPacker {
     }
     
     /**
-     * Traverses the books in the base directory to retrieve, transform and package the Aleph metadata.
+     * Traverses the books in the base directory to retrieve and package the Alma metadata.
      * @param baseBookDir The base directory for the books (either E-books or Audio books).
      */
     protected void traverseBooksInFolder(File baseBookDir) {
         File[] files = baseBookDir.listFiles();
         if(files == null) {
-            log.warn("No books to retrieve and transform Aleph metadata for within the directory: "
+            log.warn("No books to retrieve and transform Alma metadata for within the directory: "
                     + baseBookDir.getAbsolutePath());
         } else {
             for(File f : files) {
@@ -99,7 +98,7 @@ public class AlmaPacker {
     /**
      * Packages the metadata for a given book.
      * It will not do anything, if a MODS record already exists, or if it fails to extract the ISBN.
-     * Otherwise it retrieves the Aleph metadata and transforms it into MODS.
+     * Otherwise it retrieves the Alma metadata in MODS.
      * @param dir The book package directory, where the Publizon metadata already is placed.
      */
     protected void packageMetadataForBook(File dir) {
@@ -175,7 +174,6 @@ public class AlmaPacker {
      * Retrieves the Alma MODS record metadata file for a given ISBN number.
      * @param isbn The ISBN number for book, whose metadata record will be retrieved.
      * @param modsFile The output file where the MODS will be placed.
-     * @return The file with the Aleph DanMarc2 XML metadata.
      * @throws IOException If it somehow fails to retrieve or write the output file.
      */
     protected void getAlmaMetadata(String isbn, File modsFile) throws IOException {

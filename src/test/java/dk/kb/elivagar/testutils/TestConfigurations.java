@@ -16,14 +16,9 @@ import dk.kb.elivagar.utils.FileUtils;
 import dk.kb.elivagar.utils.StreamUtils;
 
 /**
- * To test against a proper system, you need the two files: pubhub-license.txt and aleph-conf.txt
- * in the root of the project folder.
+ * To test against a proper system, you need the two files: pubhub-license.txt in the root of the project folder.
  * 
  * Test pubhub-license.txt must have a single line with the given license.
- * 
- * The aleph-conf.txt must be in the following format:
- * aleph-url: $TEST_ALEPH_URL
- * base: $TEST_BASE
  */
 public class TestConfigurations {
 

@@ -4,7 +4,6 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
@@ -20,9 +19,8 @@ import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.testutils.PreventSystemExit;
 import dk.kb.elivagar.testutils.TestConfigurations;
 import dk.kb.elivagar.testutils.TestFileUtils;
-import dk.kb.elivagar.utils.StreamUtils;
 
-public class AlephExtractTest extends ExtendedTestCase {
+public class AlmaExtractTest extends ExtendedTestCase {
 
     String ID = "9788711436981";
     File testConfFile = new File("src/test/resources/elivagar.yml");
@@ -33,7 +31,7 @@ public class AlephExtractTest extends ExtendedTestCase {
     public void setup() throws IOException {
         TestFileUtils.setup();
         conf = TestConfigurations.getConfigurationForTest();
-        AlephExtract.outputDir = TestFileUtils.getTempDir();
+        AlmaExtract.outputDir = TestFileUtils.getTempDir();
     }
 
     @AfterClass
@@ -46,7 +44,7 @@ public class AlephExtractTest extends ExtendedTestCase {
         addDescription("Test the case, when not enough argument are given.");
         try {
             PreventSystemExit.forbidSystemExitCall();
-            AlephExtract.main(new String[]{"ARG1"});
+            AlmaExtract.main(new String[]{"ARG1"});
         } finally {
             PreventSystemExit.enableSystemExitCall();
         }
@@ -54,10 +52,10 @@ public class AlephExtractTest extends ExtendedTestCase {
     
     @Test(expectedExceptions = IllegalStateException.class)
     public void testFailToConnect() {
-        addDescription("Test the case, when we cannot connect to the Aleph server.");
+        addDescription("Test the case, when we cannot connect to the Alma server.");
         try {
             PreventSystemExit.forbidSystemExitCall();
-            AlephExtract.main(new String[]{testConfFile.getAbsolutePath(), ID});
+            AlmaExtract.main(new String[]{testConfFile.getAbsolutePath(), ID});
         } finally {
             PreventSystemExit.enableSystemExitCall();
         }        
@@ -80,7 +78,7 @@ public class AlephExtractTest extends ExtendedTestCase {
             }
         }).when(retriever).retrieveMetadataForISBN(eq(isbn), any(OutputStream.class));
         
-        AlephExtract.retrieveMetadataForIsbn(conf, retriever, isbn);
+        AlmaExtract.retrieveMetadataForIsbn(conf, retriever, isbn);
         
         verify(retriever).retrieveMetadataForISBN(eq(isbn), any(OutputStream.class));
         verifyNoMoreInteractions(retriever);

@@ -11,15 +11,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Extracts the metadata from Aleph and transform it into MARC and MODS.
+ * Extracts the MODS metadata from alma.
  * 
  * Usage:
- * dk.kb.elivagar.AlephExtract /PATH/TO/elivagar.yml [ISBN]+
+ * dk.kb.elivagar.AlmaExtract /PATH/TO/elivagar.yml [ISBN]+
  * 
  */
-public class AlephExtract {
+public class AlmaExtract {
     /** The logger.*/
-    private static final Logger log = LoggerFactory.getLogger(AlephExtract.class);
+    private static final Logger log = LoggerFactory.getLogger(AlmaExtract.class);
 
     protected static File outputDir = new File(".");
 
@@ -50,7 +50,7 @@ public class AlephExtract {
                 }
             }
         } catch (Exception e ) {
-            throw new IllegalStateException("Failure to retrieve Aleph metadata and transforming it to MODS.", e);
+            throw new IllegalStateException("Failure to retrieve alma metadata in MODS.", e);
         }
     }
     

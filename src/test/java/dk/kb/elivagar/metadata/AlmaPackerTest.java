@@ -187,7 +187,7 @@ public class AlmaPackerTest extends ExtendedTestCase {
         doAnswer(new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
-                throw new IOException("FAIL TO RETRIEVE FROM ALEPH!!!");
+                throw new IOException("FAIL TO RETRIEVE FROM ALMA!!!");
             }
         }).when(retriever).retrieveMetadataForISBN(eq(expectedIsbn), any(OutputStream.class));
         
