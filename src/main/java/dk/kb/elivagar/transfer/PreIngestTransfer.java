@@ -116,7 +116,8 @@ public class PreIngestTransfer {
 
                 TransferRegistry register = new TransferRegistry(bookDir);
 
-                if(register.hasBeenIngested()) {
+                if(register.getIngestDate() != null) {
+                    validateRegistry(bookDir, register);
                     updateBook(bookDir, register, bookType);
                 } else {
                     ingestBook(bookDir, register, bookType);
@@ -126,7 +127,28 @@ public class PreIngestTransfer {
             log.error("Failure while transfering books from '" + dir + "'", e);
         }
     }
-    
+
+    /**
+     * Validates that the registry has any of the books in
+     * @param bookDir The directory to validate the registry for.
+     * @param register The register.
+     * @throws IOException If it fails to validate or update the register.
+     */
+    protected void validateRegistry(File bookDir, TransferRegistry register) throws IOException {
+        List<Path> contentFiles = getContentFiles(bookDir);
+        boolean hasAny = false;
+        for(Path p : contentFiles) {
+            hasAny = hasAny || register.hasFileEntry(p.toFile());
+        }
+        log.debug("Had any content-files in registry: " + hasAny);
+        if(!hasAny) {
+            log.warn("Registry for book '" + bookDir.getName() + "' needs to be rebuild.");
+            for(Path p : contentFiles) {
+                register.setChecksumAndDate(p.toFile());
+            }
+        }
+    }
+
     /**
      * Update a book.
      * Will try to find any metadata, technical metadata or content files which are newer than the latest

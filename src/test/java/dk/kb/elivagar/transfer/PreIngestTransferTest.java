@@ -14,6 +14,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -153,8 +154,8 @@ public class PreIngestTransferTest extends ExtendedTestCase {
 
         pit.transferBook(bookBaseDir, BookTypeEnum.EBOG);
         
-        verify(conf).getAudioFormats();
-        verify(conf).getEbookFormats();
+        verify(conf, times(2)).getAudioFormats();
+        verify(conf, times(2)).getEbookFormats();
         verifyNoMoreInteractions(conf);
 
         verifyZeroInteractions(transferConf);
@@ -194,8 +195,8 @@ public class PreIngestTransferTest extends ExtendedTestCase {
             destinationDir.setWritable(true);
         }
         
-        verify(conf, times(2)).getAudioFormats();
-        verify(conf, times(2)).getEbookFormats();
+        verify(conf, times(3)).getAudioFormats();
+        verify(conf, times(3)).getEbookFormats();
         verify(conf, times(2)).getTransferConfiguration();
         verifyNoMoreInteractions(conf);
 
@@ -983,6 +984,77 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         verify(conf).getEbookFormats();
         verify(conf).getAudioFormats();
         verifyNoMoreInteractions(conf);
+    }
+
+    @Test
+    public void testOldRegistryFile() throws IOException {
+        addDescription("Test when the registry file has the old template with only the ingest date and not the checksum and last-modified date");
+        Configuration conf = mock(Configuration.class);
+        TransferConfiguration transferConf = mock(TransferConfiguration.class);
+
+        String bookId = UUID.randomUUID().toString();
+        File booksBaseDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + "baseBookDir");
+        File bookDir = FileUtils.createDirectory(booksBaseDir.getAbsolutePath() + "/" + bookId);
+        File bookFile = new File(bookDir, bookDir.getName() + ".pdf");
+        TestFileUtils.createFile(bookFile, UUID.randomUUID().toString());
+        File fitsFile = new File(bookDir, bookDir.getName() + Constants.FITS_METADATA_SUFFIX);
+        TestFileUtils.createFile(fitsFile, UUID.randomUUID().toString());
+        File modsFile = new File(bookDir, bookDir.getName() + Constants.MODS_METADATA_SUFFIX);
+        TestFileUtils.createFile(modsFile, UUID.randomUUID().toString());
+        File ingestBaseDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + "ingest");
+        File ingestBookDir = FileUtils.createDirectory(ingestBaseDir.getAbsolutePath() + "/" + bookId);
+        File updateContentBaseDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + "updateContent");
+        File updateMetadataBaseDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + "updateMetadata");
+        File updateContentBookDir = FileUtils.createDirectory(updateContentBaseDir.getAbsolutePath() + "/" + bookId);
+        File updateMetadataBookDir = FileUtils.createDirectory(updateMetadataBaseDir.getAbsolutePath() + "/" + bookId);
+
+        when(conf.getTransferConfiguration()).thenReturn(transferConf);
+        when(conf.getAudioFormats()).thenReturn(Arrays.asList("mp3"));
+        when(conf.getEbookFormats()).thenReturn(Arrays.asList("pdf"));
+        when(transferConf.getUpdateEbookContentDir()).thenReturn(updateContentBaseDir);
+        when(transferConf.getUpdateEbookMetadataDir()).thenReturn(updateMetadataBaseDir);
+        when(transferConf.getEbookIngestDir()).thenReturn(ingestBaseDir);
+
+        PreIngestTransfer pit = new PreIngestTransfer(conf);
+
+        addStep("Set only the ingest date in the registry to 1 hour ago - before the metadata files",
+                "No record of the file. ");
+        TransferRegistry registry = new TransferRegistry(bookDir);
+        registry.setIngestDate(new Date(System.currentTimeMillis() - 3600000L));
+        Assert.assertFalse(registry.hasFileEntry(bookFile));
+
+        addStep("Check transfer folders", "Should all be empty.");
+        Assert.assertEquals(updateContentBookDir.list().length, 0);
+        Assert.assertEquals(updateMetadataBookDir.list().length, 0);
+        Assert.assertEquals(ingestBookDir.list().length, 0);
+
+        pit.transferBook(booksBaseDir, BookTypeEnum.EBOG);
+
+        addStep("Check transfer folders",
+                "Should have transferred fits file to update-content dir, and mods file to update-metadata dir.");
+        Assert.assertEquals(ingestBookDir.list().length, 0);
+        Assert.assertEquals(updateMetadataBookDir.list().length, 1);
+        Assert.assertEquals(updateMetadataBookDir.listFiles()[0].getName(), modsFile.getName());
+        Assert.assertEquals(updateContentBookDir.list().length, 1);
+        Assert.assertEquals(updateContentBookDir.listFiles()[0].getName(), fitsFile.getName());
+
+        addStep("Check Registry",
+                "Should have entry for file and newer date for update than ingest.");
+        registry = new TransferRegistry(bookDir);
+        Assert.assertTrue(registry.hasFileEntry(bookFile));
+        Date ingestDate = registry.getIngestDate();
+        Date updateDate = registry.getLatestUpdateDate();
+        Assert.assertTrue(ingestDate.getTime() < updateDate.getTime());
+
+
+        verify(conf, times(2)).getTransferConfiguration();
+        verify(conf, times(2)).getAudioFormats();
+        verify(conf, times(2)).getEbookFormats();
+        verifyNoMoreInteractions(conf);
+
+        verify(transferConf).getUpdateEbookContentDir();
+        verify(transferConf).getUpdateEbookMetadataDir();
+        verifyNoMoreInteractions(transferConf);
     }
 }
 
