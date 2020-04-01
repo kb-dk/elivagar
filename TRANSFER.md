@@ -10,7 +10,7 @@ It is configurable what is required for the ingest (the initial transfer), but g
 * The given content file (pdf, epub, mp3, etc.)
 * The Fits characterization of the content file
 * The metadata record from Publizon.
-* The MODS record from Alma (or previously Aleph)
+* The MODS record from the library system (Alma)
 
 For an update, one of the files must be newer than the latest update date or the ingest date (if it has not been updated before),
 or the content file must have a different checksum and a newer date than its latest ingest/update.
