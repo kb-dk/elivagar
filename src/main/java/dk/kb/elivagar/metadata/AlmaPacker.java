@@ -89,8 +89,8 @@ public class AlmaPacker {
             log.warn("No books to retrieve and transform Alma metadata for within the directory: "
                     + baseBookDir.getAbsolutePath());
         } else {
-            for(File f : files) {
-                packageMetadataForBook(f);
+            for(File dir : files) {
+                packageMetadataForBook(dir);
             }
         }
     }

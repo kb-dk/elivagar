@@ -14,9 +14,10 @@ It is configurable what is required for the ingest (the initial transfer), but g
 
 For an update, one of the files must be newer than the latest update date or the ingest date (if it has not been updated before),
 or the content file must have a different checksum and a newer date than its latest ingest/update.
+In addition, an update can also occur if a book is received in a new file format.
 
 # Registry
-The registry file keeps track of if and when a e-book/audio-book has been ingested and updated, and also which checksum and last-modified the book had.
+The registry file keeps track of if and when a e-book/audio-book has been ingested and updated, and also which checksum and last-modified date the book had.
 It will be created during the ingest (the initial transfer), and it will be updated whenever an update-transfer it performed.
 
 It will have one ingest date for when all data and metadata has been initially transferred. 

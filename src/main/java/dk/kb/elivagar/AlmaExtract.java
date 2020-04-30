@@ -21,9 +21,11 @@ public class AlmaExtract {
     /** The logger.*/
     private static final Logger log = LoggerFactory.getLogger(AlmaExtract.class);
 
+    /** The output directory.*/
     protected static File outputDir = new File(".");
 
     /**
+     * Requires at least the two arguments the configuration file and a list of ISBN of books to retrieve.
      * @param args The arguments.
      */
     public static void main(String[] args) {
