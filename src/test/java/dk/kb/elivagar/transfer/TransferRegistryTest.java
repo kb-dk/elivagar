@@ -1,5 +1,15 @@
 package dk.kb.elivagar.transfer;
 
+import dk.kb.elivagar.testutils.TestFileUtils;
+import dk.kb.elivagar.utils.ChecksumUtils;
+import dk.kb.elivagar.utils.FileUtils;
+import dk.kb.elivagar.utils.StreamUtils;
+import org.jaccept.structure.ExtendedTestCase;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -8,18 +18,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
-import dk.kb.elivagar.utils.ChecksumUtils;
-import dk.kb.elivagar.utils.StreamUtils;
-import org.jaccept.structure.ExtendedTestCase;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import dk.kb.elivagar.testutils.TestFileUtils;
-import dk.kb.elivagar.utils.FileUtils;
-import org.testng.annotations.TestInstance;
-
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class TransferRegistryTest extends ExtendedTestCase {
     
     @BeforeClass
@@ -48,7 +47,7 @@ public class TransferRegistryTest extends ExtendedTestCase {
     public void testIngestDate() throws IOException {
         addDescription("Test successfully setting and getting the date for ingest.");
         File bookDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsoluteFile() + "/" + UUID.randomUUID().toString());
-        Long time = new Random().nextLong();
+        long time = new Random().nextLong();
         Date d = new Date(time);
         
         TransferRegistry registry = new TransferRegistry(bookDir);
@@ -56,7 +55,7 @@ public class TransferRegistryTest extends ExtendedTestCase {
         
         registry.setIngestDate(d);
         Assert.assertTrue(registry.hasBeenIngested());
-        Assert.assertEquals(registry.getIngestDate().getTime(), time.longValue());
+        Assert.assertEquals(registry.getIngestDate().getTime(), time);
     }
     
     @Test(expectedExceptions = IllegalStateException.class)
@@ -98,7 +97,7 @@ public class TransferRegistryTest extends ExtendedTestCase {
     public void testUpdateDate() throws IOException {
         addDescription("Test successfully setting and getting the date for update.");
         File bookDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsoluteFile() + "/" + UUID.randomUUID().toString());
-        Long time = new Random().nextLong();
+        long time = new Random().nextLong();
         Date d = new Date(time);
         
         TransferRegistry registry = new TransferRegistry(bookDir);
@@ -106,7 +105,7 @@ public class TransferRegistryTest extends ExtendedTestCase {
         
         registry.setUpdateDate(d);
         Assert.assertTrue(registry.hasBeenIngested());
-        Assert.assertEquals(registry.getLatestUpdateDate().getTime(), time.longValue());
+        Assert.assertEquals(registry.getLatestUpdateDate().getTime(), time);
     }
     
     @Test(expectedExceptions = IllegalStateException.class)
@@ -125,7 +124,7 @@ public class TransferRegistryTest extends ExtendedTestCase {
     public void testGetLatestUpdateDateWhenOnlyIngest() throws Exception {
         addDescription("Test successfully getting the date for update when it has only been ingested.");
         File bookDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsoluteFile() + "/" + UUID.randomUUID().toString());
-        Long time = new Random().nextLong();
+        long time = new Random().nextLong();
         Date d = new Date(time);
         
         TransferRegistry registry = new TransferRegistry(bookDir);
@@ -133,7 +132,7 @@ public class TransferRegistryTest extends ExtendedTestCase {
         
         registry.setIngestDate(d);
         Assert.assertTrue(registry.hasBeenIngested());
-        Assert.assertEquals(registry.getLatestUpdateDate().getTime(), time.longValue());
+        Assert.assertEquals(registry.getLatestUpdateDate().getTime(), time);
     }
     
     @Test

@@ -1,11 +1,12 @@
 package dk.kb.elivagar.metadata;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import dk.kb.elivagar.Constants;
+import dk.kb.elivagar.config.Configuration;
+import dk.kb.elivagar.exception.ArgumentCheck;
+import dk.kb.elivagar.utils.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,28 +14,22 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-
-import dk.kb.elivagar.Constants;
-import dk.kb.elivagar.config.Configuration;
-import dk.kb.elivagar.exception.ArgumentCheck;
-import dk.kb.elivagar.utils.FileUtils;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
- * The Aleph packer.
+ * The Alma packer.
  * It will iterate through all the books - both E-books and Audio books.
  * The books which does not have a MODS metadata file in their package directory, will have the metadata retrieved.
  * This is done by extracting the ISBN number from the Publizon metadata file, then use this ISBN to retrieve the 
- * Aleph DanMarc2 metadata, and then transforming that Aleph metadata into MARC21, and finally transforming the
- * MARC21 metadata into MODS.
+ * MODS from Alma.
  * This MODS metadata file is then placed in the book's package directory.
  */
-public class AlephPacker {
+public class AlmaPacker {
     /** The logger.*/
-    private static final Logger log = LoggerFactory.getLogger(AlephPacker.class);
+    private static final Logger log = LoggerFactory.getLogger(AlmaPacker.class);
 
     /** The XPATH for extracting the Identifier from the pubhub Book xml file.*/
     protected static final String XPATH_FIND_IDENTIFIER = "/*:Book/*:Identifier/text()";
@@ -43,10 +38,8 @@ public class AlephPacker {
     
     /** The configuration.*/
     protected final Configuration conf;
-    /** The metadata retriever for the Aleph metadata.*/
-    protected final AlephMetadataRetriever metadataRetriever;
-    /** The metadata transformer, for transforming the Aleph metadata first into MARC21 and then into MODS.*/
-    protected final MetadataTransformer transformer;
+    /** The metadata retriever for the Alma metadata.*/
+    protected final AlmaMetadataRetriever almaMetadataRetriever;
     /** The metadata validator.*/
     protected final MetadataValidator validator;
 
@@ -58,29 +51,26 @@ public class AlephPacker {
     /**
      * Constructor.
      * @param conf The configuration.
-     * @param alephRetriever The retriever of Aleph metadata.
-     * @param transformer The metadata transformer.
+     * @param almaMetadataRetriever The retriever of Alma metadata.
      */
-    public AlephPacker(Configuration conf, AlephMetadataRetriever alephRetriever, MetadataTransformer transformer) {
+    public AlmaPacker(Configuration conf, AlmaMetadataRetriever almaMetadataRetriever) {
         ArgumentCheck.checkNotNull(conf, "Configuration conf");
-        ArgumentCheck.checkNotNull(alephRetriever, "AlephMetadataRetriever alephRetriever");
-        ArgumentCheck.checkNotNull(transformer, "MetadataTransformer transformer");
+        ArgumentCheck.checkNotNull(almaMetadataRetriever, "AlmaMetadataRetriever almaMetadataRetriever");
         this.conf = conf;
-        this.metadataRetriever = alephRetriever;
-        this.transformer = transformer;
+        this.almaMetadataRetriever = almaMetadataRetriever;
         this.factory = DocumentBuilderFactory.newInstance();
         this.xPathfactory = XPathFactory.newInstance();
         this.validator = new MetadataValidator();
     }
     
     /**
-     * Pack Aleph metadata for all books; both E-books and Audio books.
+     * Pack Alma metadata for all books; both E-books and Audio books.
      * Will not retrieve the metadata, if it has already been retrieved.
      * 
      * If the e-book package base directory and the audio book package base directory are the same, then they
      * are only traversed once.
      */
-    public void packAlephMetadataForBooks() {
+    public void packAlmaMetadataForBooks() {
         traverseBooksInFolder(conf.getEbookOutputDir());
         if(conf.getEbookOutputDir().getAbsolutePath().equals(conf.getAudioOutputDir().getAbsolutePath())) {
             log.debug("Ebooks and Audio books have same base-dir.");
@@ -90,17 +80,17 @@ public class AlephPacker {
     }
     
     /**
-     * Traverses the books in the base directory to retrieve, transform and package the Aleph metadata.
+     * Traverses the books in the base directory to retrieve and package the Alma metadata.
      * @param baseBookDir The base directory for the books (either E-books or Audio books).
      */
     protected void traverseBooksInFolder(File baseBookDir) {
         File[] files = baseBookDir.listFiles();
         if(files == null) {
-            log.warn("No books to retrieve and transform Aleph metadata for within the directory: "
+            log.warn("No books to retrieve and transform Alma metadata for within the directory: "
                     + baseBookDir.getAbsolutePath());
         } else {
-            for(File f : files) {
-                packageMetadataForBook(f);
+            for(File dir : files) {
+                packageMetadataForBook(dir);
             }
         }
     }
@@ -108,7 +98,7 @@ public class AlephPacker {
     /**
      * Packages the metadata for a given book.
      * It will not do anything, if a MODS record already exists, or if it fails to extract the ISBN.
-     * Otherwise it retrieves the Aleph metadata and transforms it into MODS.
+     * Otherwise it retrieves the Alma metadata in MODS.
      * @param dir The book package directory, where the Publizon metadata already is placed.
      */
     protected void packageMetadataForBook(File dir) {
@@ -123,26 +113,10 @@ public class AlephPacker {
                 log.debug("Could not retrieve a ISBN or GTIN from '" + dir.getAbsolutePath() + "'.");
                 return;
             }
-            
-            File alephMetadata = getAlephMetadata(isbn);
-            File marcMetadata = transformAlephMetadataToMarc(alephMetadata, isbn);
-            File tempModsFile = new File(dir, dir.getName() + Constants.TEMP_MODS_METADATA_SUFFIX);
 
-            try (OutputStream out = new FileOutputStream(tempModsFile)) {
-                transformMarcToMods(marcMetadata, out);
-            }
-            
-            try (OutputStream out = new FileOutputStream(modsMetadata)) {
-                transformModsCleanup(tempModsFile, out);
-            }
-            
-            FileUtils.deleteFile(alephMetadata);
-            FileUtils.deleteFile(marcMetadata);
-            FileUtils.deleteFile(tempModsFile);
-            
-            handleXmlValidity(modsMetadata);
+            getAlmaMetadata(isbn, modsMetadata);
         } catch (Exception e) {
-            log.info("Non-critical failure while trying to retrieve the Aleph metadata for the book directory '" 
+            log.info("Non-critical failure while trying to retrieve the Alma metadata for the book directory '"
                     + dir.getAbsolutePath() + "'", e);
         }
     }
@@ -195,62 +169,17 @@ public class AlephPacker {
             return null;
         }
     }
-    
+
     /**
-     * Retrieves the Aleph DanMarc2 XML metadata file for a given ISBN number.
+     * Retrieves the Alma MODS record metadata file for a given ISBN number.
      * @param isbn The ISBN number for book, whose metadata record will be retrieved.
-     * @return The file with the Aleph DanMarc2 XML metadata.
+     * @param modsFile The output file where the MODS will be placed.
      * @throws IOException If it somehow fails to retrieve or write the output file.
      */
-    protected File getAlephMetadata(String isbn) throws IOException {
-        File res = new File(conf.getAlephConfiguration().getTempDir(), isbn + Constants.ALEPH_METADATA_SUFFIX);
-        try (OutputStream out = new FileOutputStream(res)) {
-            metadataRetriever.retrieveMetadataForISBN(isbn, out);
+    protected void getAlmaMetadata(String isbn, File modsFile) throws IOException {
+        try (OutputStream out = new FileOutputStream(modsFile)) {
+            almaMetadataRetriever.retrieveMetadataForISBN(isbn, out);
             out.flush();
         }
-        return res;
-    }
-    
-    /**
-     * Transforms an Aleph DanMarc2 XML metadata file into a MARC21 XML metadata file.
-     * @param alephMetadata The file with the Aleph DanMarc2 XML metadata.
-     * @param isbn The ISBN number for the metadata record.
-     * @return The file with the MARC21 XML metadata file.
-     * @throws IOException If it somehow fails to make the transformation.
-     */
-    protected File transformAlephMetadataToMarc(File alephMetadata, String isbn) throws IOException {
-        File res = new File(conf.getAlephConfiguration().getTempDir(), isbn + Constants.MARC_METADATA_SUFFIX);
-        try (InputStream in = new FileInputStream(alephMetadata);
-                OutputStream out = new FileOutputStream(res)) {
-            transformer.transformMetadata(in, out, MetadataTransformer.TransformationType.ALEPH_TO_MARC21);
-            out.flush();
-        } 
-        return res;
-    }
-    
-    /**
-     * Transforms a file with MARC21 XML metadata into MODS.
-     * @param marcMetadata The file with MARC 21 metadata.
-     * @param modsOutput The output stream, where the MODS metadata is written.
-     * @throws IOException If it somehow fails to make the transformation.
-     */
-    protected void transformMarcToMods(File marcMetadata, OutputStream modsOutput) throws IOException {
-        try (InputStream in = new FileInputStream(marcMetadata)) {
-            transformer.transformMetadata(in, modsOutput, MetadataTransformer.TransformationType.MARC21_TO_MODS);
-            modsOutput.flush();
-        } 
-    }
-    
-    /**
-     * Transforms a potential dirty MODS file to a clean MODS file.
-     * @param marcMetadata The dirty MODS file.
-     * @param modsOutput The output stream, where the clean MODS metadata is written.
-     * @throws IOException If it somehow fails to make the transformation.
-     */
-    protected void transformModsCleanup(File dirtyModsMetadata, OutputStream modsOutput) throws IOException {
-        try (InputStream in = new FileInputStream(dirtyModsMetadata)) {
-            transformer.transformMetadata(in, modsOutput, MetadataTransformer.TransformationType.MODS_CLEANUP);
-            modsOutput.flush();
-        } 
     }
 }

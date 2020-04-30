@@ -38,8 +38,7 @@ public class HttpClient {
         ArgumentCheck.checkNotNull(out, "OutputStream out");
         
         log.debug("Retrieving content from URL: " + url);
-        CloseableHttpClient client = HttpClients.createDefault();
-        try {
+        try (CloseableHttpClient client = HttpClients.createDefault();) {
             HttpGet getMethod = new HttpGet(url);
             
             CloseableHttpResponse response = client.execute(getMethod);
@@ -49,8 +48,6 @@ public class HttpClient {
             }
             
             StreamUtils.copyInputStreamToOutputStream(response.getEntity().getContent(), out);
-        } finally {
-            client.close();
         }
     }
     

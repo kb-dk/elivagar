@@ -11,55 +11,19 @@ import java.util.Map;
 
 import org.testng.SkipException;
 
-import dk.kb.elivagar.config.AlephConfiguration;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.utils.FileUtils;
 import dk.kb.elivagar.utils.StreamUtils;
 
 /**
- * To test against a proper system, you need the two files: pubhub-license.txt and aleph-conf.txt
- * in the root of the project folder.
+ * To test against a proper system, you need the two files: pubhub-license.txt in the root of the project folder.
  * 
  * Test pubhub-license.txt must have a single line with the given license.
- * 
- * The aleph-conf.txt must be in the following format:
- * aleph-url: $TEST_ALEPH_URL
- * base: $TEST_BASE
  */
 public class TestConfigurations {
 
     public static final String licenseFilePath = "pubhub-license.txt";
-    public static final String alephFilePath = "aleph-conf.txt";
 
-
-    public static AlephConfiguration getAlephConfigurationForTest() throws FileNotFoundException, IOException {
-        Map<String, String> res = getAlephMap();
-        return new AlephConfiguration(res.get(Configuration.CONF_ALEPH_URL), 
-                res.get(Configuration.CONF_ALEPH_BASE), TestFileUtils.getTempDir());
-    }
-
-    protected static Map<String, String> getAlephMap() throws FileNotFoundException, IOException {
-        File alephConf = new File(alephFilePath);
-        if(!alephConf.isFile()) {
-            throw new SkipException("No aleph configuration file for test setup at: " + alephConf.getAbsolutePath());
-        }
-        List<String> alephConfLines = StreamUtils.extractInputStreamAsLines(new FileInputStream(alephConf));
-
-        if(alephConfLines.size() < 2 || !alephConfLines.get(0).startsWith("aleph-url: ") || !alephConfLines.get(1).startsWith("base: ")) {
-            throw new SkipException("Bad content for the aleph conf file: " + alephConfLines);
-        }
-
-        String url = alephConfLines.get(0).replace("aleph-url: ", "");
-        String base = alephConfLines.get(1).replace("base: ", "");
-
-        Map<String, String> res = new HashMap<String, String>();
-        res.put(Configuration.CONF_ALEPH_URL, url);
-        res.put(Configuration.CONF_ALEPH_BASE, base);
-        res.put(Configuration.CONF_ALEPH_TEMP_DIR, TestFileUtils.getTempDir().getAbsolutePath());
-
-        return res;
-    }
-    
     protected static Map<String, Object> getTransferMap() throws Exception {
         
         Map<String, Object> res = new HashMap<String, Object>();
@@ -102,8 +66,8 @@ public class TestConfigurations {
             confMap.put(Configuration.CONF_EBOOK_FORMATS, Arrays.asList("pdf", "epub"));
             confMap.put(Configuration.CONF_XSLT_DIR, TestFileUtils.getTempDir().getAbsolutePath());
             confMap.put(Configuration.CONF_STATISTIC_DIR, statisticsDir.getAbsolutePath());
+            confMap.put(Configuration.CONF_ALMA_SRU_SEARCH, "https://kbdk-kgl.alma.exlibrisgroup.com/view/sru/45KBDK_KGL?version=1.2&operation=searchRetrieve&");
             
-            confMap.put(Configuration.CONF_ALEPH_ROOT, getAlephMap());
             confMap.put(Configuration.CONF_TRANSFER_ROOT, getTransferMap());
 
             return new Configuration(confMap);
@@ -138,8 +102,7 @@ public class TestConfigurations {
             confMap.put(Configuration.CONF_EBOOK_FORMATS, Arrays.asList("pdf", "epub"));
             confMap.put(Configuration.CONF_XSLT_DIR, TestFileUtils.getTempDir().getAbsolutePath());
             confMap.put(Configuration.CONF_STATISTIC_DIR, statisticsDir.getAbsolutePath());
-            
-            confMap.put(Configuration.CONF_ALEPH_ROOT, getAlephMap());
+            confMap.put(Configuration.CONF_ALMA_SRU_SEARCH, "https://kbdk-kgl.alma.exlibrisgroup.com/view/sru/45KBDK_KGL?version=1.2&operation=searchRetrieve&");
 
             return new Configuration(confMap);
         } catch (Exception e) {

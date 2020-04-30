@@ -28,4 +28,4 @@ fi
 
 cd ${assembly.home.env.name.ref}
 
-"${JAVA}" ${JAVA_OPTS} -D${assembly.home.env.name}="${assembly.home.env.name.ref}" -cp "$CP" dk.kb.elivagar.AlephExtract "$@"
+"${JAVA}" ${JAVA_OPTS} -D${assembly.home.env.name}="${assembly.home.env.name.ref}" -cp "$CP" dk.kb.elivagar.AlmaExtract "$@"

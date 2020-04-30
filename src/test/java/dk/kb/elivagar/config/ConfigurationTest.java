@@ -52,14 +52,9 @@ public class ConfigurationTest extends ExtendedTestCase {
         Assert.assertFalse(conf.getAudioFormats().isEmpty());
         Assert.assertFalse(conf.getEbookFormats().isEmpty());
         Assert.assertTrue(conf.getStatisticsDir().isDirectory());
-        
-        addStep("Test the aleph configuration", "");
-        Assert.assertNotNull(conf.getAlephConfiguration());
-        Assert.assertNotNull(conf.getAlephConfiguration().getServerUrl());
-        Assert.assertNotNull(conf.getAlephConfiguration().getBase());
-        Assert.assertNotNull(conf.getAlephConfiguration().getTempDir());
-        Assert.assertTrue(conf.getAlephConfiguration().getTempDir().isDirectory());
-        
+
+        Assert.assertNotNull(conf.getAlmaSruSearch());
+
         addStep("Test the transfer configuration", "");
         Assert.assertNotNull(conf.getTransferConfiguration());
         Assert.assertNotNull(conf.getTransferConfiguration().getEbookIngestDir());

@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.config.TransferConfiguration;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class TransferWorkflowTest extends ExtendedTestCase {
 
     @Test

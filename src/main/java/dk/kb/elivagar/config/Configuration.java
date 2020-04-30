@@ -39,12 +39,7 @@ import dk.kb.elivagar.utils.YamlUtils;
  *     <ul>
  *       <li>- mp3</li>
  *     </ul>
- *     <li>aleph:</li>
- *     <ul>
- *       <li>aleph_url: $ALEPH_URL</li>
- *       <li>aleph_base: $ALEPH_BASE</li>
- *       <li>temp_dir: $TEMP_DIR</li>
- *     </ul>
+ *     <li>alma_sru_search: $ALMA_SRU_SEARCH</li>
  *     <li>transfer: (THIS ELEMENT IS NOT REQUIRED)</li>
  *     <ul>
  *       <li>ingest_ebook_path: /transfer/path/root/ingest/ebook/</li>
@@ -92,16 +87,10 @@ public class Configuration {
     public static final String CONF_AUDIO_FORMATS = "audio_formats";
     /** The directory where the output statistics will be placed.*/
     public static final String CONF_STATISTIC_DIR = "statistics_dir";
-    
-    /** The configuration Aleph element.*/
-    public static final String CONF_ALEPH_ROOT = "aleph";
-    /** The configuration name for the Aleph url.*/
-    public static final String CONF_ALEPH_URL = "aleph_url";
-    /** The configuration name for the Aleph base.*/
-    public static final String CONF_ALEPH_BASE = "aleph_base";
-    /** The configuration name for the directory for temporary storing aleph resources.*/
-    public static final String CONF_ALEPH_TEMP_DIR = "temp_dir";
-    
+
+    /** The configuration Alma sru search base url.*/
+    public static final String CONF_ALMA_SRU_SEARCH = "alma_sru_search";
+
     /** The configuration transfer element.*/
     public static final String CONF_TRANSFER_ROOT = "transfer";
     /** The base path for the ingest dir for ebooks.*/
@@ -141,15 +130,15 @@ public class Configuration {
     protected final File xsltFileDir;
     /** The directory for the output statistics files.*/
     protected final File statisticsDir;
-    
+
     /** The list of formats for the ebooks.*/
     protected List<String> ebookFormats;
     /** The list of formats for the audio books.*/
     protected List<String> audioFormats;
-    
-    /** The Aleph configuration.*/
-    protected final AlephConfiguration alephConfiguration;
-    
+
+    /** The configuration for the alma sru search.*/
+    protected final String almaSruSearchConfiguration;
+
     /** The transfer configuration. This may be null.*/
     protected TransferConfiguration transferConfiguration;
     
@@ -171,8 +160,8 @@ public class Configuration {
         ArgumentCheck.checkThatMapContainsKey(confMap, CONF_AUDIO_FILE_DIR, "confMap");
         ArgumentCheck.checkThatMapContainsKey(confMap, CONF_XSLT_DIR, "confMap");
         ArgumentCheck.checkThatMapContainsKey(confMap, CONF_STATISTIC_DIR, "confMap");
-        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_ALEPH_ROOT, "confMap");
-        
+        ArgumentCheck.checkThatMapContainsKey(confMap, CONF_ALMA_SRU_SEARCH, "confMap");
+
         ebookOutputDir = FileUtils.createDirectory((String) confMap.get(CONF_EBOOK_OUTPUT_DIR));
         abookOutputDir = FileUtils.createDirectory((String) confMap.get(CONF_AUDIO_OUTPUT_DIR));
         licenseKey = (String) confMap.get(CONF_LICENSE_KEY);
@@ -187,7 +176,8 @@ public class Configuration {
         ebookFormats = (List<String>) confMap.get(CONF_EBOOK_FORMATS);
         audioFormats = (List<String>) confMap.get(CONF_AUDIO_FORMATS);
         
-        this.alephConfiguration = getAlephConfiguration((Map<String, Object>) confMap.get(CONF_ALEPH_ROOT));
+        this.almaSruSearchConfiguration = (String) confMap.get(CONF_ALMA_SRU_SEARCH);
+
         if(confMap.containsKey(CONF_TRANSFER_ROOT)) {
             this.transferConfiguration = getTransferConfiguration((Map<String, Object>) 
                     confMap.get(CONF_TRANSFER_ROOT));
@@ -195,25 +185,7 @@ public class Configuration {
             this.transferConfiguration = null;
         }
     }
-    
-    /**
-     * Instantiates the AlephConfiguration from the given map.
-     * @param alephMap The map with the Aleph elements.
-     * @return The configuration for retrieving data from Aleph.
-     * @throws IOException If the temporary directory cannot be instantiated.
-     */
-    protected AlephConfiguration getAlephConfiguration(Map<String, Object> alephMap) throws IOException {
-        ArgumentCheck.checkThatMapContainsKey(alephMap, CONF_ALEPH_URL, "alephMap");
-        ArgumentCheck.checkThatMapContainsKey(alephMap, CONF_ALEPH_BASE, "alephMap");
-        ArgumentCheck.checkThatMapContainsKey(alephMap, CONF_ALEPH_TEMP_DIR, "alephMap");
-        
-        String url = (String) alephMap.get(CONF_ALEPH_URL);
-        String base = (String) alephMap.get(CONF_ALEPH_BASE);
-        String tempDirPath = (String) alephMap.get(CONF_ALEPH_TEMP_DIR);
-        File tempDir = FileUtils.createDirectory(tempDirPath);
-        return new AlephConfiguration(url, base, tempDir);
-    }
-    
+
     /**
      * Instantiates the TransferConfiguration from the given map.
      * @param transferMap The map with the Transfer elements.
@@ -259,12 +231,12 @@ public class Configuration {
                 baseIngestAudioDir, baseContentAudioDir, baseMetadataAudioDir, retainCreateDate, 
                 retainModifyDate, retainPublicationDate, requiredFormats);
     }
-    
-    /** @return The aleph configuration. */
-    public AlephConfiguration getAlephConfiguration() {
-        return alephConfiguration;
+
+    /** @return The alma sru search base.*/
+    public String getAlmaSruSearch() {
+        return almaSruSearchConfiguration;
     }
-    
+
     /** @return The transfer configuration. */
     public TransferConfiguration getTransferConfiguration() {
         return transferConfiguration;

@@ -77,4 +77,14 @@ public class ElivagarVerificationTest extends ExtendedTestCase {
         
         Assert.assertTrue(b);
     }
+
+    @Test
+    public void testVerifyAlmaUrl() throws Exception {
+        addDescription("Test the verifyAlmaUrl method ");
+        String url = "https://kbdk-kgl.alma.exlibrisgroup.com/view/sru/45KBDK_KGL?version=1.2&operation=searchRetrieve&";
+
+        Boolean b = ElivagarVerification.verifyAlmaUrl(url);
+
+        Assert.assertFalse(b);
+    }
 }

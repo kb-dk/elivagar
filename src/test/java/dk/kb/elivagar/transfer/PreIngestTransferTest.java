@@ -14,11 +14,13 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class PreIngestTransferTest extends ExtendedTestCase {
     
     @BeforeClass
@@ -26,7 +28,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         TestFileUtils.setup();
     }
     
-    @AfterClass
+//    @AfterClass
     public void tearDown() {
         TestFileUtils.tearDown();
     }
@@ -152,8 +154,8 @@ public class PreIngestTransferTest extends ExtendedTestCase {
 
         pit.transferBook(bookBaseDir, BookTypeEnum.EBOG);
         
-        verify(conf).getAudioFormats();
-        verify(conf).getEbookFormats();
+        verify(conf, times(2)).getAudioFormats();
+        verify(conf, times(2)).getEbookFormats();
         verifyNoMoreInteractions(conf);
 
         verifyZeroInteractions(transferConf);
@@ -193,8 +195,8 @@ public class PreIngestTransferTest extends ExtendedTestCase {
             destinationDir.setWritable(true);
         }
         
-        verify(conf, times(2)).getAudioFormats();
-        verify(conf, times(2)).getEbookFormats();
+        verify(conf, times(3)).getAudioFormats();
+        verify(conf, times(3)).getEbookFormats();
         verify(conf, times(2)).getTransferConfiguration();
         verifyNoMoreInteractions(conf);
 
@@ -206,7 +208,7 @@ public class PreIngestTransferTest extends ExtendedTestCase {
 
     @Test
     public void testUpdateBookAllUpdates() throws Exception {
-        addDescription("Test the updateBook method, when all types of files is being updated.");
+        addDescription("Test the updateBook method, when all types of files is being updated - though no files already in update folder.");
         Configuration conf = mock(Configuration.class);
         TransferRegistry register = mock(TransferRegistry.class);
         TransferConfiguration transferConf = mock(TransferConfiguration.class);
@@ -237,9 +239,13 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         
         Assert.assertEquals(updateContentBookDir.list().length, 0);
         Assert.assertEquals(updateMetadataBookDir.list().length, 0);
-        
+
+        Assert.assertFalse(new File(updateContentBookDir, bookFile.getName()).exists());
+        Assert.assertFalse(new File(updateContentBookDir, fitsFile.getName()).exists());
+        Assert.assertFalse(new File(updateMetadataBookDir, modsFile.getName()).exists());
+
         pit.updateBook(bookDir, register, BookTypeEnum.EBOG);
-        
+
         Assert.assertEquals(updateContentBookDir.list().length, 2);
         Assert.assertEquals(updateMetadataBookDir.list().length, 1);
         Assert.assertTrue(new File(updateContentBookDir, bookFile.getName()).exists());
@@ -254,6 +260,88 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         verify(transferConf).getUpdateEbookMetadataDir();
         verifyNoMoreInteractions(transferConf);
         
+        verify(register).getLatestUpdateDate();
+        verify(register).setUpdateDate(any(Date.class));
+        verify(register).hasFileEntry(eq(bookFile));
+        verify(register).verifyFile(eq(bookFile));
+        verify(register).updateFileEntries(eq(Arrays.asList(bookFile)));
+        verifyNoMoreInteractions(register);
+    }
+
+    @Test
+    public void testUpdateBookAllReUpdates() throws Exception {
+        addDescription("Test the updateBook method, when all types of files is being updated - even though all the update folders have files.");
+        Configuration conf = mock(Configuration.class);
+        TransferRegistry register = mock(TransferRegistry.class);
+        TransferConfiguration transferConf = mock(TransferConfiguration.class);
+
+        long oneMinuteAgo = System.currentTimeMillis()-60000;
+        long oneHourAgo = System.currentTimeMillis()-3600000;
+
+        String bookId = UUID.randomUUID().toString();
+        File bookDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + bookId);
+        File bookFile = new File(bookDir, bookDir.getName() + ".pdf");
+        TestFileUtils.createFile(bookFile, UUID.randomUUID().toString());
+        File fitsFile = new File(bookDir, bookDir.getName() + Constants.FITS_METADATA_SUFFIX);
+        TestFileUtils.createFile(fitsFile, UUID.randomUUID().toString());
+        File modsFile = new File(bookDir, bookDir.getName() + Constants.MODS_METADATA_SUFFIX);
+        TestFileUtils.createFile(modsFile, UUID.randomUUID().toString());
+        File updateContentBaseDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + UUID.randomUUID().toString());
+        File updateMetadataBaseDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + UUID.randomUUID().toString());
+        File updateContentBookDir = FileUtils.createDirectory(updateContentBaseDir.getAbsolutePath() + "/" + bookId);
+        File updateMetadataBookDir = FileUtils.createDirectory(updateMetadataBaseDir.getAbsolutePath() + "/" + bookId);
+
+        when(conf.getTransferConfiguration()).thenReturn(transferConf);
+        when(conf.getAudioFormats()).thenReturn(Arrays.asList("mp3"));
+        when(conf.getEbookFormats()).thenReturn(Arrays.asList("pdf"));
+        when(transferConf.getUpdateEbookContentDir()).thenReturn(updateContentBaseDir);
+        when(transferConf.getUpdateEbookMetadataDir()).thenReturn(updateMetadataBaseDir);
+        when(register.getLatestUpdateDate()).thenReturn(new Date(oneHourAgo));
+        when(register.hasFileEntry(eq(bookFile))).thenReturn(true);
+        when(register.verifyFile(eq(bookFile))).thenReturn(false);
+
+        File updateBookFile = new File(updateContentBookDir, bookFile.getName());
+        File updateFitsFile = new File(updateContentBookDir, fitsFile.getName());
+        File updateModsFile = new File(updateMetadataBookDir, modsFile.getName());
+        TestFileUtils.createFile(updateBookFile, UUID.randomUUID().toString());
+        TestFileUtils.createFile(updateFitsFile, UUID.randomUUID().toString());
+        TestFileUtils.createFile(updateModsFile, UUID.randomUUID().toString());
+
+        updateBookFile.setLastModified(oneHourAgo);
+        updateFitsFile.setLastModified(oneHourAgo);
+        updateModsFile.setLastModified(oneHourAgo);
+
+        PreIngestTransfer pit = new PreIngestTransfer(conf);
+
+        Assert.assertEquals(updateContentBookDir.list().length, 2);
+        Assert.assertEquals(updateMetadataBookDir.list().length, 1);
+
+        Assert.assertTrue(new File(updateContentBookDir, bookFile.getName()).exists());
+        Assert.assertTrue(new File(updateContentBookDir, fitsFile.getName()).exists());
+        Assert.assertTrue(new File(updateMetadataBookDir, modsFile.getName()).exists());
+        Assert.assertTrue(new File(updateContentBookDir, bookFile.getName()).lastModified() < oneMinuteAgo);
+        Assert.assertTrue(new File(updateContentBookDir, fitsFile.getName()).lastModified() < oneMinuteAgo);
+        Assert.assertTrue(new File(updateMetadataBookDir, modsFile.getName()).lastModified() < oneMinuteAgo);
+
+        pit.updateBook(bookDir, register, BookTypeEnum.EBOG);
+
+        Assert.assertEquals(updateContentBookDir.list().length, 2);
+        Assert.assertEquals(updateMetadataBookDir.list().length, 1);
+        Assert.assertTrue(new File(updateContentBookDir, bookFile.getName()).exists());
+        Assert.assertTrue(new File(updateContentBookDir, fitsFile.getName()).exists());
+        Assert.assertTrue(new File(updateMetadataBookDir, modsFile.getName()).exists());
+        Assert.assertTrue(new File(updateContentBookDir, bookFile.getName()).lastModified() >= oneMinuteAgo);
+        Assert.assertTrue(new File(updateContentBookDir, fitsFile.getName()).lastModified() >= oneMinuteAgo);
+        Assert.assertTrue(new File(updateMetadataBookDir, modsFile.getName()).lastModified() >= oneMinuteAgo);
+
+        verify(conf, times(3)).getTransferConfiguration();
+        verify(conf).getAudioFormats();
+        verify(conf).getEbookFormats();
+        verifyNoMoreInteractions(conf);
+        verify(transferConf, times(2)).getUpdateEbookContentDir();
+        verify(transferConf).getUpdateEbookMetadataDir();
+        verifyNoMoreInteractions(transferConf);
+
         verify(register).getLatestUpdateDate();
         verify(register).setUpdateDate(any(Date.class));
         verify(register).hasFileEntry(eq(bookFile));
@@ -896,6 +984,77 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         verify(conf).getEbookFormats();
         verify(conf).getAudioFormats();
         verifyNoMoreInteractions(conf);
+    }
+
+    @Test
+    public void testOldRegistryFile() throws IOException {
+        addDescription("Test when the registry file has the old template with only the ingest date and not the checksum and last-modified date");
+        Configuration conf = mock(Configuration.class);
+        TransferConfiguration transferConf = mock(TransferConfiguration.class);
+
+        String bookId = UUID.randomUUID().toString();
+        File booksBaseDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + "baseBookDir");
+        File bookDir = FileUtils.createDirectory(booksBaseDir.getAbsolutePath() + "/" + bookId);
+        File bookFile = new File(bookDir, bookDir.getName() + ".pdf");
+        TestFileUtils.createFile(bookFile, UUID.randomUUID().toString());
+        File fitsFile = new File(bookDir, bookDir.getName() + Constants.FITS_METADATA_SUFFIX);
+        TestFileUtils.createFile(fitsFile, UUID.randomUUID().toString());
+        File modsFile = new File(bookDir, bookDir.getName() + Constants.MODS_METADATA_SUFFIX);
+        TestFileUtils.createFile(modsFile, UUID.randomUUID().toString());
+        File ingestBaseDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + "ingest");
+        File ingestBookDir = FileUtils.createDirectory(ingestBaseDir.getAbsolutePath() + "/" + bookId);
+        File updateContentBaseDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + "updateContent");
+        File updateMetadataBaseDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + "updateMetadata");
+        File updateContentBookDir = FileUtils.createDirectory(updateContentBaseDir.getAbsolutePath() + "/" + bookId);
+        File updateMetadataBookDir = FileUtils.createDirectory(updateMetadataBaseDir.getAbsolutePath() + "/" + bookId);
+
+        when(conf.getTransferConfiguration()).thenReturn(transferConf);
+        when(conf.getAudioFormats()).thenReturn(Arrays.asList("mp3"));
+        when(conf.getEbookFormats()).thenReturn(Arrays.asList("pdf"));
+        when(transferConf.getUpdateEbookContentDir()).thenReturn(updateContentBaseDir);
+        when(transferConf.getUpdateEbookMetadataDir()).thenReturn(updateMetadataBaseDir);
+        when(transferConf.getEbookIngestDir()).thenReturn(ingestBaseDir);
+
+        PreIngestTransfer pit = new PreIngestTransfer(conf);
+
+        addStep("Set only the ingest date in the registry to 1 hour ago - before the metadata files",
+                "No record of the file. ");
+        TransferRegistry registry = new TransferRegistry(bookDir);
+        registry.setIngestDate(new Date(System.currentTimeMillis() - 3600000L));
+        Assert.assertFalse(registry.hasFileEntry(bookFile));
+
+        addStep("Check transfer folders", "Should all be empty.");
+        Assert.assertEquals(updateContentBookDir.list().length, 0);
+        Assert.assertEquals(updateMetadataBookDir.list().length, 0);
+        Assert.assertEquals(ingestBookDir.list().length, 0);
+
+        pit.transferBook(booksBaseDir, BookTypeEnum.EBOG);
+
+        addStep("Check transfer folders",
+                "Should have transferred fits file to update-content dir, and mods file to update-metadata dir.");
+        Assert.assertEquals(ingestBookDir.list().length, 0);
+        Assert.assertEquals(updateMetadataBookDir.list().length, 1);
+        Assert.assertEquals(updateMetadataBookDir.listFiles()[0].getName(), modsFile.getName());
+        Assert.assertEquals(updateContentBookDir.list().length, 1);
+        Assert.assertEquals(updateContentBookDir.listFiles()[0].getName(), fitsFile.getName());
+
+        addStep("Check Registry",
+                "Should have entry for file and newer date for update than ingest.");
+        registry = new TransferRegistry(bookDir);
+        Assert.assertTrue(registry.hasFileEntry(bookFile));
+        Date ingestDate = registry.getIngestDate();
+        Date updateDate = registry.getLatestUpdateDate();
+        Assert.assertTrue(ingestDate.getTime() < updateDate.getTime());
+
+
+        verify(conf, times(2)).getTransferConfiguration();
+        verify(conf, times(2)).getAudioFormats();
+        verify(conf, times(2)).getEbookFormats();
+        verifyNoMoreInteractions(conf);
+
+        verify(transferConf).getUpdateEbookContentDir();
+        verify(transferConf).getUpdateEbookMetadataDir();
+        verifyNoMoreInteractions(transferConf);
     }
 }
 

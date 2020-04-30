@@ -1,27 +1,24 @@
 package dk.kb.elivagar;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Date;
-
-import javax.xml.bind.JAXBException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import dk.kb.elivagar.characterization.CharacterizationHandler;
 import dk.kb.elivagar.characterization.EpubCheckerCharacterizer;
 import dk.kb.elivagar.characterization.FitsCharacterizer;
 import dk.kb.elivagar.config.Configuration;
-import dk.kb.elivagar.metadata.AlephMetadataRetriever;
-import dk.kb.elivagar.metadata.AlephPacker;
-import dk.kb.elivagar.metadata.MetadataTransformer;
+import dk.kb.elivagar.metadata.AlmaPacker;
+import dk.kb.elivagar.metadata.AlmaMetadataRetriever;
 import dk.kb.elivagar.pubhub.PubhubMetadataRetriever;
 import dk.kb.elivagar.pubhub.PubhubPacker;
 import dk.kb.elivagar.pubhub.PubhubWorkflow;
 import dk.kb.elivagar.transfer.TransferWorkflow;
 import dk.kb.elivagar.utils.CalendarUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.JAXBException;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Date;
 
 /**
  * Class for instantiating the Elivagar workflow.
@@ -108,10 +105,8 @@ public class Elivagar {
 
             PubhubWorkflow pubhubWorkflow = new PubhubWorkflow(conf, retriever, characterizer, packer);
             
-            MetadataTransformer transformer = new MetadataTransformer(conf.getXsltFileDir());
-            AlephMetadataRetriever alephRetriever = new AlephMetadataRetriever(conf.getAlephConfiguration(), 
-                    new HttpClient());
-            AlephPacker alephWorkflow = new AlephPacker(conf, alephRetriever, transformer);
+            AlmaMetadataRetriever almaMetadataRetriever = new AlmaMetadataRetriever(conf, new HttpClient());
+            AlmaPacker almaWorkflow = new AlmaPacker(conf, almaMetadataRetriever);
 
             TransferWorkflow transferWorkflow = new TransferWorkflow(conf);
             
@@ -124,7 +119,7 @@ public class Elivagar {
                 log.debug("No data retrieval.");
             }
             pubhubWorkflow.packFilesForBooks();
-            alephWorkflow.packAlephMetadataForBooks();
+            almaWorkflow.packAlmaMetadataForBooks();
             transferWorkflow.run();
             
             File statisticsFile = new File(conf.getStatisticsDir(), 
