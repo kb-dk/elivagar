@@ -71,8 +71,7 @@ public class ElivagarVerification {
         // TODO: Validate LICENSE ??
         failure = validateExecutableFile((String) confMap.get(Configuration.CONF_CHARACTERIZATION_SCRIPT), 
                 "Characterization Script") || failure;
-        failure = validateReadOnlyDirectory((String) confMap.get(Configuration.CONF_XSLT_DIR), "XSLT Dir") || failure;
-        failure = validateReadOnlyDirectory((String) confMap.get(Configuration.CONF_STATISTIC_DIR), 
+        failure = validateReadOnlyDirectory((String) confMap.get(Configuration.CONF_STATISTIC_DIR),
                 "Statistics Dir") || failure;
         // TODO: Validate formats?
 

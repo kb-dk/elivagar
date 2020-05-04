@@ -4,7 +4,7 @@ elivagar:
   ebook_orig_dir: tempDir/downloaded_book_files
   audio_orig_dir: tempDir/downloaded_audio_files
   license_key: DO_NOT_PUT_LICENSE_IN_GITHUB_FILE
-  characterization_script: src/main/resources/bin/run_fits.sh
+  characterization_script: bin/run_fits.sh
   xslt_dir: tempDir/scripts
   statistics_dir: tempDir/statistic
   ebook_formats:

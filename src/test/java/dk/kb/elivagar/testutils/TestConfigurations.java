@@ -64,7 +64,6 @@ public class TestConfigurations {
             confMap.put(Configuration.CONF_LICENSE_KEY, license);
             confMap.put(Configuration.CONF_AUDIO_FORMATS, Arrays.asList("mp3"));
             confMap.put(Configuration.CONF_EBOOK_FORMATS, Arrays.asList("pdf", "epub"));
-            confMap.put(Configuration.CONF_XSLT_DIR, TestFileUtils.getTempDir().getAbsolutePath());
             confMap.put(Configuration.CONF_STATISTIC_DIR, statisticsDir.getAbsolutePath());
             confMap.put(Configuration.CONF_ALMA_SRU_SEARCH, "https://kbdk-kgl.alma.exlibrisgroup.com/view/sru/45KBDK_KGL?version=1.2&operation=searchRetrieve&");
             
@@ -100,7 +99,6 @@ public class TestConfigurations {
             confMap.put(Configuration.CONF_LICENSE_KEY, license);
             confMap.put(Configuration.CONF_AUDIO_FORMATS, Arrays.asList("mp3"));
             confMap.put(Configuration.CONF_EBOOK_FORMATS, Arrays.asList("pdf", "epub"));
-            confMap.put(Configuration.CONF_XSLT_DIR, TestFileUtils.getTempDir().getAbsolutePath());
             confMap.put(Configuration.CONF_STATISTIC_DIR, statisticsDir.getAbsolutePath());
             confMap.put(Configuration.CONF_ALMA_SRU_SEARCH, "https://kbdk-kgl.alma.exlibrisgroup.com/view/sru/45KBDK_KGL?version=1.2&operation=searchRetrieve&");
 
