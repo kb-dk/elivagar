@@ -28,7 +28,6 @@ import dk.kb.elivagar.utils.YamlUtils;
  *     <li>audio_orig_dir: /path/to/orig/audio/dir/</li>
  *     <li>license_key: DO_NOT_PUT_LICENSE_IN_GITHUB_FILE</li>
  *     <li>characterization_script: bin/run_fits.sh (optional)</li>
- *     <li>xslt_dir: scripts</li>
  *     <li>statistics_dir: /path/to/statistics/dir/</li>
  *     <li>ebook_formats:</li>
  *     <ul>
