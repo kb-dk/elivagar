@@ -470,8 +470,8 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         Assert.assertEquals(destinationDir.listFiles()[0].list().length, bookDir.list().length);
 
         verify(conf, times(5)).getTransferConfiguration();
-        verify(conf).getEbookFormats();
-        verify(conf).getAudioFormats();
+        verify(conf, times(2)).getEbookFormats();
+        verify(conf, times(2)).getAudioFormats();
         verifyNoMoreInteractions(conf);
         verify(transferConf).getRequiredFormats();
         verify(transferConf).getRetainCreateDate();
@@ -481,6 +481,55 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         verifyNoMoreInteractions(transferConf);
         
         verify(register).setIngestDate(any(Date.class));
+        verify(register).setChecksumAndDate(any(File.class));
+        verifyNoMoreInteractions(register);
+    }
+
+    @Test
+    public void testIngestBookWithSeveralFilesSuccess() throws Exception {
+        addDescription("Test the ingestBook method when it successfully is ingested a book with two different e-book files (both epub and pdf)");
+        Configuration conf = mock(Configuration.class);
+        TransferRegistry register = mock(TransferRegistry.class);
+        TransferConfiguration transferConf = mock(TransferConfiguration.class);
+
+        File bookDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + UUID.randomUUID().toString());
+        File bookFile1 = new File(bookDir, bookDir.getName() + ".pdf");
+        File bookFile2 = new File(bookDir, bookDir.getName() + ".epub");
+        TestFileUtils.createFile(bookFile1, UUID.randomUUID().toString());
+        TestFileUtils.createFile(bookFile2, UUID.randomUUID().toString());
+        File destinationDir = FileUtils.createDirectory(TestFileUtils.getTempDir().getAbsolutePath() + "/" + UUID.randomUUID().toString());
+
+        when(conf.getTransferConfiguration()).thenReturn(transferConf);
+        when(conf.getEbookFormats()).thenReturn(Arrays.asList("pdf", "epub"));
+        when(conf.getAudioFormats()).thenReturn(Arrays.asList("mp3"));
+        when(transferConf.getRequiredFormats()).thenReturn(Arrays.asList("pdf", "epub"));
+        when(transferConf.getRetainCreateDate()).thenReturn(-1L);
+        when(transferConf.getRetainModifyDate()).thenReturn(-1L);
+        when(transferConf.getRetainPublicationDate()).thenReturn(-1L);
+        when(transferConf.getEbookIngestDir()).thenReturn(destinationDir);
+
+        PreIngestTransfer pit = new PreIngestTransfer(conf);
+
+        Assert.assertEquals(destinationDir.list().length, 0);
+        pit.ingestBook(bookDir, register, BookTypeEnum.EBOG);
+        Assert.assertEquals(destinationDir.list().length, 1);
+        Assert.assertEquals(destinationDir.listFiles()[0].getName(), bookDir.getName());
+        Assert.assertEquals(destinationDir.listFiles()[0].list().length, bookDir.list().length);
+
+        verify(conf, times(7)).getTransferConfiguration();
+        verify(conf, times(2)).getEbookFormats();
+        verify(conf, times(2)).getAudioFormats();
+        verifyNoMoreInteractions(conf);
+        verify(transferConf).getRequiredFormats();
+        verify(transferConf, times(2)).getRetainCreateDate();
+        verify(transferConf, times(2)).getRetainModifyDate();
+        verify(transferConf).getRetainPublicationDate();
+        verify(transferConf).getEbookIngestDir();
+        verifyNoMoreInteractions(transferConf);
+
+        verify(register).setIngestDate(any(Date.class));
+        verify(register).setChecksumAndDate(eq(bookFile1));
+        verify(register).setChecksumAndDate(eq(bookFile2));
         verifyNoMoreInteractions(register);
     }
     

@@ -1,31 +1,25 @@
 package dk.kb.elivagar.transfer;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import dk.kb.elivagar.Constants;
+import dk.kb.elivagar.config.Configuration;
+import dk.kb.elivagar.utils.CalendarUtils;
+import dk.kb.elivagar.utils.FileUtils;
+import dk.pubhub.service.BookTypeEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-
-import dk.kb.elivagar.Constants;
-import dk.kb.elivagar.config.Configuration;
-import dk.kb.elivagar.utils.CalendarUtils;
-import dk.kb.elivagar.utils.FileUtils;
-import dk.pubhub.service.BookTypeEnum;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
 
 /**
  * Class for dealing with the transfer of the packaged data to the pre-ingest area of the preservation repository.
@@ -221,6 +215,7 @@ public class PreIngestTransfer {
 
     /**
      * Performs the ingest of a book directory.
+     * Sets the ingest date along with each content-files checksum and last modified date.
      * @param bookDir The book directory.
      * @param register The register for the book.
      * @param bookType The type of book.
@@ -236,6 +231,9 @@ public class PreIngestTransfer {
             File outputDir = FileUtils.createDirectory(outputDirPath);
             FileUtils.moveDirectory(transferDir, outputDir);
             register.setIngestDate(new Date());
+            for(Path path : getContentFiles(bookDir)) {
+                register.setChecksumAndDate(path.toFile());
+            }
         }
     }
 
