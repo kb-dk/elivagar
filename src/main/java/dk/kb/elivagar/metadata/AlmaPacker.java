@@ -180,6 +180,10 @@ public class AlmaPacker {
         try (OutputStream out = new FileOutputStream(modsFile)) {
             almaMetadataRetriever.retrieveMetadataForISBN(isbn, out);
             out.flush();
+        } finally {
+            if(modsFile.exists() && modsFile.length() == 0) {
+                modsFile.delete();
+            }
         }
     }
 }

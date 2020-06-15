@@ -78,8 +78,8 @@ public class MetadataValidator {
         errorHandler.reset();
         try {
             validationBuilder.reset();
-            validationBuilder.setEntityResolver(entityResolver);
             validationBuilder.setErrorHandler(errorHandler);
+            validationBuilder.setEntityResolver(entityResolver);
             return !errorHandler.hasErrors();
         } catch (Throwable t) {
             log.error("Exception validating XML stream!", t);

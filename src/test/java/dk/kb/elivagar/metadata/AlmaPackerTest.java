@@ -124,7 +124,16 @@ public class AlmaPackerTest extends ExtendedTestCase {
         Assert.assertTrue(modsTestFile.isFile());
         
         TestFileUtils.copyFile(new File("src/test/resources/metadata/pubhub_metadata.xml"), new File(dir, dir.getName() + Constants.PUBHUB_METADATA_SUFFIX));
-        
+
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
+                OutputStream out = (OutputStream) invocationOnMock.getArgument(1);
+                out.write(UUID.randomUUID().toString().getBytes());
+                return null;
+            }
+        }).when(retriever).retrieveMetadataForISBN(eq(expectedIsbn), any(OutputStream.class));
+
         File modsFile = new File(dir, dir.getName() + Constants.MODS_METADATA_SUFFIX);
         Assert.assertFalse(modsFile.exists());
 
@@ -134,9 +143,42 @@ public class AlmaPackerTest extends ExtendedTestCase {
         
         verify(retriever).retrieveMetadataForISBN(eq(expectedIsbn), any(OutputStream.class));
         verifyNoMoreInteractions(retriever);
-        
     }
-    
+
+    @Test
+    public void testPackageMetadataForBookFailureToRetrieveMods() throws Exception {
+        addDescription("Test the packageMetadataForBook method when no MODS record is retrieved.");
+        AlmaMetadataRetriever retriever = mock(AlmaMetadataRetriever.class);
+
+        AlmaPacker packer = new AlmaPacker(configuration, retriever);
+
+        String expectedIsbn = "9788711436981";
+        String id = UUID.randomUUID().toString();
+        File dir = TestFileUtils.createEmptyDirectory(new File(TestFileUtils.getTempDir(), id).getAbsolutePath());
+        final File modsTestFile = new File("src/test/resources/metadata/mods.xml");
+        Assert.assertTrue(modsTestFile.isFile());
+
+        TestFileUtils.copyFile(new File("src/test/resources/metadata/pubhub_metadata.xml"), new File(dir, dir.getName() + Constants.PUBHUB_METADATA_SUFFIX));
+
+        // Do not write to output stream!!!
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
+                return null;
+            }
+        }).when(retriever).retrieveMetadataForISBN(eq(expectedIsbn), any(OutputStream.class));
+
+        File modsFile = new File(dir, dir.getName() + Constants.MODS_METADATA_SUFFIX);
+        Assert.assertFalse(modsFile.exists());
+
+        packer.packageMetadataForBook(dir);
+
+        Assert.assertFalse(modsFile.exists());
+
+        verify(retriever).retrieveMetadataForISBN(eq(expectedIsbn), any(OutputStream.class));
+        verifyNoMoreInteractions(retriever);
+    }
+
     @Test
     public void testPackageMetadataForBookModsAlreadyExists() throws Exception {
         addDescription("Test the packageMetadataForBook method for the scenario, when the MODS record already exists.");
