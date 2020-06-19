@@ -211,22 +211,23 @@ public class TransferRegistry {
         String checksumPrefix = LINE_PREFIX_CHECKSUM + f.getName() + LINE_FILENAME_VALUE_SEPARATOR;
 
         // first check date.
-        String lastModifiedDate = getLatestEntryWithPrefix(datePrefix);
-        if(lastModifiedDate == null || lastModifiedDate.isEmpty()) {
-            log.debug("No last modified date for the file.");
-            return false;
-        }
-        try {
-            Long date = Long.parseLong(lastModifiedDate);
-            if (f.lastModified() == date) {
-                return true;
-            }
-            log.debug("Unexpected last modified date: " + f.lastModified() + "! expected: " + date);
-        } catch (NumberFormatException e) {
-            log.warn("Cannot parse the date. Verification failed, false returned.", e);
-            return false;
-        }
+//        String lastModifiedDate = getLatestEntryWithPrefix(datePrefix);
+//        if(lastModifiedDate == null || lastModifiedDate.isEmpty()) {
+//            log.debug("No last modified date for the file.");
+//            return false;
+//        }
+//        try {
+//            Long date = Long.parseLong(lastModifiedDate);
+//            if (f.lastModified() == date) {
+//                return true;
+//            }
+//            log.debug("Unexpected last modified date: " + f.lastModified() + "! expected: " + date);
+//        } catch (NumberFormatException e) {
+//            log.warn("Cannot parse the date. Verification failed, false returned.", e);
+//            return false;
+//        }
 
+        // Then check checksum
         String latestChecksum = getLatestEntryWithPrefix(checksumPrefix);
         if(latestChecksum == null || latestChecksum.isEmpty()) {
             log.debug("No last checksum for the file.");

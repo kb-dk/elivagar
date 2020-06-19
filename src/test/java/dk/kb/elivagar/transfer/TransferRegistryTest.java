@@ -274,20 +274,18 @@ public class TransferRegistryTest extends ExtendedTestCase {
         addStep("Not in registry", "Not verification");
         Assert.assertFalse(registry.verifyFile(bookFile));
 
-        addStep("Add date line with no date", "No verification");
-        registry.writeLine(TransferRegistry.LINE_PREFIX_FILE_DATE + bookFile.getName() + TransferRegistry.LINE_FILENAME_VALUE_SEPARATOR);
-        Assert.assertFalse(registry.verifyFile(bookFile));
-
-        addStep("Add date line with the correct date", "Verification!!!");
-        registry.writeLine(TransferRegistry.LINE_PREFIX_FILE_DATE + bookFile.getName() + TransferRegistry.LINE_FILENAME_VALUE_SEPARATOR + bookFile.lastModified());
-        Assert.assertTrue(registry.verifyFile(bookFile));
-
-        System.err.println("Time: " + System.currentTimeMillis());
-
-        addStep("Add date line with the incorrect date", "No verification - needs also checksum");
-        registry.writeLine(TransferRegistry.LINE_PREFIX_FILE_DATE + bookFile.getName() + TransferRegistry.LINE_FILENAME_VALUE_SEPARATOR + "1234567890000");
-        Assert.assertFalse(registry.verifyFile(bookFile));
-
+//        addStep("Add date line with no date", "No verification");
+//        registry.writeLine(TransferRegistry.LINE_PREFIX_FILE_DATE + bookFile.getName() + TransferRegistry.LINE_FILENAME_VALUE_SEPARATOR);
+//        Assert.assertFalse(registry.verifyFile(bookFile));
+//
+//        addStep("Add date line with the correct date", "Verification!!!");
+//        registry.writeLine(TransferRegistry.LINE_PREFIX_FILE_DATE + bookFile.getName() + TransferRegistry.LINE_FILENAME_VALUE_SEPARATOR + bookFile.lastModified());
+//        Assert.assertTrue(registry.verifyFile(bookFile));
+//
+//        addStep("Add date line with the incorrect date", "No verification - needs also checksum");
+//        registry.writeLine(TransferRegistry.LINE_PREFIX_FILE_DATE + bookFile.getName() + TransferRegistry.LINE_FILENAME_VALUE_SEPARATOR + "1234567890000");
+//        Assert.assertFalse(registry.verifyFile(bookFile));
+//
         addStep("Add checksum line with no data", "No verification");
         registry.writeLine(TransferRegistry.LINE_PREFIX_CHECKSUM + bookFile.getName() + TransferRegistry.LINE_FILENAME_VALUE_SEPARATOR);
         Assert.assertFalse(registry.verifyFile(bookFile));
