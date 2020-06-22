@@ -271,7 +271,7 @@ public class TransferRegistryTest extends ExtendedTestCase {
         File bookFile = new File(bookDir, bookDir.getName() + ".suffix");
         TestFileUtils.createFile(bookFile, UUID.randomUUID().toString());
 
-        addStep("Not in registry", "Not verification");
+        addStep("Not in registry", "No verification");
         Assert.assertFalse(registry.verifyFile(bookFile));
 
 //        addStep("Add date line with no date", "No verification");
@@ -279,7 +279,7 @@ public class TransferRegistryTest extends ExtendedTestCase {
 //        Assert.assertFalse(registry.verifyFile(bookFile));
 //
 //        addStep("Add date line with the correct date", "Verification!!!");
-//        registry.writeLine(TransferRegistry.LINE_PREFIX_FILE_DATE + bookFile.getName() + TransferRegistry.LINE_FILENAME_VALUE_SEPARATOR + bookFile.lastModified());
+        registry.writeLine(TransferRegistry.LINE_PREFIX_FILE_DATE + bookFile.getName() + TransferRegistry.LINE_FILENAME_VALUE_SEPARATOR + bookFile.lastModified());
 //        Assert.assertTrue(registry.verifyFile(bookFile));
 //
 //        addStep("Add date line with the incorrect date", "No verification - needs also checksum");
