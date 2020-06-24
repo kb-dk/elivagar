@@ -218,9 +218,9 @@ public class TransferRegistry {
         }
         try {
             Long date = Long.parseLong(lastModifiedDate);
-//            if (f.lastModified() == date) {
-//                return true;
-//            }
+            if (f.lastModified() == date) {
+                return true;
+            }
             log.debug("Unexpected last modified date: " + f.lastModified() + "! expected: " + date);
         } catch (NumberFormatException e) {
             log.warn("Cannot parse the date. Verification failed, false returned.", e);
