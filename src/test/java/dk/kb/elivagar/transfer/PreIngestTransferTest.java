@@ -5,6 +5,7 @@ import dk.kb.elivagar.config.Configuration;
 import dk.kb.elivagar.config.TransferConfiguration;
 import dk.kb.elivagar.testutils.TestFileUtils;
 import dk.kb.elivagar.utils.CalendarUtils;
+import dk.kb.elivagar.utils.ChecksumUtils;
 import dk.kb.elivagar.utils.FileUtils;
 import dk.pubhub.service.BookTypeEnum;
 import org.jaccept.structure.ExtendedTestCase;
@@ -14,6 +15,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
@@ -137,14 +139,13 @@ public class PreIngestTransferTest extends ExtendedTestCase {
         File bookFile = new File(bookDir, bookDir.getName() + ".pdf");
         TestFileUtils.createFile(bookFile, UUID.randomUUID().toString());
         
-        // make sure, that it ends with '000', dues to file date precision.
-        Long registryDate = Math.abs(new Random().nextLong())/1000 * 1000L;
-        
         addStep("Setting the register to a date in the future (by one minute)", "Should not find anything to update.");
         TransferRegistry register = new TransferRegistry(bookDir);
         register.setIngestDate(new Date(System.currentTimeMillis() + 60000L));
         register.setChecksumAndDate(bookFile);
-        register.registryFile.setLastModified(registryDate.longValue());
+        
+        File registryFileBeforeTransfer = register.registryFile.getCanonicalFile();
+        String registryFileChecksumBeforeTransfer = ChecksumUtils.generateMD5Checksum(new FileInputStream(registryFileBeforeTransfer));
 
         when(conf.getAudioFormats()).thenReturn(new ArrayList<String>());
         when(conf.getEbookFormats()).thenReturn(Arrays.asList("pdf"));
@@ -160,7 +161,10 @@ public class PreIngestTransferTest extends ExtendedTestCase {
 
         verifyZeroInteractions(transferConf);
 
-        Assert.assertEquals(register.registryFile.lastModified(), registryDate.longValue());
+        File registryFileAfterTransfer = register.registryFile.getCanonicalFile();
+        String registryFileChecksumAfterTransfer = ChecksumUtils.generateMD5Checksum(new FileInputStream(registryFileAfterTransfer));
+
+        Assert.assertEquals(registryFileChecksumBeforeTransfer, registryFileChecksumAfterTransfer);
     }
     
     @Test
