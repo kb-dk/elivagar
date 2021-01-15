@@ -6,7 +6,7 @@
 
   <groupId>dk.kb</groupId>
   <artifactId>elivagar</artifactId>
-  <version>1.6.2-RC1</version>
+  <version>1.6.2</version>
   <packaging>jar</packaging>
 
   <name>elivagar</name>
@@ -63,15 +63,6 @@
       <organizationUrl>https://www.kb.dk</organizationUrl>
       <roles>
         <role>Project lead and reviewer</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>Søren Vejdrup Clausen</name>
-      <email>svc@kb.dk</email>
-      <organization>kb</organization>
-      <organizationUrl>https://www.kb.dk</organizationUrl>
-      <roles>
-        <role>Reviewer</role>
       </roles>
     </developer>
   </developers>
