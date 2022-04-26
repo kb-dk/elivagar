@@ -168,13 +168,8 @@ public class PubhubPacker {
         log.info("Packaging book file for book-id: " + id);
         File bookDir = getBookDir(id, BookTypeEnum.EBOG);
         File bookLinkFile = new File(bookDir, bookFile.getName());
-//        if(bookLinkFile.isFile()) {
-//            log.trace("The hard link for the book file for book-id '" + id + "' already exists.");
-//        } else {
         //  The file is overwritten if it already exists
-            FileUtils.copyFileFollowSymbolicLinks(bookFile, bookLinkFile);
-//            Files.createLink(bookLinkFile.toPath(), bookFile.toPath().toAbsolutePath());
-//        }
+        FileUtils.copyFileFollowSymbolicLinks(bookFile, bookLinkFile);
         characterizationHandler.characterize(bookFile, bookDir);
     }
 
@@ -204,12 +199,7 @@ public class PubhubPacker {
         log.info("Packaging book file for book-id: " + id);
         File bookDir = getBookDir(id, BookTypeEnum.LYDBOG);
         File bookLinkFile = new File(bookDir, bookFile.getName().toLowerCase());
-//        if(bookLinkFile.isFile()) {
-//            log.trace("The hard link for the book file for book-id '" + id + "' already exists.");
-//        } else {
-            FileUtils.copyFileFollowSymbolicLinks(bookFile, bookLinkFile);
-//            Files.createLink(bookLinkFile.toPath(), bookFile.toPath().toAbsolutePath());
-//        }
+        FileUtils.copyFileFollowSymbolicLinks(bookFile, bookLinkFile);
         characterizationHandler.characterize(bookFile, bookDir);
     }
 
