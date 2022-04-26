@@ -25,7 +25,7 @@ public class PubhubWorkflow {
     private static final Logger log = LoggerFactory.getLogger(PubhubWorkflow.class);
 
     /** The sub directory path from audio book dir to the folder with the actual file.*/
-    protected static final String AUDIO_SUB_DIR_PATH = "Full/Mp3/";
+    protected static final String AUDIO_SUB_DIR_PATH = ""; //"Full/Mp3/" changed delivery dir
 
     /** The configuration for pubhub.*/
     protected final Configuration conf;
@@ -105,7 +105,6 @@ public class PubhubWorkflow {
         File[] eBooks = conf.getEbookFileDir().listFiles();
         if(eBooks == null) {
             log.info("No ebook files to package. We are done.");
-            return;
         } else {
             for(File fileForBook : eBooks) {
                 try {
@@ -133,7 +132,6 @@ public class PubhubWorkflow {
         File[] audioBooks = conf.getAudioFileDir().listFiles();
         if(audioBooks == null) {
             log.info("No audio files to package. We are done.");
-            return;
         } else {
             for(File audioBookBaseDir : audioBooks) {
                 String id = audioBookBaseDir.getName();
