@@ -169,7 +169,7 @@ public class PubhubPacker {
         File bookDir = getBookDir(id, BookTypeEnum.EBOG);
         File bookLinkFile = new File(bookDir, bookFile.getName());
         //  The file is overwritten if it already exists
-        FileUtils.copyFileFollowSymbolicLinks(bookFile, bookLinkFile);
+        FileUtils.copyFile(bookFile, bookLinkFile);
         characterizationHandler.characterize(bookFile, bookDir);
     }
 
@@ -199,7 +199,7 @@ public class PubhubPacker {
         log.info("Packaging book file for book-id: " + id);
         File bookDir = getBookDir(id, BookTypeEnum.LYDBOG);
         File bookLinkFile = new File(bookDir, bookFile.getName().toLowerCase());
-        FileUtils.copyFileFollowSymbolicLinks(bookFile, bookLinkFile);
+        FileUtils.copyFile(bookFile, bookLinkFile);
         characterizationHandler.characterize(bookFile, bookDir);
     }
 

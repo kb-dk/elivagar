@@ -76,7 +76,7 @@ public class FileUtils {
         }
         
         for(File f : getFilesInDirectory(from)) {
-            copyFileFollowSymbolicLinks(f, new File(to, f.getName()));
+            copyFile(f, new File(to, f.getName()));
         }
     }
 
@@ -86,7 +86,7 @@ public class FileUtils {
      * @param toFile The to file.
      * @throws IOException If it fails to handle the copy or symbolic links.
      */
-    public static void copyFileFollowSymbolicLinks(File fromFile, File toFile) throws IOException {
+    public static void copyFile(File fromFile, File toFile) throws IOException {
         ArgumentCheck.checkExistsNormalFile(fromFile, "File from");
         Path toPath = toFile.toPath();
         Path fromPath = getFileOrSymlinkPath(fromFile);
