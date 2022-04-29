@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -152,11 +151,11 @@ public class PubhubPacker {
      * Packs a file for the ebook. This is expected to be the content file in an ebook format 
      * - according to the configured formats (e.g. pdf or epub).
      * 
-     * This makes a hard link to the file from the ebook folder to the original file.
+     * This makes a copy of the original file to the ebook folder.
      * It is a prerequisite that the file has the name of the ID.
      * Also, if the file is ignored, if it does not have an ebook suffix.
      * @param bookFile The file for the ebook.
-     * @throws IOException If the book directory cannot be instantiated, or if the hard link from the
+     * @throws IOException If the book directory cannot be instantiated, or if the copy of the
      * original ebook file cannot be created.
      */
     public void packFileForEbook(File bookFile) throws IOException {
@@ -169,28 +168,25 @@ public class PubhubPacker {
         log.info("Packaging book file for book-id: " + id);
         File bookDir = getBookDir(id, BookTypeEnum.EBOG);
         File bookLinkFile = new File(bookDir, bookFile.getName());
-        if(bookLinkFile.isFile()) {
-            log.trace("The hard link for the book file for book-id '" + id + "' already exists.");
-        } else {
-            Files.createLink(bookLinkFile.toPath(), bookFile.toPath().toAbsolutePath());
-        }
+        //  The file is overwritten if it already exists
+        FileUtils.copyFile(bookFile, bookLinkFile);
         characterizationHandler.characterize(bookFile, bookDir);
     }
 
     /**
-     * Packs a file for the audio book. 
+     * Packs a file for the audiobook.
      * This is expected to be the content file in an audio format - according to the configured formats (e.g. mp3).
      * 
-     * This makes a hard link to the file from the audio book folder to the original file.
+     * This makes a copy of the original file to the audiobook folder.
      * It is a prerequisite that the file has the name of the ID.
      * The file name might be in upper-case, but the ID should be in lower-case, therefore
      * it is lowercased for the directory, the hard link and the characterization file.
-     * Also, if the file is ignored, if it does not have an audio book suffix.
+     * Also, if the file is ignored, if it does not have an audiobook suffix.
      * 
      * This will also perform the characterization, if needed.
      * 
-     * @param bookFile The file for the audio book.
-     * @throws IOException If the book directory cannot be instantiated, or if the hard link from the
+     * @param bookFile The file for the audiobook.
+     * @throws IOException If the book directory cannot be instantiated, or if the copy of the
      * original audio file cannot be created.
      */
     public void packFileForAudio(File bookFile) throws IOException {
@@ -203,11 +199,7 @@ public class PubhubPacker {
         log.info("Packaging book file for book-id: " + id);
         File bookDir = getBookDir(id, BookTypeEnum.LYDBOG);
         File bookLinkFile = new File(bookDir, bookFile.getName().toLowerCase());
-        if(bookLinkFile.isFile()) {
-            log.trace("The hard link for the book file for book-id '" + id + "' already exists.");
-        } else {
-            Files.createLink(bookLinkFile.toPath(), bookFile.toPath().toAbsolutePath());
-        }
+        FileUtils.copyFile(bookFile, bookLinkFile);
         characterizationHandler.characterize(bookFile, bookDir);
     }
 

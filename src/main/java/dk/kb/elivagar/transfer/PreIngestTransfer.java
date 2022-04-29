@@ -207,7 +207,7 @@ public class PreIngestTransfer {
         File transferDir = getTransferDir(destDirPath);
         for(File fromFile : files) {
             File toFile = new File(transferDir, fromFile.getName());
-            FileUtils.copyFileFollowSymbolicLinks(fromFile, toFile);
+            FileUtils.copyFile(fromFile, toFile);
         }
         File destDir = FileUtils.createDirectory(destDirPath);
         FileUtils.moveDirectory(transferDir, destDir);
