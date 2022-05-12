@@ -39,9 +39,9 @@
     <slf4j.version>1.7.25</slf4j.version>
     <logback.version>1.2.9</logback.version>
     <assembly.home.env.name>ELIVAGAR_HOME</assembly.home.env.name>
-    <assembly.home.env.name.ref>${assembly.home.env.name}</assembly.home.env.name.ref>
+    <assembly.home.env.name.ref>${ELIVAGAR_HOME}</assembly.home.env.name.ref>
     <assembly.conf.env.file>ELIVAGAR_CONF_FILE</assembly.conf.env.file>
-    <assembly.conf.env.file.ref>${assembly.conf.env.file}</assembly.conf.env.file.ref>
+    <assembly.conf.env.file.ref>${ELIVAGAR_CONF_FILE}</assembly.conf.env.file.ref>
     <assembly.main.class.name>dk.kb.elivagar.Elivagar</assembly.main.class.name>
   </properties>
 
